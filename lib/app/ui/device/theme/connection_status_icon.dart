@@ -7,6 +7,9 @@ class ConnectionStatusIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Certifique-se de que o ConnectionController está disponível
+    final ConnectionController controller = Get.find<ConnectionController>();
+
     return GetX<ConnectionController>(
       builder: (controller) {
         debugPrint(

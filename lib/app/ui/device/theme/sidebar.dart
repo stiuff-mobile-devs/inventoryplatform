@@ -7,16 +7,17 @@ import 'package:sidebarx/sidebarx.dart';
 
 class CustomSidebar extends StatelessWidget {
   CustomSidebar({super.key});
-  final controller = Get.lazyPut(() => SidebarController());
+  final controller = Get.put(SidebarController());
+  //final UtilsService utilsService = UtilsService();
 
   final SidebarXController sidebarController =
       SidebarXController(selectedIndex: 0, extended: true);
 
   final List<String> routes = [
     Routes.HOME,
-    /*AppRoutes.settings,
-    AppRoutes.help,
-    AppRoutes.departament,*/
+    /*Routes.SETTINGS,
+    Routes.HELP,
+    AppRoutes.DEPARTAMENT,*/
   ];
 
   void _updateSelectedIndex(String route) {
@@ -76,7 +77,7 @@ class CustomSidebar extends StatelessWidget {
             top: 30.0,
             bottom: GetPlatform.isWeb ? 15.0 : 0.0,
           ),
-          //child: _buildUserHeader(controller, extended),
+          child: _buildUserHeader(controller, extended),
         );
       },
       items: [
@@ -125,7 +126,7 @@ class CustomSidebar extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-             // _buildUserAvatar(controller, extended),
+              //_buildUserAvatar(controller, extended),
               if (extended) const SizedBox(width: 16),
               if (extended) _buildUserInfo(controller),
             ],
@@ -141,8 +142,7 @@ class CustomSidebar extends StatelessWidget {
     final double iconSize = extended ? 48 : 24;
 
     return FutureBuilder<String?>(
-      // ignore: avoid_print
-      future: print("hi"),
+      future: controller.getProfileImageUrl(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return CircleAvatar(
