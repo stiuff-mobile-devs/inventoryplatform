@@ -1,5 +1,6 @@
 abstract class Routes {
   static const HOME = '/';
+  static const PANEL = '/panel';
   static const ROUTES = '/routes';
   static const INITIAL = '/initial';
   static const LOGIN = '/login';

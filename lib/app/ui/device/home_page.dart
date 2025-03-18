@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import 'package:inventoryplatform/app/controllers/home_controller.dart';
+import 'package:inventoryplatform/app/routes/app_routes.dart';
 import 'package:inventoryplatform/app/ui/device/theme/base_scaffold.dart';
+import 'package:inventoryplatform/app/ui/device/theme/carousel_section.dart' as w;
 
 class HomePage extends StatelessWidget {
   final HomeController controller = Get.put(HomeController());
@@ -21,14 +23,13 @@ class HomePage extends StatelessWidget {
             const SizedBox(height: 20),
             _buildQuickActions(context),
             const SizedBox(height: 20),
-            _buildSectionTitle('Minhas Organizações', context),
+            _buildSectionTitle('Meus Departamentos', context),
             const SizedBox(height: 16),
-            /*w.CarouselSection(
+            w.CarouselSection(
               isExpanded: true,
               controller: controller.carouselController,
-              items: controller.organizations,
-              route: AppRoutes.panel,
-            ),*/
+              departments: controller.departments,
+            ),
           ],
         ),
       ),

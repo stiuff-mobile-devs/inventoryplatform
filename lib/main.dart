@@ -7,11 +7,9 @@ import 'package:inventoryplatform/app/routes/app_pages.dart';
 import 'package:inventoryplatform/app/routes/app_routes.dart';
 import 'package:inventoryplatform/app/ui/device/theme/app_theme.dart';
 
-
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   Get.put(ConnectionController());
-
   
   runApp(
     GetMaterialApp(
