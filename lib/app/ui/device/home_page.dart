@@ -113,13 +113,13 @@ class HomePage extends StatelessWidget {
             children: [
             _buildQuickActionButton(
               icon: Icons.add_circle_rounded,
-              label: 'Criar uma nova Organização',
+              label: 'Criar um novo Departamento',
               color: Colors.blue,
-              onPressed: () {},
+              onPressed: () => controller.createDepartment(context),
             ),
             _buildQuickActionButton(
               icon: Icons.supervised_user_circle,
-              label: 'Participar de uma Organização',
+              label: 'Participar de um Departamento',
               color: Colors.green,
               onPressed: () {},
             ),

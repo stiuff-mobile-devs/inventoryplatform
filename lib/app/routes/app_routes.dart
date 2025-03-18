@@ -3,6 +3,7 @@ abstract class Routes {
   static const PANEL = '/panel';
   static const ROUTES = '/routes';
   static const INITIAL = '/initial';
+  static const DEPARTMENT = '/department';
   static const LOGIN = '/login';
   static const REGISTER = '/register';
   static const SETTINGS = '/settings';
