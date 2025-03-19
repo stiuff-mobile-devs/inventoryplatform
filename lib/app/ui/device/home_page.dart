@@ -29,6 +29,7 @@ class HomePage extends StatelessWidget {
               isExpanded: true,
               controller: controller.carouselController,
               departments: controller.departments,
+              route: Routes.PANEL,
             ),
           ],
         ),
