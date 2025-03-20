@@ -1,8 +1,9 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:get/get.dart';
-
+import 'package:inventoryplatform/app/data/models/departments_model.dart';
 class DepartmentsController extends GetxController {
   final TextEditingController titleController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
@@ -43,6 +44,14 @@ class DepartmentsController extends GetxController {
 
       mockService.addSampleOrganizations();
       */
+      //SALVANDO NO BD LOCAL 
+      final box = Hive.box<DepartmentsModel>('departments');
+      final department = DepartmentsModel(
+        title: titleController.text.trim(),
+        description: descriptionController.text.trim(),
+        imagePath: image?.path,
+      );
+      await box.add(department);
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Departamento criado com sucesso!")),
@@ -55,5 +64,10 @@ class DepartmentsController extends GetxController {
       );
     }
     isLoading.value = false;
+  }
+
+  List<DepartmentsModel> getDepartments() {
+    final box = Hive.box<DepartmentsModel>('departments');
+    return box.values.toList();
   }
 }

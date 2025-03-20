@@ -1,26 +1,25 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:inventoryplatform/app/controllers/carousel_section_controller.dart';
-import 'package:inventoryplatform/app/data/models/department_model.dart';
+import 'package:inventoryplatform/app/data/models/departments_model.dart';
 
 class CarouselSection extends StatelessWidget {
-  final CarouselSectionController controller;
-  final List<DepartmentModel> departments;
-
+  final CarouselSectionController controller = Get.put(CarouselSectionController());
   final bool? isExpanded;
   final String? route;
 
-  const CarouselSection({
+  CarouselSection({
     super.key,
     this.isExpanded,
     this.route,
-    required this.controller,
-    required this.departments,
   });
 
   @override
   Widget build(BuildContext context) {
+    List<DepartmentsModel> departments = controller.getDepartments();
     controller.initializeHoverState(departments.length);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -31,8 +30,7 @@ class CarouselSection extends StatelessWidget {
       );
     });
 
-    return Obx(
-      () => Stack(
+    return  Stack(
         alignment: Alignment.bottomCenter,
         children: [
           Padding(
@@ -79,11 +77,10 @@ class CarouselSection extends StatelessWidget {
             ),
           ),
         ],
-      ),
     );
   }
 
-  Widget _buildCarouselItem(int index, DepartmentModel department,
+  Widget _buildCarouselItem(int index, DepartmentsModel department,
       double viewportfraction, BuildContext context,
       {String? route}) {
     return GestureDetector(
@@ -117,8 +114,8 @@ class CarouselSection extends StatelessWidget {
               ClipRRect(
                 borderRadius: BorderRadius.circular(10.0),
                 child: (department.imagePath != null)
-                    ? Image.asset(
-                        department.imagePath!,
+                    ? Image.file(
+                        File(department.imagePath!),
                         fit: BoxFit.cover,
                         height: double.infinity,
                         width: double.infinity,

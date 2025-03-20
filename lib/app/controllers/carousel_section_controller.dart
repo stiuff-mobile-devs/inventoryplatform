@@ -1,4 +1,6 @@
 import 'package:get/get.dart';
+import 'package:inventoryplatform/app/controllers/departments_controller.dart';
+import 'package:inventoryplatform/app/data/models/departments_model.dart';
 
 class CarouselSectionController extends GetxController {
   var carouselIndex = 0.obs;
@@ -22,5 +24,11 @@ class CarouselSectionController extends GetxController {
 
   void initializeHoverState(int itemCount) {
     isHoveredList.value = List<bool>.filled(itemCount, false);
+  }
+
+
+  List<DepartmentsModel> getDepartments() {
+    final departmentsController = Get.find<DepartmentsController>();
+    return departmentsController.getDepartments();
   }
 }
