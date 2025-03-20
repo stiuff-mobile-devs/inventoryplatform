@@ -102,17 +102,8 @@ class ScrollableBottomNavigationBarState
                           0, Icons.dashboard_rounded, 'Dashboard'),
                       _buildNavigationBarItem(
                           1, Icons.inventory_rounded, 'Inventories'),
-                      _buildNavigationBarItem(2, Icons.data_object, 'Domains'),
-                      _buildNavigationBarItem(3, Icons.tag, 'Tags'),
                       _buildNavigationBarItem(
-                          4, Icons.barcode_reader, 'Readers'),
-                      _buildNavigationBarItem(
-                          5, Icons.groups_rounded, 'Members'),
-                      _buildNavigationBarItem(6, Icons.device_hub, 'Entities'),
-                      _buildNavigationBarItem(
-                          7, Icons.summarize, 'Relatório'),
-                      _buildNavigationBarItem(
-                          8, Icons.admin_panel_settings, 'Admin'),
+                          2, Icons.summarize, 'Materials'),
                     ],
                   ),
                 ),

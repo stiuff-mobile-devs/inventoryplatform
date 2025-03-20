@@ -41,7 +41,7 @@ class _DashboardTabState extends State<DashboardTab> {
               child: Image.asset(
                 department.imagePath!,
                 fit: BoxFit.cover,
-              ),
+              )
             ),
             Positioned(
               bottom: 16.0,

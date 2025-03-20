@@ -1,43 +1,37 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:inventory_platform/data/models/item_model.dart';
-import 'package:inventory_platform/data/models/organization_model.dart';
-import 'package:inventory_platform/data/repositories/organization_repository.dart';
-import '../../../../../core/services/utils_service.dart';
+import 'package:inventoryplatform/app/data/models/department_model.dart';
+import 'package:inventoryplatform/app/data/models/material_model.dart';
 
 class MaterialsTab extends StatefulWidget {
   const MaterialsTab({super.key});
 
   @override
-  State<MaterialsTab> createState() => _ReportsTabState();
+  State<MaterialsTab> createState() => _MaterialsTabState();
 }
 
-class _ReportsTabState extends State<ReportsTab> {
-  List<ItemModel> _allItems = [];
-  final OrganizationModel organization = Get.arguments;
-  final _utilsService = UtilsService();
+class _MaterialsTabState extends State<MaterialsTab> {
+  final List<MaterialModel> _allMaterials = [];
+  final DepartmentModel department = Get.arguments;
 
-  final OrganizationRepository _organizationRepository =
-  Get.find<OrganizationRepository>();
-
-  final Map<String, bool> _groupExpansionState = {};
+  //final OrganizationRepository _organizationRepository = Get.find<OrganizationRepository>();
 
   @override
   void initState() {
     super.initState();
-    _loadItems();
+    //_loadItems();
   }
 
-  Future<void> _loadItems() async {
+  /*Future<void> _loadItems() async {
     final items = await _organizationRepository
         .getItemsForOrganization(organization.id);
     setState(() {
       _allItems = items;
     });
-  }
+  }*/
 
   Future<void> _onRefresh() async {
-    await _loadItems();
+    //await _loadItems();
   }
 
   @override
@@ -48,7 +42,7 @@ class _ReportsTabState extends State<ReportsTab> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildHeader(organization.title),
+          _buildHeader(department.title),
           _buildItemList(),
         ],
       ),
@@ -101,27 +95,43 @@ class _ReportsTabState extends State<ReportsTab> {
   }
 
   Widget _buildItemList() {
-    return const Padding(
-      padding: const EdgeInsets.only(
-      left: 20,
-      top: 20,
-      right: 20,
-      bottom: 20,
-    ),
-      child: Column (
+    return Padding(
+      padding: const EdgeInsets.only(left: 20, top: 10, right: 20, bottom: 20),
+      child:
+      Column (
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           const Row (
             children: [
-              Expanded(child: Text("ID", style: TextStyle(fontWeight: FontWeight.bold))),
-              Expanded(child: Text("Descrição", style: TextStyle(fontWeight: FontWeight.bold))),
+              Expanded(child: Text("Identificador", style: TextStyle(fontWeight: FontWeight.bold))),
+              SizedBox(width:50),
+              Expanded(child: Text("Título", style: TextStyle(fontWeight: FontWeight.bold))),
+              SizedBox(width: 40),
               Expanded(child: Text("Adicionado", style: TextStyle(fontWeight: FontWeight.bold))),
             ],
           ),
-           SizedBox(height: 8),
-           Divider(),
+          const Divider(color: Colors.black, thickness: 1, indent: 1, endIndent: 1),
+          ListView.separated(
+            scrollDirection: Axis.vertical,
+            shrinkWrap: true,
+            itemCount: _allMaterials.length,
+            itemBuilder: (context, index) {
+              return Row (
+                  children: [
+                    Expanded(child: Text(_allMaterials[index].id)),
+                    const SizedBox(width: 50),
+                    Expanded(child: Text(_allMaterials[index].title)),
+                    const SizedBox(width: 40),
+                    const Expanded(child: Text("Data")),
+                  ]
+              );
+            },
+            separatorBuilder: (context, index) {
+              return const Divider(color: Colors.grey, thickness: 1, indent: 1, endIndent: 1,);
+            },
+          )
         ],
-      )
+      ),
     );
   }
 }

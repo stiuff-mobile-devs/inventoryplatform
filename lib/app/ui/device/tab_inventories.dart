@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:inventoryplatform/app/controllers/panel_controller.dart';
 import 'package:inventoryplatform/app/data/models/inventory_model.dart';
 import 'package:inventoryplatform/app/routes/app_routes.dart';
+import 'package:inventoryplatform/app/ui/device/theme/details_dialog.dart';
 import 'package:inventoryplatform/app/ui/device/theme/list_item_widget.dart';
 import 'package:inventoryplatform/app/ui/device/theme/search_bar_widget.dart';
 import 'package:inventoryplatform/app/ui/device/theme/temporary_message_display.dart';
@@ -188,9 +189,8 @@ class _TabInventoriesState extends State<InventoriesTab> {
                   attributes: {
                     'Título': item.title,
                     'Descrição': item.description,
-                    'Criado em': _utilsService.formatDate(item.createdAt),
-                    'Atualizado em':
-                        _utilsService.formatDate(item.lastUpdatedAt),
+                    'Criado em': "data",
+                    'Atualizado em':  "data",
                   },
                   isActive: item.isActive,
                   icon: Icons.donut_large_rounded,
@@ -203,23 +203,21 @@ class _TabInventoriesState extends State<InventoriesTab> {
                         'Descrição': item.description,
                         'Está Ativo?': item.isActive == 1 ? 'Sim' : 'Não',
                         'Número de Revisão': item.revisionNumber,
-                        'Data de Criação':
-                            _utilsService.formatDate(item.createdAt),
-                        'Última Atualização':
-                            _utilsService.formatDate(item.lastUpdatedAt),
+                        'Data de Criação': "data",
+                        'Última Atualização': "data",
                       },
                       () async {
                         searchFocusNode.unfocus();
                         Navigator.of(context).pop();
-                        await Get.toNamed(
-                          AppRoutes.form,
-                          arguments: [
-                            _utilsService.tabIndexToEnum(
-                                _panelController.selectedTabIndex.value),
-                            _panelController.inventories
-                                .firstWhere((e) => e.id == item.id),
-                          ],
-                        );
+                        // await Get.toNamed(
+                        //   AppRoutes.form,
+                        //   arguments: [
+                        //     _utilsService.tabIndexToEnum(
+                        //         _panelController.selectedTabIndex.value),
+                        //     _panelController.inventories
+                        //         .firstWhere((e) => e.id == item.id),
+                        //   ],
+                        // );
                       },
                     );
                   },
