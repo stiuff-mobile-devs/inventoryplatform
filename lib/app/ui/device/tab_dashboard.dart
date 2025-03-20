@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:inventoryplatform/app/controllers/panel_controller.dart';
-import 'package:inventoryplatform/app/data/models/department_model.dart';
+import 'package:inventoryplatform/app/data/models/departments_model.dart';
 import 'package:inventoryplatform/app/ui/device/theme/chart_status.dart';
 import 'package:inventoryplatform/app/ui/device/theme/chart_update.dart';
 
@@ -18,7 +18,7 @@ class _DashboardTabState extends State<DashboardTab> {
   int _currentCarouselIndex = 0;
   late final String departmentId;
 
-  Widget _buildHeader(DepartmentModel department) {
+  Widget _buildHeader(DepartmentsModel department) {
     return Container(
       margin: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(

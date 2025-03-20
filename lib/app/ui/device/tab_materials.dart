@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:inventoryplatform/app/data/models/department_model.dart';
+import 'package:inventoryplatform/app/data/models/departments_model.dart';
 import 'package:inventoryplatform/app/data/models/material_model.dart';
 
 class MaterialsTab extends StatefulWidget {
@@ -12,7 +12,7 @@ class MaterialsTab extends StatefulWidget {
 
 class _MaterialsTabState extends State<MaterialsTab> {
   final List<MaterialModel> _allMaterials = [];
-  final DepartmentModel department = Get.arguments;
+  final DepartmentsModel department = Get.arguments;
 
   //final OrganizationRepository _organizationRepository = Get.find<OrganizationRepository>();
 

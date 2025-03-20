@@ -27,6 +27,7 @@ class HomePage extends StatelessWidget {
             const SizedBox(height: 16),
             w.CarouselSection(
               isExpanded: true,
+              route: Routes.PANEL,
             ),
           ],
         ),

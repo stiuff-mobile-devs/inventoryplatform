@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:inventoryplatform/app/controllers/panel_controller.dart';
-import 'package:inventoryplatform/app/data/models/department_model.dart';
+import 'package:inventoryplatform/app/data/models/departments_model.dart';
 
 class InventoryController extends GetxController {
-  late final DepartmentModel currentDepartment;
+  late final DepartmentsModel currentDepartment;
   late final PanelController panelController;
 
   //**
