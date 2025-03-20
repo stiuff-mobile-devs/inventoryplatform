@@ -4,51 +4,66 @@ import 'package:image_picker/image_picker.dart';
 import 'package:inventoryplatform/app/controllers/departments_controller.dart';
 
 class DepartmentsForm extends StatelessWidget {
-  const DepartmentsForm({super.key});
+  DepartmentsForm({super.key});
+
+  final _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
     final DepartmentsController controller = Get.find<DepartmentsController>();
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Criar Novo Departamento")),
+      appBar: AppBar(title: const Text("Criar Novo Departamento", style: TextStyle(color: Colors.white))),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            TextField(
-              controller: controller.titleController,
-              decoration: const InputDecoration(labelText: "Título"),
-            ),
-            TextField(
-              controller: controller.descriptionController,
-              decoration: const InputDecoration(labelText: "Descrição"),
-            ),
-            const SizedBox(height: 10),
-             controller.image == null
-                ? const Text("Nenhuma imagem selecionada")
-                : Image.file(controller.image!, height: 100),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.camera),
-                  onPressed: () => controller.pickImage(ImageSource.camera),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.photo_library),
-                  onPressed: () => controller.pickImage(ImageSource.gallery),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
-           controller.isLoading.value
-                ? const CircularProgressIndicator()
-                : ElevatedButton(
-                    onPressed: () => controller.saveDepartment(context),
-                    child: const Text("Salvar Departamento"),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            children: [
+              TextFormField(
+                controller: controller.titleController,
+                decoration: const InputDecoration(labelText: "Título"),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return "O título é obrigatório";
+                  }
+                  return null;
+                },
+              ),
+              TextFormField(
+                controller: controller.descriptionController,
+                decoration: const InputDecoration(labelText: "Descrição"),
+              ),
+              const SizedBox(height: 10),
+              Obx(() => controller.image.value == null
+                  ? const Text("Nenhuma imagem selecionada")
+                  : Image.file(controller.image.value!, height: 100),),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.camera),
+                    onPressed: () => controller.pickImage(ImageSource.camera),
                   ),
-          ],
+                  IconButton(
+                    icon: const Icon(Icons.photo_library),
+                    onPressed: () => controller.pickImage(ImageSource.gallery),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+              controller.isLoading.value
+                  ? const CircularProgressIndicator()
+                  : ElevatedButton(
+                      onPressed: () {
+                        if (_formKey.currentState!.validate()) {
+                          controller.saveDepartment(context);
+                        }
+                      },
+                      child: const Text("Salvar Departamento"),
+                    ),
+            ],
+          ),
         ),
       ),
     );

@@ -21,7 +21,7 @@ class AppPages {
 
     GetPage(
       name: Routes.DEPARTMENT,
-      page: () => const DepartmentsForm(),
+      page: () => DepartmentsForm(),
       binding: DepartmentsBinding(),
     ),
 

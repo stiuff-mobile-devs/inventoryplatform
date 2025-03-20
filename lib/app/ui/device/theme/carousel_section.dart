@@ -7,7 +7,7 @@ import 'package:inventoryplatform/app/controllers/carousel_section_controller.da
 import 'package:inventoryplatform/app/data/models/departments_model.dart';
 
 class CarouselSection extends StatelessWidget {
-  final CarouselSectionController controller = Get.put(CarouselSectionController());
+  final CarouselSectionController controller = Get.find<CarouselSectionController>();
   final bool? isExpanded;
   final String? route;
 

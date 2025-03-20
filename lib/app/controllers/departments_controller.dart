@@ -4,18 +4,31 @@ import 'package:hive/hive.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:get/get.dart';
 import 'package:inventoryplatform/app/data/models/departments_model.dart';
+import 'package:inventoryplatform/app/routes/app_routes.dart';
 class DepartmentsController extends GetxController {
   final TextEditingController titleController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
   final ImagePicker picker = ImagePicker();
 
-  File? image;
+  Rx<File?> image = Rx<File?>(null);
   var isLoading = false.obs;
 
+  @override
+  void onClose() {
+    clearData();
+    super.onClose();
+  }
+
+  void clearData() {
+    titleController.clear();
+    descriptionController.clear();
+    image.value = null;
+  }
+  
   Future<void> pickImage(ImageSource source) async {
     final pickedFile = await picker.pickImage(source: source);
     if (pickedFile != null) {
-      image = File(pickedFile.path);
+      image.value = File(pickedFile.path);
       update();
     }
   }
@@ -49,14 +62,15 @@ class DepartmentsController extends GetxController {
       final department = DepartmentsModel(
         title: titleController.text.trim(),
         description: descriptionController.text.trim(),
-        imagePath: image?.path,
+        imagePath: image.value?.path,
       );
       await box.add(department);
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Departamento criado com sucesso!")),
       );
-      Navigator.pop(context);
+      clearData();
+      Get.offAllNamed(Routes.HOME);
     } catch (e) {
       print(e.toString());
       ScaffoldMessenger.of(context).showSnackBar(
