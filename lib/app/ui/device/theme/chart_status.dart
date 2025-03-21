@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:inventoryplatform/app/data/models/inventory_model.dart';
+import 'package:inventoryplatform/app/data/models/inventories_model.dart';
+//import 'package:inventoryplatform/app/data/models/inventory_model.dart';
 
 class StatusChart extends StatelessWidget {
-  final List<InventoryModel> inventories;
+  final List<InventoriesModel> inventories;
 
   const StatusChart({super.key, required this.inventories});
 
   @override
   Widget build(BuildContext context) {
-    final openedCount = _getOpenedInventoryCount();
-    final closedCount = _getClosedInventoryCount();
+    //final openedCount = _getOpenedInventoryCount();
+    //final closedCount = _getClosedInventoryCount();
 
     return Stack(
       children: [
@@ -48,13 +49,13 @@ class StatusChart extends StatelessWidget {
           margin: const EdgeInsets.only(top: 48.0),
           padding: const EdgeInsets.only(
               left: 10.0, top: 16.0, bottom: 16.0, right: 38.0),
-          child: Center(child: _buildBarChart(openedCount, closedCount)),
+          //child: Center(child: _buildBarChart(openedCount, closedCount)),
         ),
       ],
     );
   }
 
-  int _getOpenedInventoryCount() {
+ /* int _getOpenedInventoryCount() {
     final now = DateTime.now();
     final thirtyDaysAgo = now.subtract(const Duration(days: 30));
 
@@ -62,9 +63,9 @@ class StatusChart extends StatelessWidget {
       return inventory.createdAt != null &&
           inventory.createdAt!.isAfter(thirtyDaysAgo);
     }).length;
-  }
+  }*/
 
-  int _getClosedInventoryCount() {
+ /* int _getClosedInventoryCount() {
     final now = DateTime.now();
     final thirtyDaysAgo = now.subtract(const Duration(days: 30));
 
@@ -73,7 +74,7 @@ class StatusChart extends StatelessWidget {
           inventory.lastUpdatedAt!.isAfter(thirtyDaysAgo) &&
           inventory.isActive == 0;
     }).length;
-  }
+  }*/
 
   Widget _buildBarChart(int openedCount, int closedCount) {
     double maxY =

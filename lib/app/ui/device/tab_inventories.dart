@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 import 'package:inventoryplatform/app/controllers/inventory_controller.dart';
 import 'package:inventoryplatform/app/controllers/panel_controller.dart';
 import 'package:inventoryplatform/app/data/models/inventories_model.dart';
-import 'package:inventoryplatform/app/data/models/inventory_model.dart';
 import 'package:inventoryplatform/app/routes/app_routes.dart';
 import 'package:inventoryplatform/app/ui/device/theme/details_dialog.dart';
 import 'package:inventoryplatform/app/ui/device/theme/list_item_widget.dart';
@@ -59,12 +58,12 @@ class _TabInventoriesState extends State<InventoriesTab> {
       return;
     }
 
-    final filteredList = _panelController.inventories
+   /* final filteredList = _panelController.inventories
         .where((inventory) =>
-            inventory.title.toLowerCase().contains(query.toLowerCase()))
-        .toList();
+            inventory?title.toLowerCase().contains(query.toLowerCase()))
+        .toList();*/
 
-    _panelController.listedItems.assignAll(filteredList);
+    //_panelController.listedItems.assignAll(filteredList);
   }
 
   Widget _buildHeader(BuildContext context) {

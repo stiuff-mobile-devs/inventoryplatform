@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:inventoryplatform/app/data/models/inventory_model.dart';
+import 'package:inventoryplatform/app/data/models/inventories_model.dart';
 
 class UpdateChart extends StatefulWidget {
-  final List<InventoryModel> inventories;
+  final List<InventoriesModel> inventories;
 
   const UpdateChart({super.key, required this.inventories});
 
@@ -20,7 +20,7 @@ class UpdateChartState extends State<UpdateChart> {
   @override
   void initState() {
     super.initState();
-    updatesPerDay = _getUpdatesPerDay();
+   // updatesPerDay = _getUpdatesPerDay();
   }
 
   @override
@@ -138,7 +138,7 @@ class UpdateChartState extends State<UpdateChart> {
     );
   }
 
-  List<int> _getUpdatesPerDay() {
+  /*List<int> _getUpdatesPerDay() {
     final updates = <DateTime, int>{};
 
     for (var inventory in widget.inventories) {
@@ -163,5 +163,5 @@ class UpdateChartState extends State<UpdateChart> {
           )
           .value;
     }).reversed.toList();
-  }
+  }*/
 }
