@@ -17,7 +17,7 @@ class MaterialsController extends GetxController {
   final TextEditingController geolocationController = TextEditingController();
   final TextEditingController locationController = TextEditingController();
   final TextEditingController nameController = TextEditingController();
-  final TextEditingController observations = TextEditingController();
+  final TextEditingController observationsController = TextEditingController();
   final ImagePicker picker = ImagePicker();
 
 
@@ -50,7 +50,7 @@ class MaterialsController extends GetxController {
         date: DateTime.parse(dateController.text.trim()),
         description: descriptionController.text.trim(),
         geolocation: geolocationController.text.trim(),
-        observations: observations.text.trim(),
+        observations: observationsController.text.trim(),
         inventoryId: (context.widget as MaterialsForm).cod,
         imagePath: image.value?.path,
       );
