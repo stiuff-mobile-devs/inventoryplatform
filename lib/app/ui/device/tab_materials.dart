@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
+import 'package:inventoryplatform/app/controllers/materials_controller.dart';
 import 'package:inventoryplatform/app/data/models/departments_model.dart';
-import 'package:inventoryplatform/app/data/models/material_model.dart';
+import 'package:inventoryplatform/app/data/models/materials_model.dart';
 
 class MaterialsTab extends StatefulWidget {
   const MaterialsTab({super.key});
@@ -11,27 +13,27 @@ class MaterialsTab extends StatefulWidget {
 }
 
 class _MaterialsTabState extends State<MaterialsTab> {
-  final List<MaterialModel> _allMaterials = [];
   final DepartmentsModel department = Get.arguments;
+  final MaterialsController controller = MaterialsController();
+  List<MaterialsModel> _allMaterials = [];
 
   //final OrganizationRepository _organizationRepository = Get.find<OrganizationRepository>();
 
   @override
   void initState() {
     super.initState();
-    //_loadItems();
+    _loadItems();
   }
 
-  /*Future<void> _loadItems() async {
-    final items = await _organizationRepository
-        .getItemsForOrganization(organization.id);
+  Future<void> _loadItems() async {
+    final items = controller.getInventories();
     setState(() {
-      _allItems = items;
+      _allMaterials = items;
     });
-  }*/
+  }
 
   Future<void> _onRefresh() async {
-    //await _loadItems();
+    await _loadItems();
   }
 
   @override
@@ -49,7 +51,7 @@ class _MaterialsTabState extends State<MaterialsTab> {
     );
   }
 
-  Widget _buildHeader(String organizationName) {
+  Widget _buildHeader(String departmentName) {
     return Padding(
       padding: const EdgeInsets.only(
           left: 16.0, right: 16.0, top: 20.0, bottom: 8.0),
@@ -64,7 +66,7 @@ class _MaterialsTabState extends State<MaterialsTab> {
               color: Colors.black87,
             ),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(height: 20),
           Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -79,7 +81,7 @@ class _MaterialsTabState extends State<MaterialsTab> {
                   borderRadius: BorderRadius.circular(5.0),
                 ),
                 child: Text(
-                  organizationName,
+                  departmentName,
                   style: const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
@@ -103,10 +105,8 @@ class _MaterialsTabState extends State<MaterialsTab> {
         children: [
           const Row (
             children: [
-              Expanded(child: Text("Identificador", style: TextStyle(fontWeight: FontWeight.bold))),
-              SizedBox(width:50),
+              Expanded(flex: 2, child: Text("Código de Barras", style: TextStyle(fontWeight: FontWeight.bold))),
               Expanded(child: Text("Título", style: TextStyle(fontWeight: FontWeight.bold))),
-              SizedBox(width: 40),
               Expanded(child: Text("Adicionado", style: TextStyle(fontWeight: FontWeight.bold))),
             ],
           ),
@@ -118,11 +118,9 @@ class _MaterialsTabState extends State<MaterialsTab> {
             itemBuilder: (context, index) {
               return Row (
                   children: [
-                    Expanded(child: Text(_allMaterials[index].id)),
-                    const SizedBox(width: 50),
-                    Expanded(child: Text(_allMaterials[index].title)),
-                    const SizedBox(width: 40),
-                    const Expanded(child: Text("Data")),
+                    Expanded(flex: 2, child: Text(_allMaterials[index].barcode)),
+                    Expanded(child: Text(_allMaterials[index].name)),
+                    Expanded(child: Text(formatDatePortuguese(_allMaterials[index].date))),
                   ]
               );
             },
@@ -133,5 +131,11 @@ class _MaterialsTabState extends State<MaterialsTab> {
         ],
       ),
     );
+  }
+
+  String formatDatePortuguese(DateTime? date) {
+    return date != null
+        ? DateFormat("dd/MM/yyyy").format(date)
+        : "Data Indisponível";
   }
 }
