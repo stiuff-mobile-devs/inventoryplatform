@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:inventoryplatform/app/controllers/departments_controller.dart';
+import 'package:inventoryplatform/app/controllers/department_controller.dart';
 
-class DepartmentsForm extends StatelessWidget {
-  DepartmentsForm({super.key});
+class DepartmentForm extends StatelessWidget {
+  DepartmentForm({super.key});
 
   final _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
-    final DepartmentsController controller = Get.find<DepartmentsController>();
+    final DepartmentController controller = Get.find<DepartmentController>();
 
     return Scaffold(
       appBar: AppBar(title: const Text("Criar Novo Departamento", style: TextStyle(color: Colors.white))),

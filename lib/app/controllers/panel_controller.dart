@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:inventoryplatform/app/data/models/departments_model.dart';
-import 'package:inventoryplatform/app/data/models/inventories_model.dart';
+import 'package:inventoryplatform/app/data/models/department_model.dart';
+import 'package:inventoryplatform/app/data/models/inventory_model.dart';
 import 'package:inventoryplatform/app/data/models/material_model.dart';
 
 enum TabType {
@@ -16,12 +16,12 @@ class PanelController extends GetxController {
 
   final searchController = TextEditingController();
 
-  final Rx<DepartmentsModel?> _currentDepartment = Rx<DepartmentsModel?>(null);
+  final Rx<DepartmentModel?> _currentDepartment = Rx<DepartmentModel?>(null);
   final RxInt selectedTabIndex = 0.obs;
   final RxList<dynamic> listedItems = <dynamic>[].obs;
 
-  final RxList<DepartmentsModel> departments = <DepartmentsModel>[].obs;
-  final RxList<InventoriesModel> inventories = <InventoriesModel>[].obs;
+  final RxList<DepartmentModel> departments = <DepartmentModel>[].obs;
+  final RxList<InventoryModel> inventories = <InventoryModel>[].obs;
   final RxList<MaterialModel> materials = <MaterialModel>[].obs;
   /*final RxList<EntityModel> entities = <EntityModel>[].obs;
   final RxList<TagModel> tags = <TagModel>[].obs;
@@ -41,11 +41,11 @@ class PanelController extends GetxController {
     super.dispose();
   }
 
-  void setCurrentDepartment(DepartmentsModel department) {
+  void setCurrentDepartment(DepartmentModel department) {
     _currentDepartment.value = department;
   }
 
-  DepartmentsModel? getCurrentDepartment() => _currentDepartment.value;
+  DepartmentModel? getCurrentDepartment() => _currentDepartment.value;
 
   Future<void> refreshPage() async {
     await refreshItemsForTab(

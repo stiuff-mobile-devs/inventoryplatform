@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
-import 'package:inventoryplatform/app/controllers/departments_controller.dart';
-import 'package:inventoryplatform/app/data/models/departments_model.dart';
+import 'package:inventoryplatform/app/controllers/department_controller.dart';
+import 'package:inventoryplatform/app/data/models/department_model.dart';
 
 class CarouselSectionController extends GetxController {
   var carouselIndex = 0.obs;
@@ -27,8 +27,8 @@ class CarouselSectionController extends GetxController {
   }
 
 
-  List<DepartmentsModel> getDepartments() {
-    final departmentsController = Get.find<DepartmentsController>();
+  List<DepartmentModel> getDepartments() {
+    final departmentsController = Get.find<DepartmentController>();
     return departmentsController.getDepartments();
   }
 }

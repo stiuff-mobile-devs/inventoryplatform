@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:inventoryplatform/app/controllers/carousel_section_controller.dart';
-import 'package:inventoryplatform/app/data/models/departments_model.dart';
+import 'package:inventoryplatform/app/data/models/department_model.dart';
 
 class CarouselSection extends StatelessWidget {
   final CarouselSectionController controller = Get.find<CarouselSectionController>();
@@ -19,7 +19,7 @@ class CarouselSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    List<DepartmentsModel> departments = controller.getDepartments();
+    List<DepartmentModel> departments = controller.getDepartments();
     controller.initializeHoverState(departments.length);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -80,7 +80,7 @@ class CarouselSection extends StatelessWidget {
     );
   }
 
-  Widget _buildCarouselItem(int index, DepartmentsModel department,
+  Widget _buildCarouselItem(int index, DepartmentModel department,
       double viewportfraction, BuildContext context,
       {String? route}) {
     return GestureDetector(

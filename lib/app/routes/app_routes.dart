@@ -8,7 +8,7 @@ abstract class Routes {
   static const LOGIN = '/login';
   static const REGISTER = '/register';
   static const SETTINGS = '/settings';
-  static const altCAMERA = '/alternate-camera';
+  static const ALT_CAMERA = '/alternate-camera';
   static const MATERIAL = '/material-form';
   static const NOT_FOUND = '/404';
 }

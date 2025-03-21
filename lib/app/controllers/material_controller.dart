@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:inventoryplatform/app/data/models/materials_model.dart';
-import 'package:inventoryplatform/app/ui/device/materials_form.dart';
+import 'package:inventoryplatform/app/data/models/material_model.dart';
+import 'package:inventoryplatform/app/ui/device/forms/material_form.dart';
 
-class MaterialsController extends GetxController {
+class MaterialController extends GetxController {
   
   //final _panelController = Get.find<PanelController>();
 
@@ -23,6 +23,21 @@ class MaterialsController extends GetxController {
 
   Rx<File?> image = Rx<File?>(null);
   var isLoading = false.obs;
+   void onClose() {
+    clearData();
+    super.onClose();
+  }
+
+  void clearData() {
+    nameController.clear();
+    descriptionController.clear();
+    dateController.clear();
+    barcodeController.clear();
+    geolocationController.clear();
+    locationController.clear();
+    observationsController.clear();
+    image.value = null;
+  }
 
   // Função para escolher ou capturar uma imagem
    Future<void> pickImage(ImageSource source) async {
@@ -43,15 +58,15 @@ class MaterialsController extends GetxController {
     }
 
     try {
-      final box = Hive.box<MaterialsModel>('materials');
-      final material = MaterialsModel(
+      final box = Hive.box<MaterialModel>('materials');
+      final material = MaterialModel(
         name: nameController.text.trim(),
         barcode: barcodeController.text.trim(),
         date: DateTime.parse(dateController.text.trim()),
         description: descriptionController.text.trim(),
         geolocation: geolocationController.text.trim(),
         observations: observationsController.text.trim(),
-        inventoryId: (context.widget as MaterialsForm).cod,
+        inventoryId: (context.widget as MaterialForm).cod,
         imagePath: image.value?.path,
       );
       await box.add(material);
@@ -81,7 +96,7 @@ class MaterialsController extends GetxController {
         .doc(departmentId);
 
       CollectionReference inventoriesRef = departmentRef.collection("inventories");
-      String inventoryId = (context.widget as MaterialsForm).cod; 
+      String inventoryId = (context.widget as MaterialForm).cod; 
 
       DocumentReference inventoryRef = inventoriesRef.doc(inventoryId);
       CollectionReference itemsRef = inventoryRef.collection("items");
@@ -101,6 +116,7 @@ class MaterialsController extends GetxController {
       });
 */
       // Feedback de sucesso
+      clearData();
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("material adicionado com sucesso!")),
       );
@@ -115,8 +131,8 @@ class MaterialsController extends GetxController {
     }
   }
 
-  List<MaterialsModel> getInventories() {
-    final box = Hive.box<MaterialsModel>('materials');
+  List<MaterialModel> getInventories() {
+    final box = Hive.box<MaterialModel>('materials');
     return box.values.toList();
   }
 }

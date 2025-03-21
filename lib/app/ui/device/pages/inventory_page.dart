@@ -2,21 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:inventoryplatform/app/controllers/inventory_controller.dart';
 import 'package:inventoryplatform/app/controllers/panel_controller.dart';
-import 'package:inventoryplatform/app/data/models/inventories_model.dart';
+import 'package:inventoryplatform/app/data/models/inventory_model.dart';
 import 'package:inventoryplatform/app/routes/app_routes.dart';
 import 'package:inventoryplatform/app/ui/device/theme/details_dialog.dart';
 import 'package:inventoryplatform/app/ui/device/theme/list_item_widget.dart';
 import 'package:inventoryplatform/app/ui/device/theme/search_bar_widget.dart';
 import 'package:inventoryplatform/app/ui/device/theme/temporary_message_display.dart';
 
-class InventoriesTab extends StatefulWidget {
-  const InventoriesTab({super.key});
+class InventoryPage extends StatefulWidget {
+  const InventoryPage({super.key});
 
   @override
-  State<InventoriesTab> createState() => _TabInventoriesState();
+  State<InventoryPage> createState() => _InventoryPageState();
 }
 
-class _TabInventoriesState extends State<InventoriesTab> {
+class _InventoryPageState extends State<InventoryPage> {
   final _panelController = Get.find<PanelController>();
 
   final FocusNode searchFocusNode = FocusNode();
@@ -170,13 +170,13 @@ class _TabInventoriesState extends State<InventoriesTab> {
               );
             }
 
-            if (items[index] is InventoriesModel) {
-              InventoriesModel item = items[index];
+            if (items[index] is InventoryModel) {
+              InventoryModel item = items[index];
               return Dismissible(
                 key: Key(item.id.toString()),
                 direction: DismissDirection.endToStart,
                 onDismissed: (direction) {
-                  Get.toNamed(Routes.altCAMERA,
+                  Get.toNamed(Routes.ALT_CAMERA,
                     parameters: {'cod': item.id});
                 },
                 background: Container(

@@ -1,22 +1,22 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'materials_model.dart';
+part of 'material_model.dart';
 
 // **************************************************************************
 // TypeAdapterGenerator
 // **************************************************************************
 
-class MaterialsModelAdapter extends TypeAdapter<MaterialsModel> {
+class MaterialModelAdapter extends TypeAdapter<MaterialModel> {
   @override
   final int typeId = 2;
 
   @override
-  MaterialsModel read(BinaryReader reader) {
+  MaterialModel read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return MaterialsModel(
+    return MaterialModel(
       barcode: fields[1] as String,
       name: fields[2] as String,
       observations: fields[3] as String,
@@ -29,7 +29,7 @@ class MaterialsModelAdapter extends TypeAdapter<MaterialsModel> {
   }
 
   @override
-  void write(BinaryWriter writer, MaterialsModel obj) {
+  void write(BinaryWriter writer, MaterialModel obj) {
     writer
       ..writeByte(9)
       ..writeByte(0)
@@ -58,7 +58,7 @@ class MaterialsModelAdapter extends TypeAdapter<MaterialsModel> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is MaterialsModelAdapter &&
+      other is MaterialModelAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

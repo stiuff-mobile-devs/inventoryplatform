@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:inventoryplatform/app/controllers/materials_controller.dart';
-import 'package:inventoryplatform/app/data/models/departments_model.dart';
-import 'package:inventoryplatform/app/data/models/materials_model.dart';
+import 'package:inventoryplatform/app/controllers/material_controller.dart';
+import 'package:inventoryplatform/app/data/models/department_model.dart';
+import 'package:inventoryplatform/app/data/models/material_model.dart';
 
-class MaterialsTab extends StatefulWidget {
-  const MaterialsTab({super.key});
+class MaterialPage extends StatefulWidget {
+  const MaterialPage({super.key});
 
   @override
-  State<MaterialsTab> createState() => _MaterialsTabState();
+  State<MaterialPage> createState() => _MaterialPageState();
 }
 
-class _MaterialsTabState extends State<MaterialsTab> {
-  final DepartmentsModel department = Get.arguments;
-  final MaterialsController controller = MaterialsController();
-  List<MaterialsModel> _allMaterials = [];
+class _MaterialPageState extends State<MaterialPage> {
+  final DepartmentModel department = Get.arguments;
+  final MaterialController controller = MaterialController();
+  List<MaterialModel> _allMaterials = [];
 
   //final OrganizationRepository _organizationRepository = Get.find<OrganizationRepository>();
 

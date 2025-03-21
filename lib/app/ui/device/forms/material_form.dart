@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:inventoryplatform/app/controllers/materials_controller.dart';
+import 'package:inventoryplatform/app/controllers/material_controller.dart';
 import 'package:intl/intl.dart'; // Import the intl package
 
-class MaterialsForm extends StatefulWidget {
+class MaterialForm extends StatefulWidget {
   late final String cod;
   final String? barcode;
 
-  MaterialsForm({required this.cod, this.barcode});
+  MaterialForm({required this.cod, this.barcode});
   
   @override
-  _MaterialsFormState createState() => _MaterialsFormState();
+  _MaterialFormState createState() => _MaterialFormState();
 }
 
-class _MaterialsFormState extends State<MaterialsForm> {
-  final MaterialsController controller = Get.find<MaterialsController>();
+class _MaterialFormState extends State<MaterialForm> {
+  final MaterialController controller = Get.find<MaterialController>();
   final _formKey = GlobalKey<FormState>();
 
   @override
@@ -25,7 +25,7 @@ class _MaterialsFormState extends State<MaterialsForm> {
       controller.barcodeController.text = widget.barcode!;
     }
     // Set the current date to the dateController
-    controller.dateController.text = DateFormat('yyyy/MM/dd').format(DateTime.now());
+    controller.dateController.text = DateFormat('yyyy-MM-dd').format(DateTime.now());
   }
 
   @override
@@ -43,7 +43,7 @@ class _MaterialsFormState extends State<MaterialsForm> {
                 decoration: const InputDecoration(labelText: "Código de Barras"),
               ),
                TextFormField(
-                controller: controller.geolocationController,
+                controller: controller.nameController,
                 decoration: const InputDecoration(labelText: "Nome *"),
                 validator: (value) {
                   if (value == null || value.isEmpty) {

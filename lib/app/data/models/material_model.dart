@@ -1,30 +1,46 @@
-class MaterialModel {
-  String _id;
-  String _title;
-  String _description;
-  String? _barCode;
-  DateTime? _createdAt;
+import 'package:hive/hive.dart';
+import 'package:uuid/uuid.dart';
+
+part 'material_model.g.dart';
+
+@HiveType(typeId: 2)
+class MaterialModel extends HiveObject {
+  @HiveField(0)
+  String id;
+
+  @HiveField(1)
+  String barcode;
+
+  @HiveField(2)
+  String name;
+
+  @HiveField(3)
+  String observations;
+
+  @HiveField(4)
+  DateTime date;
+
+  @HiveField(5)
+  String geolocation;
+
+  @HiveField(6)
+  String description;
+
+  @HiveField(7)
+  String inventoryId;
+
+  @HiveField(8)
+  String? imagePath;
 
   MaterialModel({
-    required String id,
-    required String title,
-    required String description,
-    String? barCode,
-    DateTime? createdAt,
-  })  : _id = id,
-        _title = title,
-        _description = description,
-        _createdAt = createdAt,
-        _barCode = barCode;
+    required this.barcode,
+    required this.name,
+    required this.observations,
+    required this.date,
+    required this.geolocation,
+    required this.description,
+    required this.inventoryId,
+    this.imagePath,
 
-  String get id => _id;
-  String get title => _title;
-  String get description => _description;
-  DateTime? get createdAt => _createdAt;
-  String? get barCode => _barCode;
-
-  set id(String id) => _id = id;
-  set title(String title) => _title = id;
-  set description(String description) => _description = description;
-  set barCode(String? barCode) => _barCode = barCode;
+  }) : id = Uuid().v4(); // Generate a unique ID
 }

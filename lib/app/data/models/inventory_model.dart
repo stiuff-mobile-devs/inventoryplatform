@@ -1,10 +1,10 @@
 import 'package:hive/hive.dart';
 import 'package:uuid/uuid.dart';
 
-part 'departments_model.g.dart';
+part 'inventory_model.g.dart';
 
-@HiveType(typeId: 0)
-class DepartmentsModel extends HiveObject {
+@HiveType(typeId: 1)
+class InventoryModel extends HiveObject {
   @HiveField(0)
   String id;
 
@@ -15,11 +15,15 @@ class DepartmentsModel extends HiveObject {
   String description;
 
   @HiveField(3)
-  String? imagePath;
+  String revisionNumber;
 
-  DepartmentsModel({
+  @HiveField(4)
+  String departmentId;
+
+  InventoryModel({
     required this.title,
     required this.description,
-    this.imagePath,
+    required this.revisionNumber,
+    required this.departmentId,
   }) : id = Uuid().v4(); // Generate a unique ID
 }

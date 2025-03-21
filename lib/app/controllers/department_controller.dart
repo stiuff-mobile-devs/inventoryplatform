@@ -3,9 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:get/get.dart';
-import 'package:inventoryplatform/app/data/models/departments_model.dart';
+import 'package:inventoryplatform/app/data/models/department_model.dart';
 import 'package:inventoryplatform/app/routes/app_routes.dart';
-class DepartmentsController extends GetxController {
+
+class DepartmentController extends GetxController {
   final TextEditingController titleController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
   final ImagePicker picker = ImagePicker();
@@ -58,8 +59,8 @@ class DepartmentsController extends GetxController {
       mockService.addSampleOrganizations();
       */
       //SALVANDO NO BD LOCAL 
-      final box = Hive.box<DepartmentsModel>('departments');
-      final department = DepartmentsModel(
+      final box = Hive.box<DepartmentModel>('departments');
+      final department = DepartmentModel(
         title: titleController.text.trim(),
         description: descriptionController.text.trim(),
         imagePath: image.value?.path,
@@ -80,8 +81,8 @@ class DepartmentsController extends GetxController {
     isLoading.value = false;
   }
 
-  List<DepartmentsModel> getDepartments() {
-    final box = Hive.box<DepartmentsModel>('departments');
+  List<DepartmentModel> getDepartments() {
+    final box = Hive.box<DepartmentModel>('departments');
     return box.values.toList();
   }
 }

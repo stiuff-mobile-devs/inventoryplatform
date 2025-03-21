@@ -1,22 +1,22 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'departments_model.dart';
+part of 'department_model.dart';
 
 // **************************************************************************
 // TypeAdapterGenerator
 // **************************************************************************
 
-class DepartmentsModelAdapter extends TypeAdapter<DepartmentsModel> {
+class DepartmentModelAdapter extends TypeAdapter<DepartmentModel> {
   @override
   final int typeId = 0;
 
   @override
-  DepartmentsModel read(BinaryReader reader) {
+  DepartmentModel read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return DepartmentsModel(
+    return DepartmentModel(
       title: fields[1] as String,
       description: fields[2] as String,
       imagePath: fields[3] as String?,
@@ -24,7 +24,7 @@ class DepartmentsModelAdapter extends TypeAdapter<DepartmentsModel> {
   }
 
   @override
-  void write(BinaryWriter writer, DepartmentsModel obj) {
+  void write(BinaryWriter writer, DepartmentModel obj) {
     writer
       ..writeByte(4)
       ..writeByte(0)
@@ -43,7 +43,7 @@ class DepartmentsModelAdapter extends TypeAdapter<DepartmentsModel> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is DepartmentsModelAdapter &&
+      other is DepartmentModelAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

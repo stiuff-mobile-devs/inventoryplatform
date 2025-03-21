@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
-import 'package:inventoryplatform/app/controllers/panel_controller.dart';
-import 'package:inventoryplatform/app/data/models/departments_model.dart';
-import 'package:inventoryplatform/app/data/models/inventories_model.dart';
-import 'package:inventoryplatform/app/ui/device/inventory_form_page.dart';
+import 'package:inventoryplatform/app/data/models/inventory_model.dart';
+import 'package:inventoryplatform/app/ui/device/forms/inventory_form.dart';
 
 class InventoryController extends GetxController {
   final TextEditingController titleController = TextEditingController();
@@ -24,8 +22,8 @@ class InventoryController extends GetxController {
 
     try {
 
-      final box = Hive.box<InventoriesModel>('inventories');
-      final department = InventoriesModel(
+      final box = Hive.box<InventoryModel>('inventories');
+      final department = InventoryModel(
         title: titleController.text.trim(),
         description: descriptionController.text.trim(),
         revisionNumber: revisionController.text.trim(),
@@ -84,8 +82,8 @@ class InventoryController extends GetxController {
     }
   }
 
-   List<InventoriesModel> getInventories() {
-    final box = Hive.box<InventoriesModel>('inventories');
+   List<InventoryModel> getInventories() {
+    final box = Hive.box<InventoryModel>('inventories');
     return box.values.toList();
   }
 }

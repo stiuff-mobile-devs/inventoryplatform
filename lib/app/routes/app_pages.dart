@@ -1,18 +1,18 @@
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_navigation/src/routes/get_route.dart';
-import 'package:inventoryplatform/app/bindings/departments_bindings.dart';
+import 'package:inventoryplatform/app/bindings/department_bindings.dart';
 import 'package:inventoryplatform/app/bindings/home_bindings.dart';
 import 'package:inventoryplatform/app/bindings/inventory_bindings.dart';
 import 'package:inventoryplatform/app/bindings/panel_binding.dart';
 import 'package:inventoryplatform/app/routes/app_routes.dart';
-import 'package:inventoryplatform/app/ui/device/departments_form.dart';
-import 'package:inventoryplatform/app/ui/device/home_page.dart';
-import 'package:inventoryplatform/app/ui/device/initial_page.dart';
-import 'package:inventoryplatform/app/ui/device/inventory_form_page.dart';
-import 'package:inventoryplatform/app/ui/device/materials_form.dart';
-import 'package:inventoryplatform/app/ui/device/mobile_scanner_camera_page.dart';
-import 'package:inventoryplatform/app/ui/device/panel_page.dart';
+import 'package:inventoryplatform/app/ui/device/forms/department_form.dart';
+import 'package:inventoryplatform/app/ui/device/pages/home_page.dart';
+import 'package:inventoryplatform/app/ui/device/pages/initial_page.dart';
+import 'package:inventoryplatform/app/ui/device/forms/inventory_form.dart';
+import 'package:inventoryplatform/app/ui/device/forms/material_form.dart';
+import 'package:inventoryplatform/app/ui/device/pages/alternate_camera_page.dart';
+import 'package:inventoryplatform/app/ui/device/pages/panel_page.dart';
 
 class AppPages {
   static final routes = [
@@ -29,8 +29,8 @@ class AppPages {
 
     GetPage(
       name: Routes.DEPARTMENT,
-      page: () => DepartmentsForm(),
-      binding: DepartmentsBinding(),
+      page: () => DepartmentForm(),
+      binding: DepartmentBinding(),
     ),
 
     GetPage(
@@ -46,12 +46,12 @@ class AppPages {
     ),
 
     GetPage(
-      name: Routes.altCAMERA,
+      name: Routes.ALT_CAMERA,
       page: () => AlternateCameraPage(cod: Get.parameters['cod']!),
     ),
     GetPage(
       name: Routes.MATERIAL,
-      page: () => MaterialsForm(
+      page: () => MaterialForm(
         cod: Get.parameters['cod']!,
         barcode: Get.parameters['barcode'],
       ),

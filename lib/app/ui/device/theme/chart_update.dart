@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:inventoryplatform/app/data/models/inventories_model.dart';
+import 'package:inventoryplatform/app/data/models/inventory_model.dart';
 
 class UpdateChart extends StatefulWidget {
-  final List<InventoriesModel> inventories;
+  final List<InventoryModel> inventories;
 
   const UpdateChart({super.key, required this.inventories});
 
