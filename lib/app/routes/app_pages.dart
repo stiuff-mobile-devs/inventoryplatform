@@ -1,3 +1,5 @@
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_navigation/src/routes/get_route.dart';
 import 'package:inventoryplatform/app/bindings/departments_bindings.dart';
 import 'package:inventoryplatform/app/bindings/home_bindings.dart';
@@ -31,7 +33,7 @@ class AppPages {
 
     GetPage(
       name: Routes.INVENTORY,
-      page: () => const InventoryFormPage(),
+      page: () =>  InventoryForm(cod: Get.parameters['cod']!),
       binding: InventoryBinding(),
     ),
 

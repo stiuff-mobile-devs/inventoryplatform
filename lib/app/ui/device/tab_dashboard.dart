@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:carousel_slider/carousel_slider.dart';
@@ -36,13 +38,14 @@ class _DashboardTabState extends State<DashboardTab> {
         child: Stack(
           children: [
             SizedBox(
-              width: double.infinity,
-              height: 120,
-              child: Image.asset(
-                department.imagePath!,
-                fit: BoxFit.cover,
-              )
-            ),
+                width: double.infinity,
+                height: 120,
+                child: Image.file(
+                  File(department.imagePath!),
+                  fit: BoxFit.cover,
+                  height: double.infinity,
+                  width: double.infinity,
+                )),
             Positioned(
               bottom: 16.0,
               left: 16.0,
@@ -74,7 +77,8 @@ class _DashboardTabState extends State<DashboardTab> {
     );
   }
 
-  Widget _buildOrganizationContainer(String organizationName, String organizationId) {
+  Widget _buildOrganizationContainer(
+      String organizationName, String organizationId) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
       decoration: BoxDecoration(

@@ -6,7 +6,9 @@ import 'package:hive_flutter/adapters.dart';
 import 'package:inventoryplatform/app/controllers/carousel_section_controller.dart';
 import 'package:inventoryplatform/app/controllers/connection_controller.dart';
 import 'package:inventoryplatform/app/controllers/departments_controller.dart';
+import 'package:inventoryplatform/app/controllers/inventory_controller.dart';
 import 'package:inventoryplatform/app/data/models/departments_model.dart';
+import 'package:inventoryplatform/app/data/models/inventories_model.dart';
 import 'package:inventoryplatform/app/routes/app_pages.dart';
 import 'package:inventoryplatform/app/routes/app_routes.dart';
 import 'package:inventoryplatform/app/ui/device/theme/app_theme.dart';
@@ -16,10 +18,23 @@ Future<void> main() async {
   Get.put(DepartmentsController()); // Inicializa o controller
   Get.put(ConnectionController()); 
   Get.put(CarouselSectionController());
+  Get.put(InventoryController());
+
 
   await Hive.initFlutter(); // Inicializa o Hive
+  print('Hive initialized');
+
   Hive.registerAdapter(DepartmentsModelAdapter());
+  print('DepartmentsModelAdapter registered');
+  
+  Hive.registerAdapter(InventoriesModelAdapter());
+  print('InventoriesModelAdapter registered');
+
   await Hive.openBox<DepartmentsModel>('departments');
+  print('Departments box opened');
+  
+  await Hive.openBox<InventoriesModel>('inventories');
+  print('Inventories box opened');
 
   runApp(
     GetMaterialApp(
@@ -30,4 +45,5 @@ Future<void> main() async {
       theme: globalTheme,
     ),
   );
+  print('App started');
 }

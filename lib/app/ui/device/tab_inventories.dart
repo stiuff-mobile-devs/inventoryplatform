@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:inventoryplatform/app/controllers/inventory_controller.dart';
 import 'package:inventoryplatform/app/controllers/panel_controller.dart';
+import 'package:inventoryplatform/app/data/models/inventories_model.dart';
 import 'package:inventoryplatform/app/data/models/inventory_model.dart';
 import 'package:inventoryplatform/app/routes/app_routes.dart';
 import 'package:inventoryplatform/app/ui/device/theme/details_dialog.dart';
@@ -149,7 +151,9 @@ class _TabInventoriesState extends State<InventoriesTab> {
   Widget _buildList() {
     return Expanded(
       child: Obx(() {
-        final items = _panelController.listedItems;
+        final organization = _panelController.getCurrentDepartment();
+        final allItems = Get.find<InventoryController>().getInventories();
+        final items = allItems.where((item) => item.departmentId == organization!.id).toList();
 
         if (items.isEmpty) {
           return const TemporaryMessageDisplay(
@@ -167,8 +171,8 @@ class _TabInventoriesState extends State<InventoriesTab> {
               );
             }
 
-            if (items[index] is InventoryModel) {
-              InventoryModel item = items[index];
+            if (items[index] is InventoriesModel) {
+              InventoriesModel item = items[index];
               return Dismissible(
                 key: Key(item.id.toString()),
                 direction: DismissDirection.endToStart,
@@ -192,7 +196,7 @@ class _TabInventoriesState extends State<InventoriesTab> {
                     'Criado em': "data",
                     'Atualizado em':  "data",
                   },
-                  isActive: item.isActive,
+                  isActive: 1,
                   icon: Icons.donut_large_rounded,
                   onTap: (context) {
                     searchFocusNode.unfocus();
@@ -201,7 +205,7 @@ class _TabInventoriesState extends State<InventoriesTab> {
                       {
                         'Título': item.title,
                         'Descrição': item.description,
-                        'Está Ativo?': item.isActive == 1 ? 'Sim' : 'Não',
+                        'Está Ativo?':  'sim',
                         'Número de Revisão': item.revisionNumber,
                         'Data de Criação': "data",
                         'Última Atualização': "data",
