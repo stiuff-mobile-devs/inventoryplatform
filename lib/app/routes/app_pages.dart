@@ -10,6 +10,8 @@ import 'package:inventoryplatform/app/ui/device/departments_form.dart';
 import 'package:inventoryplatform/app/ui/device/home_page.dart';
 import 'package:inventoryplatform/app/ui/device/initial_page.dart';
 import 'package:inventoryplatform/app/ui/device/inventory_form_page.dart';
+import 'package:inventoryplatform/app/ui/device/materials_form.dart';
+import 'package:inventoryplatform/app/ui/device/mobile_scanner_camera_page.dart';
 import 'package:inventoryplatform/app/ui/device/panel_page.dart';
 
 class AppPages {
@@ -41,6 +43,18 @@ class AppPages {
       name: Routes.PANEL,
       page: () => const PanelPage(),
       binding: PanelBinding(),
+    ),
+
+    GetPage(
+      name: Routes.altCAMERA,
+      page: () => AlternateCameraPage(cod: Get.parameters['cod']!),
+    ),
+    GetPage(
+      name: Routes.MATERIAL,
+      page: () => MaterialsForm(
+        cod: Get.parameters['cod']!,
+        barcode: Get.parameters['barcode'],
+      ),
     ),
 
   ];
