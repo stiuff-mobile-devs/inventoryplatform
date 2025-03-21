@@ -18,16 +18,17 @@ class MaterialsController extends GetxController {
   final TextEditingController locationController = TextEditingController();
   final TextEditingController nameController = TextEditingController();
   final TextEditingController observations = TextEditingController();
-
-  File? image;
   final ImagePicker picker = ImagePicker();
-  bool isLoading = false;
+
+
+  Rx<File?> image = Rx<File?>(null);
+  var isLoading = false.obs;
 
   // Função para escolher ou capturar uma imagem
-  Future<void> pickImage(ImageSource source) async {
+   Future<void> pickImage(ImageSource source) async {
     final pickedFile = await picker.pickImage(source: source);
     if (pickedFile != null) {
-      image = File(pickedFile.path);
+      image.value = File(pickedFile.path);
       update();
     }
   }
@@ -51,6 +52,7 @@ class MaterialsController extends GetxController {
         geolocation: geolocationController.text.trim(),
         observations: observations.text.trim(),
         inventoryId: (context.widget as MaterialsForm).cod,
+        imagePath: image.value?.path,
       );
       await box.add(material);
       // Verifique se o usuário está autenticado

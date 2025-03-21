@@ -29,6 +29,9 @@ class MaterialsModel extends HiveObject {
   @HiveField(7)
   String inventoryId;
 
+  @HiveField(8)
+  String? imagePath;
+
   MaterialsModel({
     required this.barcode,
     required this.name,
@@ -37,5 +40,7 @@ class MaterialsModel extends HiveObject {
     required this.geolocation,
     required this.description,
     required this.inventoryId,
+    this.imagePath,
+
   }) : id = Uuid().v4(); // Generate a unique ID
 }

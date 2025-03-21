@@ -24,13 +24,14 @@ class MaterialsModelAdapter extends TypeAdapter<MaterialsModel> {
       geolocation: fields[5] as String,
       description: fields[6] as String,
       inventoryId: fields[7] as String,
+      imagePath: fields[8] as String?,
     )..id = fields[0] as String;
   }
 
   @override
   void write(BinaryWriter writer, MaterialsModel obj) {
     writer
-      ..writeByte(8)
+      ..writeByte(9)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -46,7 +47,9 @@ class MaterialsModelAdapter extends TypeAdapter<MaterialsModel> {
       ..writeByte(6)
       ..write(obj.description)
       ..writeByte(7)
-      ..write(obj.inventoryId);
+      ..write(obj.inventoryId)
+      ..writeByte(8)
+      ..write(obj.imagePath);
   }
 
   @override

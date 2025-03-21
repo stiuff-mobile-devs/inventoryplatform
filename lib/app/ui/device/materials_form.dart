@@ -62,9 +62,9 @@ class _MaterialsFormState extends State<MaterialsForm> {
               decoration: const InputDecoration(labelText: "Observações"),
             ),
             const SizedBox(height: 10),
-            controller.image == null
-                ? const Text("Nenhuma imagem selecionada")
-                : Image.file(controller.image!, height: 100),
+            Obx(() => controller.image.value == null
+                  ? const Text("Nenhuma imagem selecionada")
+                  : Image.file(controller.image.value!, height: 100),),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -79,7 +79,7 @@ class _MaterialsFormState extends State<MaterialsForm> {
               ],
             ),
             const SizedBox(height: 20),
-            controller.isLoading
+            controller.isLoading.value
                 ? const CircularProgressIndicator()
                 : ElevatedButton(
                     onPressed: () => controller.saveMaterial(context),
