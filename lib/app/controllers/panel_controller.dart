@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:inventoryplatform/app/data/models/departments_model.dart';
-import 'package:inventoryplatform/app/data/models/inventory_model.dart';
+import 'package:inventoryplatform/app/data/models/inventories_model.dart';
 import 'package:inventoryplatform/app/data/models/material_model.dart';
 
 enum TabType {
@@ -21,7 +21,7 @@ class PanelController extends GetxController {
   final RxList<dynamic> listedItems = <dynamic>[].obs;
 
   final RxList<DepartmentsModel> departments = <DepartmentsModel>[].obs;
-  final RxList<InventoryModel> inventories = <InventoryModel>[].obs;
+  final RxList<InventoriesModel> inventories = <InventoriesModel>[].obs;
   final RxList<MaterialModel> materials = <MaterialModel>[].obs;
   /*final RxList<EntityModel> entities = <EntityModel>[].obs;
   final RxList<TagModel> tags = <TagModel>[].obs;
