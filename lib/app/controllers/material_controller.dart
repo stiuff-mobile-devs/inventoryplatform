@@ -14,12 +14,10 @@ class MaterialController extends GetxController {
   final TextEditingController barcodeController = TextEditingController();
   final TextEditingController dateController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
-  final TextEditingController geolocationController = TextEditingController();
   final TextEditingController locationController = TextEditingController();
   final TextEditingController nameController = TextEditingController();
   final TextEditingController observationsController = TextEditingController();
   final ImagePicker picker = ImagePicker();
-
 
   Rx<File?> image = Rx<File?>(null);
   var isLoading = false.obs;
@@ -33,7 +31,6 @@ class MaterialController extends GetxController {
     descriptionController.clear();
     dateController.clear();
     barcodeController.clear();
-    geolocationController.clear();
     locationController.clear();
     observationsController.clear();
     image.value = null;
@@ -49,7 +46,7 @@ class MaterialController extends GetxController {
   }
 
   // Função para salvar os dados no Firebase
-  Future<void> saveMaterial(BuildContext context) async {
+  Future<void> saveMaterial(BuildContext context, String geolocationStr) async {
     if (barcodeController.text.isEmpty || locationController.text.isEmpty ){
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Preencha todos os campos.")),
@@ -64,7 +61,7 @@ class MaterialController extends GetxController {
         barcode: barcodeController.text.trim(),
         date: DateTime.parse(dateController.text.trim()),
         description: descriptionController.text.trim(),
-        geolocation: geolocationController.text.trim(),
+        geolocation: geolocationStr,
         observations: observationsController.text.trim(),
         inventoryId: (context.widget as MaterialForm).cod,
         imagePath: image.value?.path,
