@@ -25,7 +25,7 @@ class MaterialModelAdapter extends TypeAdapter<MaterialModel> {
       geolocation: fields[5] as String,
       description: fields[6] as String,
       inventoryId: fields[7] as String,
-      imagePath: fields[8] as String?,
+      imagePaths: (fields[8] as List?)?.cast<String>(),
     );
   }
 
@@ -50,7 +50,7 @@ class MaterialModelAdapter extends TypeAdapter<MaterialModel> {
       ..writeByte(7)
       ..write(obj.inventoryId)
       ..writeByte(8)
-      ..write(obj.imagePath);
+      ..write(obj.imagePaths);
   }
 
   @override

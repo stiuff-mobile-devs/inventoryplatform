@@ -2,14 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:inventoryplatform/app/controllers/material_controller.dart';
-import 'package:intl/intl.dart'; // Import the intl package
+import 'package:intl/intl.dart';
+import 'package:inventoryplatform/app/ui/device/theme/image_item.dart'; // Import the intl package
 
 class MaterialForm extends StatefulWidget {
   late final String cod;
   final String? barcode;
 
   MaterialForm({required this.cod, this.barcode});
-  
+
   @override
   _MaterialFormState createState() => _MaterialFormState();
 }
@@ -25,13 +26,19 @@ class _MaterialFormState extends State<MaterialForm> {
       controller.barcodeController.text = widget.barcode!;
     }
     // Set the current date to the dateController
-    controller.dateController.text = DateFormat('yyyy-MM-dd').format(DateTime.now());
+    controller.dateController.text =
+        DateFormat('yyyy-MM-dd').format(DateTime.now());
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Criar Novo Material", style: TextStyle(color: Colors.white),),),
+      appBar: AppBar(
+        title: const Text(
+          "Criar Novo Material",
+          style: TextStyle(color: Colors.white),
+        ),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
@@ -40,9 +47,10 @@ class _MaterialFormState extends State<MaterialForm> {
             children: [
               TextFormField(
                 controller: controller.barcodeController,
-                decoration: const InputDecoration(labelText: "Código de Barras"),
+                decoration:
+                    const InputDecoration(labelText: "Código de Barras"),
               ),
-               TextFormField(
+              TextFormField(
                 controller: controller.nameController,
                 decoration: const InputDecoration(labelText: "Nome *"),
                 validator: (value) {
@@ -87,21 +95,32 @@ class _MaterialFormState extends State<MaterialForm> {
                 },
               ),
               const SizedBox(height: 10),
-              Obx(() => controller.image.value == null
-                  ? const Text("Nenhuma imagem selecionada")
-                  : Image.file(controller.image.value!, height: 100),),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.camera),
-                    onPressed: () => controller.pickImage(ImageSource.camera),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.photo_library),
-                    onPressed: () => controller.pickImage(ImageSource.gallery),
-                  ),
-                ],
+              SizedBox(
+                height: 100,
+                child: GetBuilder<MaterialController>(
+                  builder: (controller) {
+                    return ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: 3,
+                      itemBuilder: (context, index) {
+                        return ImageItem(
+                          imagePath: index < controller.images.length
+                              ? controller.images[index]
+                              : null,
+                          onRemove: index < controller.images.length
+                              ? () {
+                                  controller.images.removeAt(index);
+                                  controller.update();
+                                }
+                              : null,
+                          onAddImage: index >= controller.images.length
+                              ? () => controller.addImage(context)
+                              : null,
+                        );
+                      },
+                    );
+                  },
+                ),
               ),
               const SizedBox(height: 20),
               controller.isLoading.value
@@ -121,4 +140,3 @@ class _MaterialFormState extends State<MaterialForm> {
     );
   }
 }
-

@@ -19,7 +19,7 @@ class MaterialController extends GetxController {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController observationsController = TextEditingController();
   final ImagePicker picker = ImagePicker();
-
+  final List<String> images = [];
 
   Rx<File?> image = Rx<File?>(null);
   var isLoading = false.obs;
@@ -45,6 +45,47 @@ class MaterialController extends GetxController {
     if (pickedFile != null) {
       image.value = File(pickedFile.path);
       update();
+    }
+  }
+
+  Future<void> addImage(BuildContext context) async {
+    if (images.length < 3) {
+      final ImageSource? source = await showDialog<ImageSource>(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text('Escolha a origem da imagem'),
+            actions: <Widget>[
+              IconButton(
+                icon: const Icon(Icons.camera_alt),
+                onPressed: () {
+                  Navigator.pop(context, ImageSource.camera);
+                },
+                tooltip: 'Câmera',
+              ),
+              IconButton(
+                icon: const Icon(Icons.photo_library),
+                onPressed: () {
+                  Navigator.pop(context, ImageSource.gallery);
+                },
+                tooltip: 'Galeria',
+              ),
+            ],
+          );
+        },
+      );
+
+      if (source != null) {
+        final XFile? image = await picker.pickImage(source: source);
+        if (image != null) {
+          images.add(image.path);
+          update();
+        }
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Máximo de 3 imagens atingido.')),
+      );
     }
   }
 
@@ -92,7 +133,7 @@ class MaterialController extends GetxController {
         geolocation: geolocationController.text.trim(),
         observations: observationsController.text.trim(),
         inventoryId: (context.widget as MaterialForm).cod,
-        imagePath: image.value?.path,
+        imagePaths: images.isNotEmpty ? images : null,
         
       );
       await box.add(material);

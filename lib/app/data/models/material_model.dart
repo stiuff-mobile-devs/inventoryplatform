@@ -28,7 +28,7 @@ class MaterialModel extends HiveObject {
   String inventoryId;
 
   @HiveField(8)
-  String? imagePath;
+  List<String>? imagePaths;
 
   MaterialModel({
     required this.id,
@@ -39,7 +39,7 @@ class MaterialModel extends HiveObject {
     required this.geolocation,
     required this.description,
     required this.inventoryId,
-    this.imagePath,
+    this.imagePaths,
 
   }) ;
 }
