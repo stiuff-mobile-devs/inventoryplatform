@@ -1,7 +1,10 @@
 import 'package:animated_splash_screen/animated_splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:get/get_navigation/src/routes/default_route.dart';
+import 'package:inventoryplatform/app/routes/app_pages.dart';
 import 'package:inventoryplatform/app/ui/device/home_page.dart';
+import 'package:inventoryplatform/app/ui/device/login_page.dart';
 
 class InitialPage extends StatelessWidget {
   const InitialPage({super.key});
@@ -24,11 +27,9 @@ class InitialPage extends StatelessWidget {
         AnimatedSplashScreen(
           duration: 5000,
           splash: SvgPicture.asset(
-            'assets/RCLLogo.svg',
-            color: Colors.white,
-
+            'assets/icons/EnhancedAppIcon.svg',
           ),
-          nextScreen:  HomePage(),
+          nextScreen: LoginPage(),
           splashTransition: SplashTransition.fadeTransition,
           backgroundColor: Colors.transparent,
         ),

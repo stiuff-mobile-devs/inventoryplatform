@@ -4,7 +4,8 @@ import 'package:get/get.dart';
 import 'package:inventoryplatform/app/controllers/home_controller.dart';
 import 'package:inventoryplatform/app/routes/app_routes.dart';
 import 'package:inventoryplatform/app/ui/device/theme/base_scaffold.dart';
-import 'package:inventoryplatform/app/ui/device/theme/carousel_section.dart' as w;
+import 'package:inventoryplatform/app/ui/device/theme/carousel_section.dart'
+    as w;
 
 class HomePage extends StatelessWidget {
   final HomeController controller = Get.put(HomeController());
@@ -110,7 +111,7 @@ class HomePage extends StatelessWidget {
         const SizedBox(height: 12),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
+          children: [
             _buildQuickActionButton(
               icon: Icons.add_circle_rounded,
               label: 'Criar um novo Departamento',

@@ -5,6 +5,7 @@ import 'package:inventoryplatform/app/routes/app_routes.dart';
 import 'package:inventoryplatform/app/ui/device/departments_form.dart';
 import 'package:inventoryplatform/app/ui/device/home_page.dart';
 import 'package:inventoryplatform/app/ui/device/initial_page.dart';
+import 'package:inventoryplatform/app/ui/device/login_page.dart';
 
 class AppPages {
   static final routes = [
@@ -13,17 +14,15 @@ class AppPages {
       page: () => HomePage(),
       binding: HomeBinding(),
     ),
- 
     GetPage(
       name: Routes.INITIAL,
       page: () => InitialPage(),
     ),
-
     GetPage(
       name: Routes.DEPARTMENT,
       page: () => const DepartmentsForm(),
       binding: DepartmentsBinding(),
     ),
-
+    GetPage(name: Routes.LOGIN, page: () => const LoginPage()),
   ];
 }
