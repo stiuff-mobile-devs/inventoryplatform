@@ -48,6 +48,30 @@ class MaterialController extends GetxController {
     }
   }
 
+  String convertToEPC(String barcode, BuildContext context) {
+    String prefix = "UFF"; // Prefixo fixo
+    
+    // Converte cada caractere do código de barras para hexadecimal
+    String hexBarcode = barcode.codeUnits.map((c) => c.toRadixString(16)).join();
+    
+    // Concatena o prefixo com o código convertido
+    String epc = prefix + hexBarcode;
+    
+    // Se o EPC for maior que 24 caracteres, corta e marca o último caractere como "X"
+    if (epc.length > 24) {
+      epc = epc.substring(0, 23) + "X"; // Último caractere vira "X"
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("⚠️ Aviso: Código de barras muito longo. Último caractere foi marcado com 'X'.")),
+      );
+    } else {
+      // Preenche com zeros se for menor
+      epc = epc.padRight(24, '0');
+    }
+
+    return epc.toUpperCase();
+  }
+
+
   // Função para salvar os dados no Firebase
   Future<void> saveMaterial(BuildContext context) async {
     if (barcodeController.text.isEmpty || locationController.text.isEmpty ){
@@ -56,10 +80,11 @@ class MaterialController extends GetxController {
       );
       return;
     }
-
+    
     try {
       final box = Hive.box<MaterialModel>('materials');
       final material = MaterialModel(
+        id: convertToEPC(barcodeController.text.trim(), context),
         name: nameController.text.trim(),
         barcode: barcodeController.text.trim(),
         date: DateTime.parse(dateController.text.trim()),
@@ -68,6 +93,7 @@ class MaterialController extends GetxController {
         observations: observationsController.text.trim(),
         inventoryId: (context.widget as MaterialForm).cod,
         imagePath: image.value?.path,
+        
       );
       await box.add(material);
       // Verifique se o usuário está autenticado

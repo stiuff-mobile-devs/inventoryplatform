@@ -118,7 +118,7 @@ class _MaterialPageState extends State<MaterialPage> {
             itemBuilder: (context, index) {
               return Row (
                   children: [
-                    Expanded(flex: 2, child: Text(_allMaterials[index].barcode)),
+                    Expanded(flex: 2, child: Text(_allMaterials[index].barcode!)),
                     Expanded(child: Text(_allMaterials[index].name)),
                     Expanded(child: Text(formatDatePortuguese(_allMaterials[index].date))),
                   ]

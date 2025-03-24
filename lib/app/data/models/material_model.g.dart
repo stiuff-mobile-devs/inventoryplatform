@@ -17,7 +17,8 @@ class MaterialModelAdapter extends TypeAdapter<MaterialModel> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return MaterialModel(
-      barcode: fields[1] as String,
+      id: fields[0] as String,
+      barcode: fields[1] as String?,
       name: fields[2] as String,
       observations: fields[3] as String,
       date: fields[4] as DateTime,
@@ -25,7 +26,7 @@ class MaterialModelAdapter extends TypeAdapter<MaterialModel> {
       description: fields[6] as String,
       inventoryId: fields[7] as String,
       imagePath: fields[8] as String?,
-    )..id = fields[0] as String;
+    );
   }
 
   @override
