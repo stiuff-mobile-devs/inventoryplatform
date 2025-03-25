@@ -58,13 +58,29 @@ class _MaterialPageState extends State<MaterialPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Relatório de Materiais',
-            style: TextStyle(
-              fontSize: 24.0,
-              fontWeight: FontWeight.bold,
-              color: Colors.black87,
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'Relatório de Materiais',
+                style: TextStyle(
+                  fontSize: 24.0,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
+              ),
+              ElevatedButton.icon(
+                onPressed: () {
+                  print('oi');
+                },
+                icon: const Icon(Icons.search),
+                label: const Text('Buscar Material'),
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                  textStyle: const TextStyle(fontSize: 12),
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 20),
           Row(

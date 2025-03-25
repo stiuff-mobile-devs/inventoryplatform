@@ -6,11 +6,9 @@ import 'package:hive/hive.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:inventoryplatform/app/data/models/material_model.dart';
 import 'package:inventoryplatform/app/ui/device/forms/material_form.dart';
+import 'package:inventoryplatform/app/ui/device/pages/materials_details_page.dart';
 
 class MaterialController extends GetxController {
-  
-  //final _panelController = Get.find<PanelController>();
-
   final TextEditingController barcodeController = TextEditingController();
   final TextEditingController dateController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
@@ -23,7 +21,7 @@ class MaterialController extends GetxController {
 
   Rx<File?> image = Rx<File?>(null);
   var isLoading = false.obs;
-   void onClose() {
+  void onClose() {
     clearData();
     super.onClose();
   }
@@ -37,10 +35,11 @@ class MaterialController extends GetxController {
     locationController.clear();
     observationsController.clear();
     image.value = null;
+    images.clear();
   }
 
   // Função para escolher ou capturar uma imagem
-   Future<void> pickImage(ImageSource source) async {
+  Future<void> pickImage(ImageSource source) async {
     final pickedFile = await picker.pickImage(source: source);
     if (pickedFile != null) {
       image.value = File(pickedFile.path);
@@ -91,18 +90,21 @@ class MaterialController extends GetxController {
 
   String convertToEPC(String barcode, BuildContext context) {
     String prefix = "UFF"; // Prefixo fixo
-    
+
     // Converte cada caractere do código de barras para hexadecimal
-    String hexBarcode = barcode.codeUnits.map((c) => c.toRadixString(16)).join();
-    
+    String hexBarcode =
+        barcode.codeUnits.map((c) => c.toRadixString(16)).join();
+
     // Concatena o prefixo com o código convertido
     String epc = prefix + hexBarcode;
-    
+
     // Se o EPC for maior que 24 caracteres, corta e marca o último caractere como "X"
     if (epc.length > 24) {
       epc = epc.substring(0, 23) + "X"; // Último caractere vira "X"
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("⚠️ Aviso: Código de barras muito longo. Último caractere foi marcado com 'X'.")),
+        const SnackBar(
+            content: Text(
+                "⚠️ Aviso: Código de barras muito longo. Último caractere foi marcado com 'X'.")),
       );
     } else {
       // Preenche com zeros se for menor
@@ -112,33 +114,65 @@ class MaterialController extends GetxController {
     return epc.toUpperCase();
   }
 
+  Future<dynamic> checkMaterial(String barcode, String id) async {
+    var box = await Hive.openBox<MaterialModel>('materials');
 
-  // Função para salvar os dados no Firebase
-  Future<void> saveMaterial(BuildContext context) async {
-    if (barcodeController.text.isEmpty || locationController.text.isEmpty ){
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Preencha todos os campos.")),
+    MaterialModel material = MaterialModel(
+        id: '',
+        name: '',
+        barcode: '',
+        date: DateTime.now(),
+        description: '',
+        geolocation: '',
+        observations: '',
+        inventoryId: '',
+        imagePaths: []);
+    if (barcode.isEmpty) {
+      material = box.values
+          .firstWhere((material) => material.id == id, orElse: () => material);
+    } else {
+      material = box.values.firstWhere(
+        (material) => material.id == id && material.barcode == barcode,
+        orElse: () => material,
       );
-      return;
     }
-    
+    return material;
+  }
+
+  // Função para salvar os dados
+  Future<void> saveMaterial(BuildContext context) async {
     try {
-      final box = Hive.box<MaterialModel>('materials');
-      final material = MaterialModel(
-        id: convertToEPC(barcodeController.text.trim(), context),
-        name: nameController.text.trim(),
-        barcode: barcodeController.text.trim(),
-        date: DateTime.parse(dateController.text.trim()),
-        description: descriptionController.text.trim(),
-        geolocation: geolocationController.text.trim(),
-        observations: observationsController.text.trim(),
-        inventoryId: (context.widget as MaterialForm).cod,
-        imagePaths: images.isNotEmpty ? images : null,
-        
-      );
-      await box.add(material);
+      String newId = convertToEPC(barcodeController.text.trim(), context);
+      MaterialModel retornado =
+          await checkMaterial(barcodeController.text.trim(), newId);
+      if (retornado.id == "") {
+        final box = Hive.box<MaterialModel>('materials');
+        final material = MaterialModel(
+          id: newId,
+          name: nameController.text.trim(),
+          barcode: barcodeController.text.trim(),
+          date: DateTime.parse(dateController.text.trim()),
+          description: descriptionController.text.trim(),
+          geolocation: geolocationController.text.trim(),
+          observations: observationsController.text.trim(),
+          inventoryId: (context.widget as MaterialForm).cod,
+          imagePaths: images.isNotEmpty ? images : null,
+        );
+        await box.add(material);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("material adicionado com sucesso!")),
+        );
+      } else {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => MaterialDetailsScreen(material: retornado),
+          ),
+        );
+      }
+
       // Verifique se o usuário está autenticado
-     /* User? user = FirebaseAuth.instance.currentUser;
+      /* User? user = FirebaseAuth.instance.currentUser;
       if (user == null) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Usuário não autenticado.")),
@@ -183,13 +217,10 @@ class MaterialController extends GetxController {
       });
 */
       // Feedback de sucesso
-      clearData();
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("material adicionado com sucesso!")),
-      );
 
       // Voltar para a tela anterior
-      Navigator.pop(context);
+      clearData();
+      //Navigator.pop(context);
     } catch (e) {
       print(e.toString());
       ScaffoldMessenger.of(context).showSnackBar(

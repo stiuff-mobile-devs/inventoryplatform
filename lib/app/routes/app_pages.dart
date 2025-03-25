@@ -56,6 +56,7 @@ class AppPages {
         barcode: Get.parameters['barcode'],
       ),
     ),
+    
 
   ];
 }
