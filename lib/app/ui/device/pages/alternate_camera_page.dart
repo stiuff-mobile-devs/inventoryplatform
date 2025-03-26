@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
+import 'package:inventoryplatform/app/controllers/material_controller.dart';
+import 'package:inventoryplatform/app/data/models/material_model.dart';
 import 'package:inventoryplatform/app/routes/app_routes.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
 class AlternateCameraPage extends StatefulWidget {
   final String? cod;
 
-  const AlternateCameraPage({super.key, this.cod});
+  const AlternateCameraPage({super.key, this.cod,});
 
   @override
   State<AlternateCameraPage> createState() => _AlternateCameraPageState();
@@ -19,6 +20,8 @@ class _AlternateCameraPageState extends State<AlternateCameraPage> {
   double _buttonOpacity = 0.0;
   bool _isInFormPage = false;
   final MobileScannerController _scannerController = MobileScannerController();
+  final MaterialController _materialController = MaterialController();
+
 
   List<Rect> _barcodeRects = [];
 
@@ -64,17 +67,27 @@ class _AlternateCameraPageState extends State<AlternateCameraPage> {
             },
           ),
           Center(
-            child: Opacity(
-              opacity: 0.5,
-              child: SvgPicture.asset(
-                'assets/icons/scan-surface.svg',
-                width: 100,
-                height: 100,
-                colorFilter: const ColorFilter.mode(
-                  Colors.white,
-                  BlendMode.srcIn,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text(
+                  'Mire em um código de barras para escanear',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              ),
+                const SizedBox(height: 20),
+                Container(
+                  width: 200,
+                  height: 200,
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.white, width: 2),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+              ],
             ),
           ),
           CustomPaint(
@@ -99,13 +112,21 @@ class _AlternateCameraPageState extends State<AlternateCameraPage> {
               duration: const Duration(milliseconds: 500),
               opacity: _buttonOpacity,
               child: GestureDetector(
-                onTap: () {
+                onTap: () async {
                   if (_scannedCode != null) {
                     setState(() {
                       _isInFormPage = true;
                     });
-                    Get.toNamed(Routes.MATERIAL,
+                    MaterialModel checkMaterial =  await _materialController.checkMaterial(_scannedCode!, '');
+                    if (checkMaterial.id.isEmpty && checkMaterial.barcode!.isEmpty){
+                        Get.toNamed(Routes.MATERIAL,
                           parameters: {'cod': widget.cod!, 'barcode': _scannedCode!});
+                      }
+                    else{
+                      MaterialModel checkMaterial =  await _materialController.checkMaterial(_scannedCode!, '');
+                      _materialController.navigateToMaterialDetails(context, checkMaterial);
+                    }
+                   
                   }
                 },
                 child: Container(

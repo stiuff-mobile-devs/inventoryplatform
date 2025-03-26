@@ -177,7 +177,7 @@ class _InventoryPageState extends State<InventoryPage> {
                 direction: DismissDirection.endToStart,
                 onDismissed: (direction) {
                   Get.toNamed(Routes.ALT_CAMERA,
-                    parameters: {'cod': item.id});
+                    parameters: {'cod': item.id},);
                 },
                 background: Container(
                   color: Colors.green,

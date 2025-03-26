@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:inventoryplatform/app/controllers/material_controller.dart';
 import 'package:inventoryplatform/app/data/models/department_model.dart';
 import 'package:inventoryplatform/app/data/models/material_model.dart';
+import 'package:inventoryplatform/app/routes/app_routes.dart';
 
 class MaterialPage extends StatefulWidget {
   const MaterialPage({super.key});
@@ -71,7 +72,7 @@ class _MaterialPageState extends State<MaterialPage> {
               ),
               ElevatedButton.icon(
                 onPressed: () {
-                  print('oi');
+                   Get.toNamed(Routes.ALT_CAMERA);                
                 },
                 icon: const Icon(Icons.search),
                 label: const Text('Buscar Material'),

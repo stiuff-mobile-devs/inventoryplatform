@@ -47,7 +47,7 @@ class AppPages {
 
     GetPage(
       name: Routes.ALT_CAMERA,
-      page: () => AlternateCameraPage(cod: Get.parameters['cod']!),
+      page: () => AlternateCameraPage(cod: Get.parameters['cod'] ?? ''),
     ),
     GetPage(
       name: Routes.MATERIAL,

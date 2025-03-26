@@ -6,7 +6,7 @@ import 'package:hive/hive.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:inventoryplatform/app/data/models/material_model.dart';
 import 'package:inventoryplatform/app/ui/device/forms/material_form.dart';
-import 'package:inventoryplatform/app/ui/device/pages/materials_details_page.dart';
+import 'package:inventoryplatform/app/ui/device/pages/material_details_page.dart';
 
 class MaterialController extends GetxController {
   final TextEditingController barcodeController = TextEditingController();
@@ -16,11 +16,13 @@ class MaterialController extends GetxController {
   final TextEditingController locationController = TextEditingController();
   final TextEditingController nameController = TextEditingController();
   final TextEditingController observationsController = TextEditingController();
+
   final ImagePicker picker = ImagePicker();
   final List<String> images = [];
-
   Rx<File?> image = Rx<File?>(null);
+
   var isLoading = false.obs;
+
   void onClose() {
     clearData();
     super.onClose();
@@ -117,6 +119,7 @@ class MaterialController extends GetxController {
   Future<dynamic> checkMaterial(String barcode, String id) async {
     var box = await Hive.openBox<MaterialModel>('materials');
 
+    // Cria um material vazio
     MaterialModel material = MaterialModel(
         id: '',
         name: '',
@@ -127,10 +130,21 @@ class MaterialController extends GetxController {
         observations: '',
         inventoryId: '',
         imagePaths: []);
+
+    //Busca pelo RFID
     if (barcode.isEmpty) {
       material = box.values
           .firstWhere((material) => material.id == id, orElse: () => material);
-    } else {
+    }
+    //Busca pelo código de barras
+    else if (barcode.isNotEmpty && id.isEmpty) {
+      material = box.values.firstWhere(
+        (material) => material.barcode == barcode,
+        orElse: () => material,
+      );
+    }
+    //Busca pelo RFID e código de barras
+    else {
       material = box.values.firstWhere(
         (material) => material.id == id && material.barcode == barcode,
         orElse: () => material,
@@ -163,14 +177,8 @@ class MaterialController extends GetxController {
           const SnackBar(content: Text("material adicionado com sucesso!")),
         );
       } else {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => MaterialDetailsScreen(material: retornado),
-          ),
-        );
+        navigateToMaterialDetails(context, retornado);
       }
-
       // Verifique se o usuário está autenticado
       /* User? user = FirebaseAuth.instance.currentUser;
       if (user == null) {
@@ -232,5 +240,14 @@ class MaterialController extends GetxController {
   List<MaterialModel> getInventories() {
     final box = Hive.box<MaterialModel>('materials');
     return box.values.toList();
+  }
+
+  void navigateToMaterialDetails(BuildContext context, MaterialModel material) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => MaterialDetailsPage(material: material),
+      ),
+    );
   }
 }
