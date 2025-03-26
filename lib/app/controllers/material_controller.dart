@@ -4,12 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:inventoryplatform/app/controllers/inventory_controller.dart';
+import 'package:inventoryplatform/app/data/models/inventory_model.dart';
 import 'package:inventoryplatform/app/data/models/material_model.dart';
 import 'package:inventoryplatform/app/ui/device/forms/material_form.dart';
 
 class MaterialController extends GetxController {
   
   //final _panelController = Get.find<PanelController>();
+  final _inventoryController = Get.find<InventoryController>();
 
   final TextEditingController barcodeController = TextEditingController();
   final TextEditingController dateController = TextEditingController();
@@ -128,8 +131,19 @@ class MaterialController extends GetxController {
     }
   }
 
-  List<MaterialModel> getInventories() {
+  List<MaterialModel> getMaterials() {
     final box = Hive.box<MaterialModel>('materials');
     return box.values.toList();
+  }
+
+  List<MaterialModel> getMaterialsByInventory(String inventoryID) {
+    final box = Hive.box<MaterialModel>('materials');
+    List<MaterialModel> materials = box.values.toList();
+
+    return materials.where((mat) => mat.inventoryId == inventoryID).toList();
+  }
+
+  List<InventoryModel> getInventories() {
+     return _inventoryController.getInventories();
   }
 }

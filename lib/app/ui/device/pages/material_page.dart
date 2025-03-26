@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:inventoryplatform/app/controllers/material_controller.dart';
 import 'package:inventoryplatform/app/data/models/department_model.dart';
+import 'package:inventoryplatform/app/data/models/inventory_model.dart';
 import 'package:inventoryplatform/app/data/models/material_model.dart';
 
 class MaterialPage extends StatefulWidget {
@@ -16,6 +17,7 @@ class _MaterialPageState extends State<MaterialPage> {
   final DepartmentModel department = Get.arguments;
   final MaterialController controller = MaterialController();
   List<MaterialModel> _allMaterials = [];
+  List<InventoryModel> _allInventories = [];
 
   //final OrganizationRepository _organizationRepository = Get.find<OrganizationRepository>();
 
@@ -23,17 +25,32 @@ class _MaterialPageState extends State<MaterialPage> {
   void initState() {
     super.initState();
     _loadItems();
+    _loadInventories();
   }
 
   Future<void> _loadItems() async {
-    final items = controller.getInventories();
+    //final items = controller.getMaterialsByInventory("b95d651b-9e02-4674-98d5-49a3dd5add47");
+    List<> items = controller.getMaterials();
+    final items = allItems.where((item) => item.departmentId == department.id).toList();
     setState(() {
       _allMaterials = items;
     });
   }
 
+  Future<void> _loadInventories() async {
+    final inventories = controller.getInventories();
+    setState(() {
+      _allInventories = inventories;
+      for (var i in _allInventories) {
+        print(i.title);
+      }
+
+    });
+  }
+
   Future<void> _onRefresh() async {
     await _loadItems();
+    await _loadInventories();
   }
 
   @override
