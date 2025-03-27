@@ -130,45 +130,41 @@ class CarouselSection extends StatelessWidget {
                         ),
                       ),
               ),
-              AnimatedPositioned(
+              AnimatedOpacity(
                 duration: const Duration(milliseconds: 300),
-                curve: Curves.easeOut,
-                bottom: controller.isHoveredList[index] ? 0 : -40,
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(10.0),
-                  child: AnimatedOpacity(
-                    duration: const Duration(milliseconds: 300),
-                    opacity: controller.isHoveredList[index] ? 1.0 : 0.0,
-                    child: Container(
-                      color: Colors.black.withOpacity(0.6),
-                      width: MediaQuery.of(context).size.width *
-                          viewportfraction *
-                          0.85,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16.0,
-                        vertical: 8.0,
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
+                opacity: 1.0, // Certifique-se de que a opacidade está definida corretamente
+                child: Positioned(
+                  bottom: 20.0, // Suba o texto ajustando este valor
+                  left: 16.0,
+                  right: 16.0,
+                  child: Container(
+                    color: Colors.black.withOpacity(0.6),
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Center(
+                          child: Text(
                             department.title,
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
-                              fontSize: (isExpanded ?? false) ? 20 : 16,
+                              fontSize: 16,
                             ),
                           ),
-                          if (department.description != null)
-                            Text(
+                        ),
+                        if (department.description != null)
+                          Center(
+                            child: Text(
                               department.description!,
-                              style: TextStyle(
+                              style: const TextStyle(
                                 color: Colors.white,
-                                fontSize: (isExpanded ?? false) ? 16 : 12,
+                                fontSize: 12,
                               ),
                             ),
-                        ],
-                      ),
+                          ),
+                      ],
                     ),
                   ),
                 ),
