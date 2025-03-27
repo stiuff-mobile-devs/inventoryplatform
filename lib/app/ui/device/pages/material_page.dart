@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:inventoryplatform/app/controllers/material_controller.dart';
 import 'package:inventoryplatform/app/data/models/department_model.dart';
+import 'package:inventoryplatform/app/data/models/inventory_model.dart';
 import 'package:inventoryplatform/app/data/models/material_model.dart';
 import 'package:inventoryplatform/app/routes/app_routes.dart';
 
@@ -17,24 +18,40 @@ class _MaterialPageState extends State<MaterialPage> {
   final DepartmentModel department = Get.arguments;
   final MaterialController controller = MaterialController();
   List<MaterialModel> _allMaterials = [];
+  List<InventoryModel> _allInventories = [];
 
-  //final OrganizationRepository _organizationRepository = Get.find<OrganizationRepository>();
+  int _inventoryIndex = 0;
 
   @override
   void initState() {
     super.initState();
     _loadItems();
+    _loadInventories();
+  }
+
+  Future<void> _onRefresh() async {
+    await _loadItems();
+    await _loadInventories();
   }
 
   Future<void> _loadItems() async {
-    final items = controller.getInventories();
+    List<MaterialModel> items;
+    if (_inventoryIndex == 0) {
+      items = controller.getMaterialsByDepartment(department.id);
+    } else {
+      items = controller.getMaterialsByInventory(_allInventories[_inventoryIndex-1].id);
+    }
+
     setState(() {
       _allMaterials = items;
     });
   }
 
-  Future<void> _onRefresh() async {
-    await _loadItems();
+  Future<void> _loadInventories() async {
+    final inventories = controller.getInventoriesByDept(department.id);
+    setState(() {
+      _allInventories = inventories;
+    });
   }
 
   @override
@@ -46,6 +63,7 @@ class _MaterialPageState extends State<MaterialPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildHeader(department.title),
+          _buildInventoryOption(),
           _buildItemList(),
         ],
       ),
@@ -148,6 +166,67 @@ class _MaterialPageState extends State<MaterialPage> {
         ],
       ),
     );
+  }
+
+  Widget _buildInventoryOption() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(),
+      child: Row (
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          IconButton(
+            color: Colors.deepPurple,
+            onPressed: _backInventoryOption,
+            icon: const Icon(Icons.arrow_back)
+          ),
+          const SizedBox(width: 20),
+          Text(_handleInventoryTitle()),
+          const SizedBox(width: 20),
+          IconButton(
+            color: Colors.deepPurple,
+            onPressed: _forwardInventoryOption,
+            icon: const Icon(Icons.arrow_forward)
+          )
+        ]
+      )
+    );
+  }
+
+  void _backInventoryOption() {
+    final length = _allInventories.length;
+    if (_inventoryIndex == 0) {
+      if (length > 0) {
+        setState(() {
+          _inventoryIndex = length;
+        });
+      }
+    } else {
+      setState(() {
+        _inventoryIndex--;
+      });
+    }
+    _onRefresh();
+  }
+
+  void _forwardInventoryOption() {
+    final length = _allInventories.length;
+    if (_inventoryIndex == length) {
+      setState(() {
+        _inventoryIndex = 0;
+      });
+    } else {
+      setState(() {
+        _inventoryIndex++;
+      });
+    }
+    _onRefresh();
+  }
+
+  String _handleInventoryTitle() {
+    if (_inventoryIndex == 0) {
+      return "Todos";
+    }
+    return _allInventories[_inventoryIndex-1].title;
   }
 
   String formatDatePortuguese(DateTime? date) {

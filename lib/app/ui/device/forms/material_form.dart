@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:inventoryplatform/app/controllers/material_controller.dart';
 import 'package:intl/intl.dart';
-import 'package:inventoryplatform/app/ui/device/theme/image_item.dart'; // Import the intl package
+import 'package:inventoryplatform/app/ui/device/theme/image_item.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class MaterialForm extends StatefulWidget {
   late final String cod;
@@ -18,16 +20,57 @@ class MaterialForm extends StatefulWidget {
 class _MaterialFormState extends State<MaterialForm> {
   final MaterialController controller = Get.find<MaterialController>();
   final _formKey = GlobalKey<FormState>();
+  bool _isLoading = false;
+  Map<String,String>? _currentPosition;
+
+  Future<void> _captureGeolocation() async {
+    setState(() {
+      _isLoading = true;
+    });
+    PermissionStatus status = await Permission.location.request();
+
+    if (status.isGranted) {
+      try {
+        Position position = await Geolocator.getCurrentPosition(
+          locationSettings:
+          const LocationSettings(accuracy: LocationAccuracy.high),
+        );
+        setState(() {
+          _currentPosition = {
+            "Latitude": "${position.latitude}",
+            "Longitude": "${position.longitude}",
+            "Altitude": "${position.altitude}"
+          };
+          _isLoading = false;
+        });
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Erro ao obter localização: $e')),
+        );
+      }
+    } else {
+      setState(() {
+        _isLoading = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Permissão de localização não concedida')),
+      );
+    }
+  }
+
+  String geolocationToStr() {
+    String? geolocationStr = _currentPosition?.entries.map((e) => "${e.key}: ${e.value}").join(", ");
+    return geolocationStr!;
+  }
 
   @override
   void initState() {
     super.initState();
+    _captureGeolocation();
     if (widget.barcode != null) {
       controller.barcodeController.text = widget.barcode!;
     }
-    // Set the current date to the dateController
-    controller.dateController.text =
-        DateFormat('yyyy-MM-dd').format(DateTime.now());
+    controller.dateController.text = DateFormat('yyyy-MM-dd').format(DateTime.now());
   }
 
   @override
@@ -95,6 +138,26 @@ class _MaterialFormState extends State<MaterialForm> {
                 },
               ),
               const SizedBox(height: 10),
+              _isLoading ? const CircularProgressIndicator() :
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text("Latitude: ${_currentPosition?["Latitude"]}",),
+                  Text("Longitude: ${_currentPosition?["Longitude"]}"),
+                  Text("Altitude: ${_currentPosition?["Altitude"]}"),
+                ],
+              ),
+              const SizedBox(height: 10),
+              _isLoading ? const CircularProgressIndicator() :
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text("Latitude: ${_currentPosition?["Latitude"]}",),
+                  Text("Longitude: ${_currentPosition?["Longitude"]}"),
+                  Text("Altitude: ${_currentPosition?["Altitude"]}"),
+                ],
+              ),
+              const SizedBox(height: 10),
               SizedBox(
                 height: 100,
                 child: GetBuilder<MaterialController>(
@@ -128,7 +191,7 @@ class _MaterialFormState extends State<MaterialForm> {
                   : ElevatedButton(
                       onPressed: () {
                         if (_formKey.currentState!.validate()) {
-                          controller.saveMaterial(context);
+                          controller.saveMaterial(context,geolocationToStr());
                         }
                       },
                       child: const Text("Salvar Material"),

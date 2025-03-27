@@ -4,21 +4,27 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:inventoryplatform/app/controllers/inventory_controller.dart';
+import 'package:inventoryplatform/app/data/models/inventory_model.dart';
 import 'package:inventoryplatform/app/data/models/material_model.dart';
 import 'package:inventoryplatform/app/ui/device/forms/material_form.dart';
 import 'package:inventoryplatform/app/ui/device/pages/material_details_page.dart';
 
 class MaterialController extends GetxController {
+  
+  //final _panelController = Get.find<PanelController>();
+  final _inventoryController = Get.find<InventoryController>();
+
   final TextEditingController barcodeController = TextEditingController();
   final TextEditingController dateController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
-  final TextEditingController geolocationController = TextEditingController();
   final TextEditingController locationController = TextEditingController();
   final TextEditingController nameController = TextEditingController();
   final TextEditingController observationsController = TextEditingController();
 
   final ImagePicker picker = ImagePicker();
-  final List<String> images = [];
+
+
   Rx<File?> image = Rx<File?>(null);
 
   var isLoading = false.obs;
@@ -33,7 +39,6 @@ class MaterialController extends GetxController {
     descriptionController.clear();
     dateController.clear();
     barcodeController.clear();
-    geolocationController.clear();
     locationController.clear();
     observationsController.clear();
     image.value = null;
@@ -167,7 +172,7 @@ class MaterialController extends GetxController {
           barcode: barcodeController.text.trim(),
           date: DateTime.parse(dateController.text.trim()),
           description: descriptionController.text.trim(),
-          geolocation: geolocationController.text.trim(),
+          geolocation: geolocationStr,
           observations: observationsController.text.trim(),
           inventoryId: (context.widget as MaterialForm).cod,
           imagePaths: images.isNotEmpty ? images : null,
@@ -237,9 +242,24 @@ class MaterialController extends GetxController {
     }
   }
 
-  List<MaterialModel> getInventories() {
+  List<MaterialModel> getMaterials() {
     final box = Hive.box<MaterialModel>('materials');
     return box.values.toList();
+  }
+
+  List<MaterialModel> getMaterialsByDepartment(String deptId) {
+    final materials = getMaterials();
+    final inventoryIds = getInventoriesByDept(deptId).map((inv) => inv.id).toList();
+    return materials.where((mat) => inventoryIds.contains(mat.inventoryId)).toList();
+  }
+
+  List<MaterialModel> getMaterialsByInventory(String inventoryId) {
+    final materials = getMaterials();
+    return materials.where((mat) => mat.inventoryId == inventoryId).toList();
+  }
+
+  List<InventoryModel> getInventoriesByDept(String deptId) {
+     return _inventoryController.getInventoriesByDepartment(deptId);
   }
 
   void navigateToMaterialDetails(BuildContext context, MaterialModel material) {
