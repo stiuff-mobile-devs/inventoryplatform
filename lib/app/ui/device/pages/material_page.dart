@@ -19,7 +19,7 @@ class _MaterialPageState extends State<MaterialPage> {
   List<MaterialModel> _allMaterials = [];
   List<InventoryModel> _allInventories = [];
 
-  //final OrganizationRepository _organizationRepository = Get.find<OrganizationRepository>();
+  int _inventoryIndex = 0;
 
   @override
   void initState() {
@@ -28,29 +28,77 @@ class _MaterialPageState extends State<MaterialPage> {
     _loadInventories();
   }
 
+  Future<void> _onRefresh() async {
+    await _loadItems();
+    await _loadInventories();
+  }
+
   Future<void> _loadItems() async {
-    //final items = controller.getMaterialsByInventory("b95d651b-9e02-4674-98d5-49a3dd5add47");
-    List<> items = controller.getMaterials();
-    final items = allItems.where((item) => item.departmentId == department.id).toList();
+    List<MaterialModel> items;
+    if (_inventoryIndex == 0) {
+      items = controller.getMaterials();
+    } else {
+      items = controller.getMaterialsByInventory(_allInventories[_inventoryIndex-1].id);
+    }
+
     setState(() {
       _allMaterials = items;
     });
   }
 
   Future<void> _loadInventories() async {
-    final inventories = controller.getInventories();
+    var inventories = controller.getInventories();
+    inventories = inventories.where((item) => item.departmentId == department.id).toList();
     setState(() {
       _allInventories = inventories;
-      for (var i in _allInventories) {
-        print(i.title);
-      }
-
     });
   }
 
-  Future<void> _onRefresh() async {
-    await _loadItems();
-    await _loadInventories();
+  void _backInventoryOption() {
+    final length = _allInventories.length;
+    if (_inventoryIndex == 0 && length > 0) {
+      setState(() {
+        _inventoryIndex = length;
+        _loadItems();
+      });
+    }
+
+    else {
+      setState(() {
+        _inventoryIndex--;
+        _loadItems();
+      });
+    }
+  }
+
+  void _forwardInventoryOption() {
+    final length = _allInventories.length;
+    if (_inventoryIndex == length) {
+      setState(() {
+        _inventoryIndex = 0;
+        _loadItems();
+      });
+    }
+
+    else {
+      setState(() {
+        _inventoryIndex++;
+        _loadItems();
+      });
+    }
+  }
+
+  String _handleInventoryTitle() {
+    if (_inventoryIndex == 0) {
+      return "Todos";
+    }
+    return _allInventories[_inventoryIndex-1].title;
+  }
+
+  String formatDatePortuguese(DateTime? date) {
+    return date != null
+        ? DateFormat("dd/MM/yyyy").format(date)
+        : "Data Indisponível";
   }
 
   @override
@@ -62,6 +110,7 @@ class _MaterialPageState extends State<MaterialPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildHeader(department.title),
+          _buildInventoryOption(),
           _buildItemList(),
         ],
       ),
@@ -150,9 +199,25 @@ class _MaterialPageState extends State<MaterialPage> {
     );
   }
 
-  String formatDatePortuguese(DateTime? date) {
-    return date != null
-        ? DateFormat("dd/MM/yyyy").format(date)
-        : "Data Indisponível";
+  Widget _buildInventoryOption() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(),
+      child: Row (
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          IconButton(
+            color: Colors.deepPurple,
+            onPressed: _backInventoryOption,
+            icon: const Icon(Icons.arrow_back)
+          ),
+          Text(_handleInventoryTitle()),
+          IconButton(
+            color: Colors.deepPurple,
+            onPressed: _forwardInventoryOption,
+            icon: const Icon(Icons.arrow_forward)
+          )
+        ]
+      )
+    );
   }
 }
