@@ -33,9 +33,36 @@ dev_dependencies:
   hive_generator: ^2.0.1
   build_runner: ^2.4.13
   ulid: ^2.0.1
-
-  
+  flutter_launcher_icons: ^0.13.1
   flutter_lints: ^4.0.0
+  flutter_native_splash: ^2.0.5
+  
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  remove_alpha_ios: true
+  background_color_ios: "#ffffff"
+  image_path: "assets/images/AppLogo-1024x1024.png"
+  min_sdk_android: 21
+  web:
+    generate: true
+    image_path: "assets/images/AppLogoWeb-1024x1024.png"
+    background_color: "#ffffff"
+    theme_color: "#ffffff"
+
+flutter_native_splash:
+  color: "#FFFFFF" 
+  image: "assets/images/JustLogoInventarioSplash-1024x1024.png" 
+  android: true 
+  ios: true 
+  web: true
+  fullscreen: true 
+
+  android_12:
+    icon_background_color: "#FFFFFF"
+    image: "assets/images/JustLogoInventarioSplash-1024x1024.png" 
+    icon_background_color_dark: "#1a1a1a"
+    image_dark: "assets/images/JustLogoInventarioSplash-1024x1024.png" 
 
 flutter:
   uses-material-design: true

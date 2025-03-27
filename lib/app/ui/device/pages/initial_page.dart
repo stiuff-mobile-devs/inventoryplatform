@@ -24,9 +24,7 @@ class InitialPage extends StatelessWidget {
         AnimatedSplashScreen(
           duration: 5000,
           splash: SvgPicture.asset(
-            'assets/RCLLogo.svg',
-            color: Colors.white,
-
+            'assets/icons/JustLogoColetor.svg',
           ),
           nextScreen:  HomePage(),
           splashTransition: SplashTransition.fadeTransition,
