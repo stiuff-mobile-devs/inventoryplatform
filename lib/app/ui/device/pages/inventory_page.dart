@@ -4,7 +4,6 @@ import 'package:inventoryplatform/app/controllers/inventory_controller.dart';
 import 'package:inventoryplatform/app/controllers/panel_controller.dart';
 import 'package:inventoryplatform/app/data/models/inventory_model.dart';
 import 'package:inventoryplatform/app/routes/app_routes.dart';
-import 'package:inventoryplatform/app/ui/device/theme/details_dialog.dart';
 import 'package:inventoryplatform/app/ui/device/theme/list_item_widget.dart';
 import 'package:inventoryplatform/app/ui/device/theme/search_bar_widget.dart';
 import 'package:inventoryplatform/app/ui/device/theme/temporary_message_display.dart';
@@ -172,59 +171,115 @@ class _InventoryPageState extends State<InventoryPage> {
 
             if (items[index] is InventoryModel) {
               InventoryModel item = items[index];
-              return Dismissible(
-                key: Key(item.id.toString()),
-                direction: DismissDirection.endToStart,
-                onDismissed: (direction) {
-                  Get.toNamed(Routes.ALT_CAMERA,
-                    parameters: {'cod': item.id},);
+              return ListItemWidget(
+                attributes: {
+                  'Título': item.title,
+                  'Descrição': item.description,
+                  'Criado em': "data",
+                  'Atualizado em': "data",
                 },
-                background: Container(
-                  color: Colors.green,
-                  alignment: Alignment.centerLeft,
-                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                  child: const Icon(
-                    Icons.add,
-                    color: Colors.white,
-                  ),
-                ),
-                child: ListItemWidget(
-                  attributes: {
-                    'Título': item.title,
-                    'Descrição': item.description,
-                    'Criado em': "data",
-                    'Atualizado em':  "data",
-                  },
-                  isActive: 1,
-                  icon: Icons.donut_large_rounded,
-                  onTap: (context) {
-                    searchFocusNode.unfocus();
-                    showDetailsDialog(
-                      context,
-                      {
-                        'Título': item.title,
-                        'Descrição': item.description,
-                        'Está Ativo?':  'sim',
-                        'Número de Revisão': item.revisionNumber,
-                        'Data de Criação': "data",
-                        'Última Atualização': "data",
-                      },
-                      () async {
-                        searchFocusNode.unfocus();
-                        Navigator.of(context).pop();
-                        // await Get.toNamed(
-                        //   AppRoutes.form,
-                        //   arguments: [
-                        //     _utilsService.tabIndexToEnum(
-                        //         _panelController.selectedTabIndex.value),
-                        //     _panelController.inventories
-                        //         .firstWhere((e) => e.id == item.id),
-                        //   ],
-                        // );
-                      },
-                    );
-                  },
-                ),
+                isActive: 1,
+                icon: Icons.donut_large_rounded,
+                onTap: (context) {
+                  searchFocusNode.unfocus();
+                  showDialog(
+                    context: context,
+                    builder: (context) {
+                      return Dialog(
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+                        child: Stack(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const SizedBox(height: 8.0), // Espaço para o botão "X"
+                                  Text(
+                                    item.title,
+                                    style: const TextStyle(
+                                      fontSize: 20.0,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 16.0),
+                                  Text("Descrição: ${item.description}"),
+                                  const SizedBox(height: 8.0),
+                                  Text("Número de Revisão: ${item.revisionNumber}"),
+                                  const SizedBox(height: 8.0),
+                                  Text("Data de Criação: data"), // Substitua "data" pelo valor real
+                                  const SizedBox(height: 8.0),
+                                  Text("Última Atualização: data"), // Substitua "data" pelo valor real
+                                  const SizedBox(height: 24.0),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Expanded(
+                                        child: ElevatedButton(
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                            // Adicione a lógica para editar
+                                          },
+                                          style: ElevatedButton.styleFrom(
+                                            padding: const EdgeInsets.all(12.0),
+                                          ),
+                                          child: const Icon(Icons.edit),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8.0), // Espaço entre os botões
+                                      Expanded(
+                                        child: ElevatedButton(
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                            Get.toNamed(
+                                              Routes.ALT_CAMERA,
+                                              parameters: {'cod': item.id},
+                                            );
+                                          },
+                                          style: ElevatedButton.styleFrom(
+                                            padding: const EdgeInsets.all(12.0),
+                                          ),
+                                          child: const Icon(Icons.add),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8.0), // Espaço entre os botões
+                                      Expanded(
+                                        child: ElevatedButton(
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                            // Adicione a lógica para visualizar
+                                          },
+                                          style: ElevatedButton.styleFrom(
+                                            padding: const EdgeInsets.all(12.0),
+                                          ),
+                                          child: const Icon(Icons.search),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Positioned(
+                              top: 8.0,
+                              right: 8.0,
+                              child: GestureDetector(
+                                onTap: () {
+                                  Navigator.of(context).pop();
+                                },
+                                child: const Icon(
+                                  Icons.close,
+                                  color: Colors.black,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  );
+                },
               );
             }
             return null;
