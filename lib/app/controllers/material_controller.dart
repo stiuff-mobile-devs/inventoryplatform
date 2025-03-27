@@ -136,14 +136,18 @@ class MaterialController extends GetxController {
     return box.values.toList();
   }
 
-  List<MaterialModel> getMaterialsByInventory(String inventoryID) {
-    final box = Hive.box<MaterialModel>('materials');
-    List<MaterialModel> materials = box.values.toList();
-
-    return materials.where((mat) => mat.inventoryId == inventoryID).toList();
+  List<MaterialModel> getMaterialsByDepartment(String deptId) {
+    final materials = getMaterials();
+    final inventoryIds = getInventoriesByDept(deptId).map((inv) => inv.id).toList();
+    return materials.where((mat) => inventoryIds.contains(mat.inventoryId)).toList();
   }
 
-  List<InventoryModel> getInventories() {
-     return _inventoryController.getInventories();
+  List<MaterialModel> getMaterialsByInventory(String inventoryId) {
+    final materials = getMaterials();
+    return materials.where((mat) => mat.inventoryId == inventoryId).toList();
+  }
+
+  List<InventoryModel> getInventoriesByDept(String deptId) {
+     return _inventoryController.getInventoriesByDepartment(deptId);
   }
 }

@@ -36,7 +36,7 @@ class _MaterialPageState extends State<MaterialPage> {
   Future<void> _loadItems() async {
     List<MaterialModel> items;
     if (_inventoryIndex == 0) {
-      items = controller.getMaterials();
+      items = controller.getMaterialsByDepartment(department.id);
     } else {
       items = controller.getMaterialsByInventory(_allInventories[_inventoryIndex-1].id);
     }
@@ -47,58 +47,10 @@ class _MaterialPageState extends State<MaterialPage> {
   }
 
   Future<void> _loadInventories() async {
-    var inventories = controller.getInventories();
-    inventories = inventories.where((item) => item.departmentId == department.id).toList();
+    final inventories = controller.getInventoriesByDept(department.id);
     setState(() {
       _allInventories = inventories;
     });
-  }
-
-  void _backInventoryOption() {
-    final length = _allInventories.length;
-    if (_inventoryIndex == 0 && length > 0) {
-      setState(() {
-        _inventoryIndex = length;
-        _loadItems();
-      });
-    }
-
-    else {
-      setState(() {
-        _inventoryIndex--;
-        _loadItems();
-      });
-    }
-  }
-
-  void _forwardInventoryOption() {
-    final length = _allInventories.length;
-    if (_inventoryIndex == length) {
-      setState(() {
-        _inventoryIndex = 0;
-        _loadItems();
-      });
-    }
-
-    else {
-      setState(() {
-        _inventoryIndex++;
-        _loadItems();
-      });
-    }
-  }
-
-  String _handleInventoryTitle() {
-    if (_inventoryIndex == 0) {
-      return "Todos";
-    }
-    return _allInventories[_inventoryIndex-1].title;
-  }
-
-  String formatDatePortuguese(DateTime? date) {
-    return date != null
-        ? DateFormat("dd/MM/yyyy").format(date)
-        : "Data Indisponível";
   }
 
   @override
@@ -210,7 +162,9 @@ class _MaterialPageState extends State<MaterialPage> {
             onPressed: _backInventoryOption,
             icon: const Icon(Icons.arrow_back)
           ),
+          const SizedBox(width: 20),
           Text(_handleInventoryTitle()),
+          const SizedBox(width: 20),
           IconButton(
             color: Colors.deepPurple,
             onPressed: _forwardInventoryOption,
@@ -219,5 +173,48 @@ class _MaterialPageState extends State<MaterialPage> {
         ]
       )
     );
+  }
+
+  void _backInventoryOption() {
+    final length = _allInventories.length;
+    if (_inventoryIndex == 0) {
+      if (length > 0) {
+        setState(() {
+          _inventoryIndex = length;
+        });
+      }
+    } else {
+      setState(() {
+        _inventoryIndex--;
+      });
+    }
+    _onRefresh();
+  }
+
+  void _forwardInventoryOption() {
+    final length = _allInventories.length;
+    if (_inventoryIndex == length) {
+      setState(() {
+        _inventoryIndex = 0;
+      });
+    } else {
+      setState(() {
+        _inventoryIndex++;
+      });
+    }
+    _onRefresh();
+  }
+
+  String _handleInventoryTitle() {
+    if (_inventoryIndex == 0) {
+      return "Todos";
+    }
+    return _allInventories[_inventoryIndex-1].title;
+  }
+
+  String formatDatePortuguese(DateTime? date) {
+    return date != null
+        ? DateFormat("dd/MM/yyyy").format(date)
+        : "Data Indisponível";
   }
 }

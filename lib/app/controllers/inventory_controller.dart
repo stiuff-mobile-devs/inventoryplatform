@@ -86,4 +86,9 @@ class InventoryController extends GetxController {
     final box = Hive.box<InventoryModel>('inventories');
     return box.values.toList();
   }
+
+  List<InventoryModel> getInventoriesByDepartment(String deptId) {
+    final inventories = getInventories();
+    return inventories.where((item) => item.departmentId == deptId).toList();
+  }
 }
