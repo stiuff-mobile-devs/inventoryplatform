@@ -148,16 +148,6 @@ class _MaterialFormState extends State<MaterialForm> {
                 ],
               ),
               const SizedBox(height: 10),
-              _isLoading ? const CircularProgressIndicator() :
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text("Latitude: ${_currentPosition?["Latitude"]}",),
-                  Text("Longitude: ${_currentPosition?["Longitude"]}"),
-                  Text("Altitude: ${_currentPosition?["Altitude"]}"),
-                ],
-              ),
-              const SizedBox(height: 10),
               SizedBox(
                 height: 100,
                 child: GetBuilder<MaterialController>(
