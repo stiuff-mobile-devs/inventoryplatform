@@ -24,7 +24,7 @@ class MaterialController extends GetxController {
 
   final ImagePicker picker = ImagePicker();
 
-
+  final List<String> images = [];
   Rx<File?> image = Rx<File?>(null);
 
   var isLoading = false.obs;
@@ -159,7 +159,7 @@ class MaterialController extends GetxController {
   }
 
   // Função para salvar os dados
-  Future<void> saveMaterial(BuildContext context) async {
+  Future<void> saveMaterial(BuildContext context, String geolocationStr) async {
     try {
       String newId = convertToEPC(barcodeController.text.trim(), context);
       MaterialModel retornado =
