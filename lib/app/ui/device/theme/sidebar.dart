@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:inventoryplatform/app/controllers/sidebar_controller.dart';
 import 'package:inventoryplatform/app/routes/app_routes.dart';
 import 'package:sidebarx/sidebarx.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class CustomSidebar extends StatelessWidget {
   CustomSidebar({super.key});
@@ -89,6 +90,17 @@ class CustomSidebar extends StatelessWidget {
             sidebarController.selectIndex(0);
           },
         ),
+        SidebarXItem(
+          icon: Icons.menu_book_outlined,
+          label: 'Manual do Usuário',
+          onTap: () async {
+            final Uri _url = Uri.parse(
+                'https://github.com/stiuff-mobile-devs/inventoryplatform/wiki');
+            if (!await launchUrl(_url)) {
+              throw Exception('Could not launch $_url');
+            }
+          },
+        )
         /*SidebarXItem(
           icon: Icons.settings_applications,
           label: 'Configurações',
@@ -136,7 +148,7 @@ class CustomSidebar extends StatelessWidget {
     );
   }
 
- /* Widget _buildUserAvatar(SidebarController controller, bool extended) {
+  /* Widget _buildUserAvatar(SidebarController controller, bool extended) {
     final double radius = extended ? 30 : 16;
     final double size = extended ? 60 : 32;
     final double iconSize = extended ? 48 : 24;
