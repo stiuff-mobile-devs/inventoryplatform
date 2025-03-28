@@ -13,6 +13,7 @@ class DepartmentController extends GetxController {
 
   Rx<File?> image = Rx<File?>(null);
   var isLoading = false.obs;
+  var showError = false.obs;
 
   @override
   void onClose() {
@@ -24,17 +25,24 @@ class DepartmentController extends GetxController {
     titleController.clear();
     descriptionController.clear();
     image.value = null;
+    showError.value = false;
   }
-  
+
   Future<void> pickImage(ImageSource source) async {
     final pickedFile = await picker.pickImage(source: source);
     if (pickedFile != null) {
       image.value = File(pickedFile.path);
+      showError.value = false;
       update();
     }
   }
 
   Future<void> saveDepartment(BuildContext context) async {
+    if (image.value == null) {
+      showError.value = true;
+      return;
+    }
+
     isLoading.value = true;
 
     try {
@@ -58,12 +66,12 @@ class DepartmentController extends GetxController {
 
       mockService.addSampleOrganizations();
       */
-      //SALVANDO NO BD LOCAL 
+      //SALVANDO NO BD LOCAL
       final box = Hive.box<DepartmentModel>('departments');
       final department = DepartmentModel(
         title: titleController.text.trim(),
         description: descriptionController.text.trim(),
-        imagePath: image.value?.path,
+        imagePath: image.value!.path,
       );
       await box.add(department);
 

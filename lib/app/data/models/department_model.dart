@@ -15,11 +15,11 @@ class DepartmentModel extends HiveObject {
   String description;
 
   @HiveField(3)
-  String? imagePath;
+  String imagePath;
 
   DepartmentModel({
     required this.title,
     required this.description,
-    this.imagePath,
+    required this.imagePath,
   }) : id = Uuid().v4(); // Generate a unique ID
 }

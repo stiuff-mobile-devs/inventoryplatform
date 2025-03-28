@@ -19,7 +19,7 @@ class DepartmentModelAdapter extends TypeAdapter<DepartmentModel> {
     return DepartmentModel(
       title: fields[1] as String,
       description: fields[2] as String,
-      imagePath: fields[3] as String?,
+      imagePath: fields[3] as String,
     )..id = fields[0] as String;
   }
 

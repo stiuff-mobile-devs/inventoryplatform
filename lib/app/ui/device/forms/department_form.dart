@@ -13,7 +13,9 @@ class DepartmentForm extends StatelessWidget {
     final DepartmentController controller = Get.find<DepartmentController>();
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Criar Novo Departamento", style: TextStyle(color: Colors.white))),
+      appBar: AppBar(
+          title: const Text("Criar Novo Departamento",
+              style: TextStyle(color: Colors.white))),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
@@ -35,9 +37,11 @@ class DepartmentForm extends StatelessWidget {
                 decoration: const InputDecoration(labelText: "Descrição"),
               ),
               const SizedBox(height: 10),
-              Obx(() => controller.image.value == null
-                  ? const Text("Nenhuma imagem selecionada")
-                  : Image.file(controller.image.value!, height: 100),),
+              Obx(
+                () => controller.image.value == null
+                    ? const Text("Nenhuma imagem selecionada")
+                    : Image.file(controller.image.value!, height: 100),
+              ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -51,12 +55,27 @@ class DepartmentForm extends StatelessWidget {
                   ),
                 ],
               ),
+              Obx(() {
+                return controller.showError.value
+                    ? const Padding(
+                        padding: EdgeInsets.only(top: 8),
+                        child: Text(
+                          "Selecione uma imagem antes de continuar!",
+                          style: TextStyle(color: Colors.red),
+                        ),
+                      )
+                    : Container();
+              }),
               const SizedBox(height: 20),
               controller.isLoading.value
                   ? const CircularProgressIndicator()
                   : ElevatedButton(
                       onPressed: () {
                         if (_formKey.currentState!.validate()) {
+                          if (controller.image.value == null) {
+                            controller.showError.value = true;
+                            return;
+                          }
                           controller.saveDepartment(context);
                         }
                       },
