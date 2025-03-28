@@ -39,7 +39,8 @@ class _MaterialPageState extends State<MaterialPage> {
     if (_inventoryIndex == 0) {
       items = controller.getMaterialsByDepartment(department.id);
     } else {
-      items = controller.getMaterialsByInventory(_allInventories[_inventoryIndex-1].id);
+      items = controller
+          .getMaterialsByInventory(_allInventories[_inventoryIndex - 1].id);
     }
 
     setState(() {
@@ -83,19 +84,20 @@ class _MaterialPageState extends State<MaterialPage> {
               const Text(
                 'Relatório de Materiais',
                 style: TextStyle(
-                  fontSize: 24.0,
+                  fontSize: 22.0,
                   fontWeight: FontWeight.bold,
                   color: Colors.black87,
                 ),
               ),
               ElevatedButton.icon(
                 onPressed: () {
-                   Get.toNamed(Routes.ALT_CAMERA);                
+                  Get.toNamed(Routes.ALT_CAMERA);
                 },
                 icon: const Icon(Icons.search),
                 label: const Text('Buscar Material'),
                 style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 8.0, vertical: 4.0),
                   textStyle: const TextStyle(fontSize: 12),
                 ),
               ),
@@ -134,33 +136,45 @@ class _MaterialPageState extends State<MaterialPage> {
   Widget _buildItemList() {
     return Padding(
       padding: const EdgeInsets.only(left: 20, top: 10, right: 20, bottom: 20),
-      child:
-      Column (
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          const Row (
+          const Row(
             children: [
-              Expanded(flex: 2, child: Text("Código de Barras", style: TextStyle(fontWeight: FontWeight.bold))),
-              Expanded(child: Text("Título", style: TextStyle(fontWeight: FontWeight.bold))),
-              Expanded(child: Text("Adicionado", style: TextStyle(fontWeight: FontWeight.bold))),
+              Expanded(
+                  flex: 2,
+                  child: Text("Código de Barras",
+                      style: TextStyle(fontWeight: FontWeight.bold))),
+              Expanded(
+                  child: Text("Título",
+                      style: TextStyle(fontWeight: FontWeight.bold))),
+              Expanded(
+                  child: Text("Adicionado",
+                      style: TextStyle(fontWeight: FontWeight.bold))),
             ],
           ),
-          const Divider(color: Colors.black, thickness: 1, indent: 1, endIndent: 1),
+          const Divider(
+              color: Colors.black, thickness: 1, indent: 1, endIndent: 1),
           ListView.separated(
             scrollDirection: Axis.vertical,
             shrinkWrap: true,
             itemCount: _allMaterials.length,
             itemBuilder: (context, index) {
-              return Row (
-                  children: [
-                    Expanded(flex: 2, child: Text(_allMaterials[index].barcode!)),
-                    Expanded(child: Text(_allMaterials[index].name)),
-                    Expanded(child: Text(formatDatePortuguese(_allMaterials[index].date))),
-                  ]
-              );
+              return Row(children: [
+                Expanded(flex: 2, child: Text(_allMaterials[index].barcode!)),
+                Expanded(child: Text(_allMaterials[index].name)),
+                Expanded(
+                    child:
+                        Text(formatDatePortuguese(_allMaterials[index].date))),
+              ]);
             },
             separatorBuilder: (context, index) {
-              return const Divider(color: Colors.grey, thickness: 1, indent: 1, endIndent: 1,);
+              return const Divider(
+                color: Colors.grey,
+                thickness: 1,
+                indent: 1,
+                endIndent: 1,
+              );
             },
           )
         ],
@@ -170,26 +184,20 @@ class _MaterialPageState extends State<MaterialPage> {
 
   Widget _buildInventoryOption() {
     return Padding(
-      padding: const EdgeInsets.symmetric(),
-      child: Row (
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
+        padding: const EdgeInsets.symmetric(),
+        child: Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
           IconButton(
-            color: Colors.deepPurple,
-            onPressed: _backInventoryOption,
-            icon: const Icon(Icons.arrow_back)
-          ),
+              color: Colors.deepPurple,
+              onPressed: _backInventoryOption,
+              icon: const Icon(Icons.arrow_back)),
           const SizedBox(width: 20),
           Text(_handleInventoryTitle()),
           const SizedBox(width: 20),
           IconButton(
-            color: Colors.deepPurple,
-            onPressed: _forwardInventoryOption,
-            icon: const Icon(Icons.arrow_forward)
-          )
-        ]
-      )
-    );
+              color: Colors.deepPurple,
+              onPressed: _forwardInventoryOption,
+              icon: const Icon(Icons.arrow_forward))
+        ]));
   }
 
   void _backInventoryOption() {
@@ -226,7 +234,7 @@ class _MaterialPageState extends State<MaterialPage> {
     if (_inventoryIndex == 0) {
       return "Todos";
     }
-    return _allInventories[_inventoryIndex-1].title;
+    return _allInventories[_inventoryIndex - 1].title;
   }
 
   String formatDatePortuguese(DateTime? date) {
