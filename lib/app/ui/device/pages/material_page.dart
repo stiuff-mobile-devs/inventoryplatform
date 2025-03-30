@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'dart:io';
+import 'package:file_picker/file_picker.dart';
+import 'dart:typed_data';
+import 'package:path/path.dart' as p;
+import 'package:pdf/widgets.dart' as pw;
 import 'package:inventoryplatform/app/controllers/material_controller.dart';
 import 'package:inventoryplatform/app/data/models/department_model.dart';
 import 'package:inventoryplatform/app/data/models/inventory_model.dart';
 import 'package:inventoryplatform/app/data/models/material_model.dart';
 import 'package:inventoryplatform/app/routes/app_routes.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class MaterialPage extends StatefulWidget {
   const MaterialPage({super.key});
@@ -21,6 +27,59 @@ class _MaterialPageState extends State<MaterialPage> {
   List<InventoryModel> _allInventories = [];
 
   int _inventoryIndex = 0;
+
+  Future<void> generatePdf() async {
+    // PermissionStatus status = await Permission.manageExternalStorage.request();
+    // if (!status.isGranted) {
+    //   return;
+    // }
+
+    final pdf = pw.Document();
+    pdf.addPage(
+      pw.Page(
+        build: (pw.Context context) {
+          return pw.Wrap(
+            children: [
+              pw.Column (
+                children: [
+                  pw.Row (
+                    children: [
+                      pw.Expanded(flex: 2, child: pw.Text("Código de Barras",)),
+                      pw.Expanded(child: pw.Text("Título",)),
+                      pw.Expanded(child: pw.Text("Adicionado", )),
+                    ],
+                  ),
+                  pw.Divider( thickness: 1, indent: 1, endIndent: 1),
+                  pw.ListView.builder(
+                    itemCount: _allMaterials.length,
+                    itemBuilder: (context, index) {
+                      return pw.Row (
+                          children: [
+                            pw.Expanded(flex: 2, child: pw.Text(_allMaterials[index].barcode!)),
+                            pw.Expanded(child: pw.Text(_allMaterials[index].name)),
+                            pw.Expanded(child: pw.Text(formatDatePortuguese(_allMaterials[index].date))),
+                          ]
+                      );
+                    },
+                  )
+                ],
+              ),
+            ]
+          );
+        },
+      ),
+    );
+
+    final Uint8List pdfData = await pdf.save();
+    String? selectedDirectory = await FilePicker.platform.getDirectoryPath();
+
+    if (selectedDirectory != null) {
+      final filePath = p.join(selectedDirectory, "relatório.pdf");
+      final file = File(filePath);
+      await file.writeAsBytes(pdfData);
+      print("PDF salvo em: $filePath");
+    }
+  }
 
   @override
   void initState() {
@@ -64,7 +123,13 @@ class _MaterialPageState extends State<MaterialPage> {
         children: [
           _buildHeader(department.title),
           _buildInventoryOption(),
-          _buildItemList(),
+          _buildItemList()!,
+          Center (
+            child: ElevatedButton(
+              onPressed: generatePdf,
+              child: const Text("Gerar PDF"),
+            )
+          )
         ],
       ),
     );
@@ -131,7 +196,7 @@ class _MaterialPageState extends State<MaterialPage> {
     );
   }
 
-  Widget _buildItemList() {
+  Widget? _buildItemList() {
     return Padding(
       padding: const EdgeInsets.only(left: 20, top: 10, right: 20, bottom: 20),
       child:
