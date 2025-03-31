@@ -20,7 +20,7 @@ class _MaterialFormState extends State<MaterialForm> {
   final MaterialController controller = Get.find<MaterialController>();
   final _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
-  Map<String,String>? _currentPosition;
+  Map<String, String>? _currentPosition;
 
   Future<void> _captureGeolocation() async {
     setState(() {
@@ -30,7 +30,7 @@ class _MaterialFormState extends State<MaterialForm> {
 
     if (status.isGranted) {
       try {
-       // Position position = await Geolocator.getCurrentPosition(
+// Position position = await Geolocator.getCurrentPosition(
          // locationSettings:
         //  const LocationSettings(accuracy: LocationAccuracy.high),
         //);
@@ -81,20 +81,36 @@ class _MaterialFormState extends State<MaterialForm> {
           style: TextStyle(color: Colors.white),
         ),
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              const Text(
+                "Informações do Material",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 10),
               TextFormField(
                 controller: controller.barcodeController,
-                decoration:
-                    const InputDecoration(labelText: "Código de Barras"),
+                decoration: InputDecoration(
+                  labelText: "Código de Barras",
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                ),
               ),
+              const SizedBox(height: 10),
               TextFormField(
                 controller: controller.nameController,
-                decoration: const InputDecoration(labelText: "Nome *"),
+                decoration: InputDecoration(
+                  labelText: "Nome *",
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Nome é obrigatório';
@@ -102,9 +118,15 @@ class _MaterialFormState extends State<MaterialForm> {
                   return null;
                 },
               ),
+              const SizedBox(height: 10),
               TextFormField(
                 controller: controller.descriptionController,
-                decoration: const InputDecoration(labelText: "Descrição *"),
+                decoration: InputDecoration(
+                  labelText: "Descrição *",
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Descrição é obrigatória';
@@ -112,13 +134,25 @@ class _MaterialFormState extends State<MaterialForm> {
                   return null;
                 },
               ),
+              const SizedBox(height: 10),
               TextFormField(
                 controller: controller.dateController,
-                decoration: const InputDecoration(labelText: "Data"),
+                decoration: InputDecoration(
+                  labelText: "Data",
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                ),
               ),
+              const SizedBox(height: 10),
               TextFormField(
                 controller: controller.locationController,
-                decoration: const InputDecoration(labelText: "Localização *"),
+                decoration: InputDecoration(
+                  labelText: "Localização *",
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Localização é obrigatória';
@@ -126,9 +160,15 @@ class _MaterialFormState extends State<MaterialForm> {
                   return null;
                 },
               ),
+              const SizedBox(height: 10),
               TextFormField(
                 controller: controller.observationsController,
-                decoration: const InputDecoration(labelText: "Observações *"),
+                decoration: InputDecoration(
+                  labelText: "Observações *",
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Observações são obrigatórias';
@@ -137,15 +177,34 @@ class _MaterialFormState extends State<MaterialForm> {
                 },
               ),
               const SizedBox(height: 10),
-              _isLoading ? const CircularProgressIndicator() :
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text("Latitude: ${_currentPosition?["Latitude"]}",),
-                  Text("Longitude: ${_currentPosition?["Longitude"]}"),
-                  Text("Altitude: ${_currentPosition?["Altitude"]}"),
-                ],
-              ),
+              _isLoading
+                  ? const CircularProgressIndicator()
+                  : Container(
+                      padding: const EdgeInsets.all(16.0),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey),
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Text(
+                            "Latitude: ${_currentPosition?["Latitude"] ?? "N/A"}",
+                            style: const TextStyle(fontSize: 16),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            "Longitude: ${_currentPosition?["Longitude"] ?? "N/A"}",
+                            style: const TextStyle(fontSize: 16),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            "Altitude: ${_currentPosition?["Altitude"] ?? "N/A"}",
+                            style: const TextStyle(fontSize: 16),
+                          ),
+                        ],
+                      ),
+                    ),
               const SizedBox(height: 10),
               SizedBox(
                 height: 100,
@@ -175,16 +234,28 @@ class _MaterialFormState extends State<MaterialForm> {
                 ),
               ),
               const SizedBox(height: 20),
-              controller.isLoading.value
-                  ? const CircularProgressIndicator()
-                  : ElevatedButton(
-                      onPressed: () {
-                        if (_formKey.currentState!.validate()) {
-                          controller.saveMaterial(context,geolocationToStr());
-                        }
-                      },
-                      child: const Text("Salvar Material"),
-                    ),
+              Center(
+                child: controller.isLoading.value
+                    ? const CircularProgressIndicator()
+                    : ElevatedButton(
+                        onPressed: () {
+                          if (_formKey.currentState!.validate()) {
+                            controller.saveMaterial(context, geolocationToStr());
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                          backgroundColor: Colors.blue,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                        ),
+                        child: const Text(
+                          "Salvar Material",
+                          style: TextStyle(color: Colors.white, fontSize: 16),
+                        ),
+                      ),
+              ),
             ],
           ),
         ),
