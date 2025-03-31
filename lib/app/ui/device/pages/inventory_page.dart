@@ -61,7 +61,7 @@ class _InventoryPageState extends State<InventoryPage> {
       return;
     }
 
-   /* final filteredList = _panelController.inventories
+    /* final filteredList = _panelController.inventories
         .where((inventory) =>
             inventory?title.toLowerCase().contains(query.toLowerCase()))
         .toList();*/
@@ -143,7 +143,6 @@ class _InventoryPageState extends State<InventoryPage> {
               label: const Text('Adicionar Inventário'),
               style: TextButton.styleFrom(foregroundColor: Colors.blue),
             ),
-           
           ],
         ),
       ],
@@ -190,7 +189,8 @@ class _InventoryPageState extends State<InventoryPage> {
                     context: context,
                     builder: (context) {
                       return Dialog(
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10.0)),
                         child: Stack(
                           children: [
                             Padding(
@@ -199,7 +199,8 @@ class _InventoryPageState extends State<InventoryPage> {
                                 mainAxisSize: MainAxisSize.min,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const SizedBox(height: 8.0), // Espaço para o botão "X"
+                                  const SizedBox(
+                                      height: 8.0), // Espaço para o botão "X"
                                   Text(
                                     item.title,
                                     style: const TextStyle(
@@ -210,7 +211,8 @@ class _InventoryPageState extends State<InventoryPage> {
                                   const SizedBox(height: 16.0),
                                   Text("Descriçãos: ${item.description}"),
                                   const SizedBox(height: 8.0),
-                                  Text("Número de Revisão: ${item.revisionNumber}"),
+                                  Text(
+                                      "Número de Revisão: ${item.revisionNumber}"),
                                   const SizedBox(height: 8.0),
                                   Text("Data de Criação: ${DateFormat('dd/MM/yyyy HH:mm').format(item.createdAt.toLocal())}"), // Formata a data e hora
                                   const SizedBox(height: 8.0),
@@ -221,7 +223,8 @@ class _InventoryPageState extends State<InventoryPage> {
 
                                   const SizedBox(height: 24.0),
                                   Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       Expanded(
                                         child: ElevatedButton(
@@ -235,7 +238,8 @@ class _InventoryPageState extends State<InventoryPage> {
                                           child: const Icon(Icons.edit),
                                         ),
                                       ),
-                                      const SizedBox(width: 8.0), // Espaço entre os botões
+                                      const SizedBox(
+                                          width: 8.0), // Espaço entre os botões
                                       Expanded(
                                         child: ElevatedButton(
                                           onPressed: () {
@@ -251,7 +255,8 @@ class _InventoryPageState extends State<InventoryPage> {
                                           child: const Icon(Icons.add),
                                         ),
                                       ),
-                                      const SizedBox(width: 8.0), // Espaço entre os botões
+                                      const SizedBox(
+                                          width: 8.0), // Espaço entre os botões
                                       Expanded(
                                         child: ElevatedButton(
                                           onPressed: () {

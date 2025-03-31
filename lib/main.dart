@@ -20,9 +20,10 @@ import 'package:inventoryplatform/app/ui/device/theme/app_theme.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
- 
+
   ControllerInitializer.initialize(); // Inicializa os controladores
-  await HiveInitializer.initialize(); // Inicializa o Hive e registra os adapters
+  await HiveInitializer
+      .initialize(); // Inicializa o Hive e registra os adapters
 
   runApp(
     GetMaterialApp(
