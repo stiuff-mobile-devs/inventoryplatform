@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:inventoryplatform/app/controllers/material_controller.dart';
@@ -31,15 +30,15 @@ class _MaterialFormState extends State<MaterialForm> {
 
     if (status.isGranted) {
       try {
-        Position position = await Geolocator.getCurrentPosition(
-          locationSettings:
-          const LocationSettings(accuracy: LocationAccuracy.high),
-        );
+       // Position position = await Geolocator.getCurrentPosition(
+         // locationSettings:
+        //  const LocationSettings(accuracy: LocationAccuracy.high),
+        //);
         setState(() {
           _currentPosition = {
-            "Latitude": "${position.latitude}",
-            "Longitude": "${position.longitude}",
-            "Altitude": "${position.altitude}"
+            "Latitude": "${"-22.12321312"}",
+            "Longitude": "${"-64.3232323"}",
+            "Altitude": "${"6.323232322322"}"
           };
           _isLoading = false;
         });

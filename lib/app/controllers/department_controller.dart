@@ -85,4 +85,17 @@ class DepartmentController extends GetxController {
     final box = Hive.box<DepartmentModel>('departments');
     return box.values.toList();
   }
+
+  String? getDepartmentTitleById(String id) {
+    final box = Hive.box<DepartmentModel>('departments');
+    try {
+      final department = box.values.firstWhere(
+        (dept) => dept.id == id,
+      );
+      return department.title;
+    } catch (e) {
+      // Retorna null se nenhum departamento for encontrado
+      return null;
+    }
+  }
 }
