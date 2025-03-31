@@ -95,7 +95,7 @@ class CustomSidebar extends StatelessWidget {
           label: 'Manual do Usuário',
           onTap: () async {
             final Uri _url = Uri.parse(
-                'https://github.com/stiuff-mobile-devs/inventoryplatform/wiki');
+                'https://github.com/stiuff-mobile-devs/inventoryplatform/wiki/Manual');
             if (!await launchUrl(_url)) {
               throw Exception('Could not launch $_url');
             }
