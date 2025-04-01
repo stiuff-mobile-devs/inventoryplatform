@@ -29,7 +29,7 @@ class _DashboardPageState extends State<DashboardPage> {
           BoxShadow(
             color: Colors.black.withOpacity(0.1),
             blurRadius: 8.0,
-            offset: const Offset(0, 4),
+            offset: const Offset(0, 0),
           ),
         ],
       ),
@@ -38,14 +38,28 @@ class _DashboardPageState extends State<DashboardPage> {
         child: Stack(
           children: [
             SizedBox(
-                width: double.infinity,
-                height: 120,
-                child: Image.file(
-                  File(department.imagePath!),
-                  fit: BoxFit.cover,
-                  height: double.infinity,
-                  width: double.infinity,
-                )),
+              width: double.infinity,
+              height: 120,
+              child: department.imagePath != null
+                  ? Image.file(
+                      File(department.imagePath!),
+                      fit: BoxFit.cover,
+                      height: double.infinity,
+                      width: double.infinity,
+                    )
+                  : ClipRRect(
+                      borderRadius: BorderRadius.circular(10.0),
+                      child: const SizedBox(
+                        width: double.infinity,
+                        child: Center(
+                          child: Icon(
+                            Icons.image_not_supported_outlined,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+            ),
             Positioned(
               bottom: 16.0,
               left: 16.0,
