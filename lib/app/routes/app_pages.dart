@@ -47,12 +47,12 @@ class AppPages {
 
     GetPage(
       name: Routes.ALT_CAMERA,
-      page: () => AlternateCameraPage(cod: Get.parameters['cod'] ?? ''),
+      page: () => AlternateCameraPage(codDepartment: Get.parameters['cod'] ?? ''),
     ),
     GetPage(
       name: Routes.MATERIAL,
       page: () => MaterialForm(
-        cod: Get.parameters['cod']!,
+        codDepartment: Get.parameters['codDepartment']!,
         barcode: Get.parameters['barcode'],
       ),
     ),

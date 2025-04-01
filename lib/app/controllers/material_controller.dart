@@ -174,7 +174,7 @@ class MaterialController extends GetxController {
           description: descriptionController.text.trim(),
           geolocation: geolocationStr,
           observations: observationsController.text.trim(),
-          inventoryId: (context.widget as MaterialForm).cod,
+          inventoryId: (context.widget as MaterialForm).codDepartment,
           imagePaths: images.isNotEmpty ? images : null,
         );
         await box.add(material);
@@ -262,8 +262,8 @@ class MaterialController extends GetxController {
      return _inventoryController.getInventoriesByDepartment(deptId);
   }
 
-  void navigateToMaterialDetails(BuildContext context, MaterialModel material) {
-    Navigator.push(
+  Future<void> navigateToMaterialDetails(BuildContext context, MaterialModel material) async {
+    await Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => MaterialDetailsPage(material: material),

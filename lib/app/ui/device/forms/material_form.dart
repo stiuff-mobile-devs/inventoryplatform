@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:inventoryplatform/app/controllers/material_controller.dart';
 import 'package:intl/intl.dart';
+import 'package:inventoryplatform/app/routes/app_routes.dart';
 import 'package:inventoryplatform/app/ui/device/theme/image_item.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class MaterialForm extends StatefulWidget {
-  late final String cod;
+  late final String codDepartment;
   final String? barcode;
 
-  MaterialForm({required this.cod, this.barcode});
+  MaterialForm({required this.codDepartment, this.barcode});
 
   @override
   _MaterialFormState createState() => _MaterialFormState();
@@ -30,15 +31,14 @@ class _MaterialFormState extends State<MaterialForm> {
 
     if (status.isGranted) {
       try {
-// Position position = await Geolocator.getCurrentPosition(
-         // locationSettings:
-        //  const LocationSettings(accuracy: LocationAccuracy.high),
-        //);
+        Position position = await Geolocator.getCurrentPosition(
+          locationSettings: const LocationSettings(accuracy: LocationAccuracy.high),
+        );
         setState(() {
           _currentPosition = {
-            "Latitude": "${"-22.12321312"}",
-            "Longitude": "${"-64.3232323"}",
-            "Altitude": "${"6.323232322322"}"
+            "Latitude": "${position.latitude}",
+            "Longitude": "${position.longitude}",
+            "Altitude": "${position.altitude}",
           };
           _isLoading = false;
         });
@@ -80,6 +80,31 @@ class _MaterialFormState extends State<MaterialForm> {
           "Criar Novo Material",
           style: TextStyle(color: Colors.white),
         ),
+        actions: [
+          TextButton.icon(
+            onPressed: () {
+              // Exibe um diálogo ou mensagem indicando que está em desenvolvimento
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: const Text("Em Desenvolvimento"),
+                  content: const Text("Esta funcionalidade está em desenvolvimento."),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      child: const Text("OK"),
+                    ),
+                  ],
+                ),
+              );
+            },
+            icon: const Icon(Icons.help_outline, color: Colors.white),
+            label: const Text(
+              "",
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -95,6 +120,7 @@ class _MaterialFormState extends State<MaterialForm> {
               const SizedBox(height: 10),
               TextFormField(
                 controller: controller.barcodeController,
+                readOnly: true, // Impede edição
                 decoration: InputDecoration(
                   labelText: "Código de Barras",
                   border: OutlineInputBorder(
@@ -137,6 +163,7 @@ class _MaterialFormState extends State<MaterialForm> {
               const SizedBox(height: 10),
               TextFormField(
                 controller: controller.dateController,
+                readOnly: true, // Impede edição
                 decoration: InputDecoration(
                   labelText: "Data",
                   border: OutlineInputBorder(
@@ -178,31 +205,43 @@ class _MaterialFormState extends State<MaterialForm> {
               ),
               const SizedBox(height: 10),
               _isLoading
-                  ? const CircularProgressIndicator()
+                  ? const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children:  [
+                        CircularProgressIndicator(),
+                        SizedBox(width: 10),
+                        Text(
+                          "Carregando informações de GPS",
+                          style: TextStyle(fontSize: 16),
+                        ),
+                      ],
+                    )
                   : Container(
                       padding: const EdgeInsets.all(16.0),
                       decoration: BoxDecoration(
                         border: Border.all(color: Colors.grey),
                         borderRadius: BorderRadius.circular(8.0),
                       ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Text(
-                            "Latitude: ${_currentPosition?["Latitude"] ?? "N/A"}",
-                            style: const TextStyle(fontSize: 16),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            "Longitude: ${_currentPosition?["Longitude"] ?? "N/A"}",
-                            style: const TextStyle(fontSize: 16),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            "Altitude: ${_currentPosition?["Altitude"] ?? "N/A"}",
-                            style: const TextStyle(fontSize: 16),
-                          ),
-                        ],
+                      child: Center(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Text(
+                              "Latitude: ${_currentPosition?["Latitude"] ?? "N/A"}",
+                              style: const TextStyle(fontSize: 16),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              "Longitude: ${_currentPosition?["Longitude"] ?? "N/A"}",
+                              style: const TextStyle(fontSize: 16),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              "Altitude: ${_currentPosition?["Altitude"] ?? "N/A"}",
+                              style: const TextStyle(fontSize: 16),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
               const SizedBox(height: 10),
@@ -238,9 +277,10 @@ class _MaterialFormState extends State<MaterialForm> {
                 child: controller.isLoading.value
                     ? const CircularProgressIndicator()
                     : ElevatedButton(
-                        onPressed: () {
+                        onPressed: () async {
                           if (_formKey.currentState!.validate()) {
-                            controller.saveMaterial(context, geolocationToStr());
+                            await controller.saveMaterial(context, geolocationToStr());
+                            Get.offNamed(Routes.ALT_CAMERA, arguments: widget.codDepartment);
                           }
                         },
                         style: ElevatedButton.styleFrom(

@@ -6,9 +6,9 @@ import 'package:inventoryplatform/app/routes/app_routes.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
 class AlternateCameraPage extends StatefulWidget {
-  final String? cod;
+  final String? codDepartment;
 
-  const AlternateCameraPage({super.key, this.cod,});
+  const AlternateCameraPage({super.key, this.codDepartment,});
 
   @override
   State<AlternateCameraPage> createState() => _AlternateCameraPageState();
@@ -119,14 +119,14 @@ class _AlternateCameraPageState extends State<AlternateCameraPage> {
                     });
                     MaterialModel checkMaterial =  await _materialController.checkMaterial(_scannedCode!, '');
                     if (checkMaterial.id.isEmpty && checkMaterial.barcode!.isEmpty){
-                        Get.toNamed(Routes.MATERIAL,
-                          parameters: {'cod': widget.cod!, 'barcode': _scannedCode!});
+                        Get.offNamed(Routes.MATERIAL,
+                          parameters: {'codDepartment': widget.codDepartment!, 'barcode': _scannedCode!});
                       }
                     else{
                       MaterialModel checkMaterial =  await _materialController.checkMaterial(_scannedCode!, '');
-                      _materialController.navigateToMaterialDetails(context, checkMaterial);
+                      await _materialController.navigateToMaterialDetails(context, checkMaterial);
+                      Navigator.of(context).pop(); // Fecha a página atual
                     }
-                   
                   }
                 },
                 child: Container(
