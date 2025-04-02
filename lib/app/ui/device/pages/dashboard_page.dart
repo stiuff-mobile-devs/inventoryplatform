@@ -40,22 +40,20 @@ class _DashboardPageState extends State<DashboardPage> {
             SizedBox(
               width: double.infinity,
               height: 120,
-              child: department.imagePath != null
+              child: (department.imagePath != null &&
+                      department.imagePath!.isNotEmpty)
                   ? Image.file(
                       File(department.imagePath!),
                       fit: BoxFit.cover,
                       height: double.infinity,
                       width: double.infinity,
                     )
-                  : ClipRRect(
-                      borderRadius: BorderRadius.circular(10.0),
-                      child: const SizedBox(
-                        width: double.infinity,
-                        child: Center(
-                          child: Icon(
-                            Icons.image_not_supported_outlined,
-                            color: Colors.white,
-                          ),
+                  : const SizedBox(
+                      width: double.infinity,
+                      child: Center(
+                        child: Icon(
+                          Icons.image_not_supported_outlined,
+                          color: Colors.white,
                         ),
                       ),
                     ),
