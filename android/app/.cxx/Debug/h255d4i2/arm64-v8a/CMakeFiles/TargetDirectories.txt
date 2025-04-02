@@ -1,0 +1,2 @@
+C:/Users/rafin/Desktop/inventario-universal-novo/inventoryplatform/android/app/.cxx/Debug/h255d4i2/arm64-v8a/CMakeFiles/edit_cache.dir
+C:/Users/rafin/Desktop/inventario-universal-novo/inventoryplatform/android/app/.cxx/Debug/h255d4i2/arm64-v8a/CMakeFiles/rebuild_cache.dir

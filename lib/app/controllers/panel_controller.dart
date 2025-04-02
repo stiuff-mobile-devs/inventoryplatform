@@ -8,7 +8,7 @@ enum TabType {
   dashboard,
   inventories,
   materials,
-  unknown
+  unknown, domains, tags, readers, members, entities, admin
 }
 
 class PanelController extends GetxController {
