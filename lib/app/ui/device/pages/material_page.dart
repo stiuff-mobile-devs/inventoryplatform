@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:inventoryplatform/app/ui/device/theme/temporary_message_display.dart';
 import 'dart:io';
-import 'package:file_picker/file_picker.dart';
 import 'dart:typed_data';
-import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:inventoryplatform/app/controllers/material_controller.dart';
@@ -12,7 +12,6 @@ import 'package:inventoryplatform/app/data/models/department_model.dart';
 import 'package:inventoryplatform/app/data/models/inventory_model.dart';
 import 'package:inventoryplatform/app/data/models/material_model.dart';
 import 'package:inventoryplatform/app/routes/app_routes.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:share_plus/share_plus.dart';
 
 class MaterialPage extends StatefulWidget {
@@ -72,13 +71,10 @@ class _MaterialPageState extends State<MaterialPage> {
         children: [
           _buildHeader(department.title),
           _buildInventoryOption(),
-          _buildItemList()!,
-          Center (
-            child: ElevatedButton(
-              onPressed: sharePdf,
-              child: const Text("Gerar PDF"),
-            )
-          )
+          _allMaterials.isNotEmpty ? _buildItemList() :
+          const TemporaryMessageDisplay(
+            message: "Não há itens para serem listados.",
+          ),
         ],
       ),
     );
@@ -145,7 +141,7 @@ class _MaterialPageState extends State<MaterialPage> {
     );
   }
 
-  Widget? _buildItemList() {
+  Widget _buildItemList() {
     return Padding(
       padding: const EdgeInsets.only(left: 20, top: 10, right: 20, bottom: 20),
       child:
@@ -176,6 +172,13 @@ class _MaterialPageState extends State<MaterialPage> {
             separatorBuilder: (context, index) {
               return const Divider(color: Colors.grey, thickness: 1, indent: 1, endIndent: 1,);
             },
+          ),
+          const SizedBox(height: 20.0),
+          Center (
+            child: ElevatedButton(
+            onPressed: sharePdf,
+            child: const Text("Gerar PDF"),
+            )
           )
         ],
       ),
@@ -221,7 +224,10 @@ class _MaterialPageState extends State<MaterialPage> {
               children: [
                 pw.Column (
                   children: [
-                    pw.Center (child: pw.Text("RELATÓRIO")),
+                    pw.Center (child: pw.Text("RELATÓRIO DE MATERIAIS")),
+                    _inventoryIndex != 0 ? pw.Center (child: pw.Text(_allInventories[_inventoryIndex-1].title)) :
+                                            pw.Center (child: pw.Text("")),
+                    pw.SizedBox(height: 20.0),
                     pw.Row (
                       children: [
                         pw.Expanded(flex: 2, child: pw.Text("Código de Barras",)),
