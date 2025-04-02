@@ -91,4 +91,17 @@ class InventoryController extends GetxController {
     final inventories = getInventories();
     return inventories.where((item) => item.departmentId == deptId).toList();
   }
+
+  String? getInventoryTitleById(String id) {
+    final box = Hive.box<InventoryModel>('inventories');
+    try {
+      final inventory = box.values.firstWhere(
+        (inv) => inv.id == id,
+      );
+      return inventory.title;
+    } catch (e) {
+      // Retorna null se nenhum departamento for encontrado
+      return null;
+    }
+  }
 }

@@ -10,7 +10,7 @@ class HiveInitializer {
 
     Hive.registerAdapter(DepartmentModelAdapter());
     print('DepartmentsModelAdapter registered');
-    
+
     Hive.registerAdapter(InventoryModelAdapter());
     print('InventoriesModelAdapter registered');
 
@@ -18,7 +18,7 @@ class HiveInitializer {
 
     await Hive.openBox<DepartmentModel>('departments');
     print('Departments box opened');
-    
+
     await Hive.openBox<InventoryModel>('inventories');
     print('Inventories box opened');
 
