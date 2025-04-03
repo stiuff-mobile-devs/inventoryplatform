@@ -102,8 +102,8 @@ class ScrollableBottomNavigationBarState
                           0, Icons.dashboard_rounded, 'Dashboard'),
                       _buildNavigationBarItem(
                           1, Icons.inventory_rounded, 'Inventories'),
-                      _buildNavigationBarItem(
-                          2, Icons.summarize, 'Materials'),
+                      _buildNavigationBarItem(2, Icons.summarize, 'Materials'),
+                      _buildNavigationBarItem(3, Icons.engineering, 'Configs'),
                     ],
                   ),
                 ),
