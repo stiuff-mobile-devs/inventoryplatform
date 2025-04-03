@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:inventoryplatform/app/ui/device/theme/temporary_message_display.dart';
+import 'dart:io';
+import 'dart:typed_data';
+import 'package:path_provider/path_provider.dart';
+import 'package:pdf/widgets.dart' as pw;
 import 'package:inventoryplatform/app/controllers/material_controller.dart';
 import 'package:inventoryplatform/app/data/models/department_model.dart';
 import 'package:inventoryplatform/app/data/models/inventory_model.dart';
 import 'package:inventoryplatform/app/data/models/material_model.dart';
 import 'package:inventoryplatform/app/routes/app_routes.dart';
+import 'package:share_plus/share_plus.dart';
 
 class MaterialPage extends StatefulWidget {
   const MaterialPage({super.key});
@@ -65,7 +72,10 @@ class _MaterialPageState extends State<MaterialPage> {
         children: [
           _buildHeader(department.title),
           _buildInventoryOption(),
-          _buildItemList(),
+          _allMaterials.isNotEmpty ? _buildItemList() :
+          const TemporaryMessageDisplay(
+            message: "Não há itens para serem listados.",
+          ),
         ],
       ),
     );
@@ -176,10 +186,91 @@ class _MaterialPageState extends State<MaterialPage> {
                 endIndent: 1,
               );
             },
+          ),
+          const SizedBox(height: 20.0),
+          Center (
+            child: ElevatedButton(
+            onPressed: sharePdf,
+            child: const Text("Gerar PDF"),
+            )
           )
         ],
       ),
     );
+  }
+
+  /*Future<void> savePdf() async {
+    PermissionStatus status = await Permission.manageExternalStorage.request();
+    if (!status.isGranted) {
+      return;
+    }
+
+    final pdf = generatePdf();
+    final Uint8List pdfData = await pdf.save();
+    String? directory = await FilePicker.platform.getDirectoryPath();
+
+    if (directory != null) {
+      final filePath = p.join(directory, "relatório.pdf");
+      final file = File(filePath);
+      await file.writeAsBytes(pdfData);
+    }
+  }*/
+
+  Future<void> sharePdf() async {
+    final pdf = generatePdf();
+    final Uint8List pdfData = await pdf.save();
+
+    final temp = await getTemporaryDirectory();
+    final filePath = "${temp.path}/relatorio.pdf";
+    final file = File(filePath);
+    await file.writeAsBytes(pdfData);
+
+    await Share.shareXFiles([XFile(filePath)]);
+  }
+
+  pw.Document generatePdf() {
+    final pdf = pw.Document();
+
+    pdf.addPage(
+      pw.Page(
+        build: (pw.Context context) {
+          return pw.Wrap(
+              children: [
+                pw.Column (
+                  children: [
+                    pw.Center (child: pw.Text("RELATÓRIO DE MATERIAIS")),
+                    _inventoryIndex != 0 ? pw.Center (child: pw.Text(_allInventories[_inventoryIndex-1].title)) :
+                                            pw.Center (child: pw.Text("")),
+                    pw.SizedBox(height: 20.0),
+                    pw.Row (
+                      children: [
+                        pw.Expanded(flex: 2, child: pw.Text("Código de Barras",)),
+                        pw.Expanded(child: pw.Text("Título",)),
+                        pw.Expanded(child: pw.Text("Adicionado", )),
+                      ],
+                    ),
+                    pw.Divider( thickness: 1, indent: 1, endIndent: 1),
+                    pw.ListView.builder(
+                      itemCount: _allMaterials.length,
+                      itemBuilder: (context, index) {
+                        return pw.Row (
+                            children: [
+                              pw.Expanded(flex: 2, child: pw.Text(_allMaterials[index].barcode!)),
+                              pw.Expanded(child: pw.Text(_allMaterials[index].name)),
+                              pw.Expanded(child: pw.Text(formatDatePortuguese(_allMaterials[index].date))),
+                            ]
+                        );
+                      },
+                    )
+                  ],
+                ),
+              ]
+          );
+        },
+      ),
+    );
+
+    return pdf;
   }
 
   Widget _buildInventoryOption() {
