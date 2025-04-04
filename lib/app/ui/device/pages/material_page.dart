@@ -44,7 +44,7 @@ class _MaterialPageState extends State<MaterialPage> {
   Future<void> _loadItems() async {
     List<MaterialModel> items;
     if (_inventoryIndex == 0) {
-      items = controller.getMaterialsByDepartment(department.id);
+      items = controller.getMaterials();
     } else {
       items = controller
           .getMaterialsByInventory(_allInventories[_inventoryIndex - 1].id);
@@ -56,7 +56,7 @@ class _MaterialPageState extends State<MaterialPage> {
   }
 
   Future<void> _loadInventories() async {
-    final inventories = controller.getInventoriesByDept(department.id);
+    final inventories = controller.getInventories();
     setState(() {
       _allInventories = inventories;
     });

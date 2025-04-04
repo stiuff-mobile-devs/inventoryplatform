@@ -246,6 +246,7 @@ class _InventoryPageState extends State<InventoryPage> {
                                             Navigator.of(context).pop();
                                             Get.toNamed(
                                               Routes.ALT_CAMERA,
+                                              arguments: item,
                                               parameters: {'codDepartment': item.id},
                                             );
                                           },

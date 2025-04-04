@@ -159,7 +159,7 @@ class MaterialController extends GetxController {
   }
 
   // Função para salvar os dados
-  Future<void> saveMaterial(BuildContext context, String geolocationStr) async {
+  Future<void> saveMaterial(BuildContext context, String geolocationStr, InventoryModel codDepartment) async {
     try {
       String newId = convertToEPC(barcodeController.text.trim(), context);
       MaterialModel retornado =
@@ -174,7 +174,7 @@ class MaterialController extends GetxController {
           description: descriptionController.text.trim(),
           geolocation: geolocationStr,
           observations: observationsController.text.trim(),
-          inventoryId: (context.widget as MaterialForm).codDepartment,
+          inventoryId: codDepartment.id,
           imagePaths: images.isNotEmpty ? images : null,
         );
         await box.add(material);
@@ -260,6 +260,10 @@ class MaterialController extends GetxController {
 
   List<InventoryModel> getInventoriesByDept(String deptId) {
      return _inventoryController.getInventoriesByDepartment(deptId);
+  }
+
+  List<InventoryModel> getInventories() {
+    return _inventoryController.getInventories();
   }
 
   Future<void> navigateToMaterialDetails(BuildContext context, MaterialModel material) async {
