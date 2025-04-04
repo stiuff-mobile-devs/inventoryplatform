@@ -12,12 +12,6 @@ class InventoryController extends GetxController {
   final isLoading = false.obs;
   //final PanelController _panelController = Get.find<PanelController>();
 
-  void clearFields() {
-    titleController.clear();
-    descriptionController.clear();
-    revisionController.clear();
-  }
-
   Future<void> saveInventory(BuildContext context) async {
     if (titleController.text.isEmpty || revisionController.text.isEmpty) {
       Get.snackbar("Erro", "Preencha o campo título e número de revisão.");
@@ -71,13 +65,13 @@ class InventoryController extends GetxController {
 
       // Salva o inventário no banco de dados local
       await _dbHelper.insert('inventories', newInventory.toMap());*/
-      
-      clearFields();
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text("Sucesso, inventário criado com sucesso!"),
         ),
       );
+      Navigator.pop(context);
     } catch (e) {
       print(e.toString());
       ScaffoldMessenger.of(context).showSnackBar(

@@ -20,27 +20,16 @@ class InventoryPage extends StatefulWidget {
 class _InventoryPageState extends State<InventoryPage> {
   final PanelController _panelController = Get.find<PanelController>();
   final DepartmentController _departmentController = Get.find<DepartmentController>();
-  final InventoryController _inventoryController = Get.find<InventoryController>();
+
 
   final FocusNode searchFocusNode = FocusNode();
-
-  List<InventoryModel> _items = [].obs as List<InventoryModel>; // Variável local para armazenar os inventários
 
   @override
   void initState() {
     super.initState();
 
-    // Inicializa a lista de inventários
-    _loadInventories();
-
     _panelController.searchController.addListener(() {
       _filterInventories(_panelController.searchController.text);
-    });
-  }
-
-  void _loadInventories() {
-    setState(() {
-      _items = _inventoryController.getInventories(); // Carrega os inventários
     });
   }
 
@@ -113,7 +102,7 @@ class _InventoryPageState extends State<InventoryPage> {
                 borderRadius: BorderRadius.circular(10.0),
               ),
               child: Text(
-                '${_items.length}',
+                '${_panelController.listedItems.length}',
                 style: const TextStyle(
                     fontSize: 16.0,
                     fontWeight: FontWeight.bold,
@@ -145,12 +134,10 @@ class _InventoryPageState extends State<InventoryPage> {
         Column(
           children: [
             TextButton.icon(
-              onPressed: () async {
+              onPressed: () {
                 searchFocusNode.unfocus();
-                await Get.toNamed(Routes.INVENTORY,
+                Get.toNamed(Routes.INVENTORY,
                     parameters: {'cod': organization!.id});
-                _loadInventories(); // Atualiza a lista ao retornar
-
               },
               icon: const Icon(Icons.add),
               label: const Text('Adicionar Inventário'),
@@ -164,146 +151,154 @@ class _InventoryPageState extends State<InventoryPage> {
 
   Widget _buildList() {
     return Expanded(
-      child: _items.isEmpty
-          ? const TemporaryMessageDisplay(
-              message: "Não há itens para serem listados.",
-            )
-          : ListView.builder(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
-              itemCount: _items.isNotEmpty ? _items.length + 1 : 0,
-              itemBuilder: (context, index) {
-                if (index == _items.length) {
-                  return const TemporaryMessageDisplay(
-                    message: "Não há mais itens para serem listados.",
-                  );
-                }
+      child: Obx(() {
+        final organization = _panelController.getCurrentDepartment();
+        final items = Get.find<InventoryController>().getInventories();
+        //final items = allItems.where((item) => item.departmentId == organization!.id).toList();
 
-                if (_items[index] is InventoryModel) {
-                  InventoryModel item = _items[index];
-                  return ListItemWidget(
-                    attributes: {
-                      'Título': item.title,
-                      'Descrição': item.description,
-                      'Criado em': DateFormat('dd/MM/yyyy HH:mm').format(item.createdAt.toLocal()),
-                      'Atualizado em': item.updatedAt ?? "Nunca modificado",
-                    },
-                    isActive: 1,
-                    icon: Icons.donut_large_rounded,
-                    onTap: (context) {
-                      searchFocusNode.unfocus();
-                      showDialog(
-                        context: context,
-                        builder: (context) {
-                          return Dialog(
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10.0)),
-                            child: Stack(
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.all(16.0),
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+        if (items.isEmpty) {
+          return const TemporaryMessageDisplay(
+            message: "Não há itens para serem listados.",
+          );
+        }
+
+        return ListView.builder(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
+          itemCount: items.isNotEmpty ? items.length + 1 : 0,
+          itemBuilder: (context, index) {
+            if (index == items.length) {
+              return const TemporaryMessageDisplay(
+                message: "Não há mais itens para serem listados.",
+              );
+            }
+
+            if (items[index] is InventoryModel) {
+              InventoryModel item = items[index];
+              return ListItemWidget(
+                attributes: {
+                  'Título': item.title,
+                  'Descrição': item.description,
+                  'Criado em': DateFormat('dd/MM/yyyy HH:mm').format(item.createdAt.toLocal()),
+                  'Atualizado em': item.updatedAt ?? "Nunca modificado",
+                },
+                isActive: 1,
+                icon: Icons.donut_large_rounded,
+                onTap: (context) {
+                  searchFocusNode.unfocus();
+                  showDialog(
+                    context: context,
+                    builder: (context) {
+                      return Dialog(
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10.0)),
+                        child: Stack(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const SizedBox(
+                                      height: 8.0), // Espaço para o botão "X"
+                                  Text(
+                                    item.title,
+                                    style: const TextStyle(
+                                      fontSize: 20.0,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 16.0),
+                                  Text("Descriçãos: ${item.description}"),
+                                  const SizedBox(height: 8.0),
+                                  Text(
+                                      "Número de Revisão: ${item.revisionNumber}"),
+                                  const SizedBox(height: 8.0),
+                                  Text("Data de Criação: ${DateFormat('dd/MM/yyyy HH:mm').format(item.createdAt.toLocal())}"), // Formata a data e hora
+                                  const SizedBox(height: 8.0),
+                                  Text("Última Atualização: ${item.updatedAt ?? "Nunca modificado"}"), 
+                                  const SizedBox(height: 8.0),
+                                  Text("Departamento de origem: ${_departmentController.getDepartmentTitleById(item.departmentId) ?? "Desconhecido"}"), 
+
+
+                                  const SizedBox(height: 24.0),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
-                                      const SizedBox(
-                                          height: 8.0), // Espaço para o botão "X"
-                                      Text(
-                                        item.title,
-                                        style: const TextStyle(
-                                          fontSize: 20.0,
-                                          fontWeight: FontWeight.bold,
+                                      Expanded(
+                                        child: ElevatedButton(
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                            // Adicione a lógica para editar
+                                          },
+                                          style: ElevatedButton.styleFrom(
+                                            padding: const EdgeInsets.all(12.0),
+                                          ),
+                                          child: const Icon(Icons.edit),
                                         ),
                                       ),
-                                      const SizedBox(height: 16.0),
-                                      Text("Descriçãos: ${item.description}"),
-                                      const SizedBox(height: 8.0),
-                                      Text(
-                                          "Número de Revisão: ${item.revisionNumber}"),
-                                      const SizedBox(height: 8.0),
-                                      Text("Data de Criação: ${DateFormat('dd/MM/yyyy HH:mm').format(item.createdAt.toLocal())}"), // Formata a data e hora
-                                      const SizedBox(height: 8.0),
-                                      Text("Última Atualização: ${item.updatedAt ?? "Nunca modificado"}"), 
-                                      const SizedBox(height: 8.0),
-                                      Text("Departamento de origem: ${_departmentController.getDepartmentTitleById(item.departmentId) ?? "Desconhecido"}"), 
-
-
-                                      const SizedBox(height: 24.0),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Expanded(
-                                            child: ElevatedButton(
-                                              onPressed: () {
-                                                Navigator.of(context).pop();
-                                                // Adicione a lógica para editar
-                                              },
-                                              style: ElevatedButton.styleFrom(
-                                                padding: const EdgeInsets.all(12.0),
-                                              ),
-                                              child: const Icon(Icons.edit),
-                                            ),
+                                      const SizedBox(
+                                          width: 8.0), // Espaço entre os botões
+                                      Expanded(
+                                        child: ElevatedButton(
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                            Get.toNamed(
+                                              Routes.ALT_CAMERA,
+                                              parameters: {'codDepartment': item.id},
+                                            );
+                                          },
+                                          style: ElevatedButton.styleFrom(
+                                            padding: const EdgeInsets.all(12.0),
                                           ),
-                                          const SizedBox(
-                                              width: 8.0), // Espaço entre os botões
-                                          Expanded(
-                                            child: ElevatedButton(
-                                              onPressed: () {
-                                                Navigator.of(context).pop();
-                                                Get.toNamed(
-                                                  Routes.ALT_CAMERA,
-                                                  parameters: {'codDepartment': item.id},
-                                                );
-                                              },
-                                              style: ElevatedButton.styleFrom(
-                                                padding: const EdgeInsets.all(12.0),
-                                              ),
-                                              child: const Icon(Icons.add),
-                                            ),
+                                          child: const Icon(Icons.add),
+                                        ),
+                                      ),
+                                      const SizedBox(
+                                          width: 8.0), // Espaço entre os botões
+                                      Expanded(
+                                        child: ElevatedButton(
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                            // Adicione a lógica para visualizar
+                                          },
+                                          style: ElevatedButton.styleFrom(
+                                            padding: const EdgeInsets.all(12.0),
                                           ),
-                                          const SizedBox(
-                                              width: 8.0), // Espaço entre os botões
-                                          Expanded(
-                                            child: ElevatedButton(
-                                              onPressed: () {
-                                                Navigator.of(context).pop();
-                                                // Adicione a lógica para visualizar
-                                              },
-                                              style: ElevatedButton.styleFrom(
-                                                padding: const EdgeInsets.all(12.0),
-                                              ),
-                                              child: const Icon(Icons.search),
-                                            ),
-                                          ),
-                                        ],
+                                          child: const Icon(Icons.search),
+                                        ),
                                       ),
                                     ],
                                   ),
-                                ),
-                                Positioned(
-                                  top: 8.0,
-                                  right: 8.0,
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      Navigator.of(context).pop();
-                                    },
-                                    child: const Icon(
-                                      Icons.close,
-                                      color: Colors.black,
-                                    ),
-                                  ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
-                          );
-                        },
+                            Positioned(
+                              top: 8.0,
+                              right: 8.0,
+                              child: GestureDetector(
+                                onTap: () {
+                                  Navigator.of(context).pop();
+                                },
+                                child: const Icon(
+                                  Icons.close,
+                                  color: Colors.black,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       );
                     },
                   );
-                }
-                return null;
-              },
-            ),
+                },
+              );
+            }
+            return null;
+          },
+        );
+      }),
     );
   }
 }
