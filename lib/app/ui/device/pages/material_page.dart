@@ -101,7 +101,7 @@ class _MaterialPageState extends State<MaterialPage> {
               ),
               ElevatedButton.icon(
                 onPressed: () {
-                  Get.toNamed(Routes.ALT_CAMERA);
+                  Get.toNamed(Routes.ALT_CAMERA, arguments: _allInventories[0]);
                 },
                 icon: const Icon(Icons.search),
                 label: const Text('Buscar Material'),
