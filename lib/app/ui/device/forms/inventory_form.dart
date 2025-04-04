@@ -110,6 +110,8 @@ class InventoryForm extends StatelessWidget {
                         onPressed: () {
                           if (_formKey.currentState!.validate()) {
                             controller.saveInventory(context);
+                            Navigator.pop(context);
+
                           }
                         },
                         style: ElevatedButton.styleFrom(
