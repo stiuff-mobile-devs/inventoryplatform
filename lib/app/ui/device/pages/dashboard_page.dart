@@ -203,8 +203,8 @@ class _DashboardPageState extends State<DashboardPage> {
               children: [
                 CarouselSlider(
                   items: [
-                    StatusChart(inventories: _panelController.inventories),
-                    UpdateChart(inventories: _panelController.inventories),
+                    StatusChart(inventories: _inventoryController.inventories.value),
+                    UpdateChart(inventories: _inventoryController.inventories.value),
                   ],
                   options: CarouselOptions(
                     height: 350.0,
