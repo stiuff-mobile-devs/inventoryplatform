@@ -3,6 +3,8 @@ import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:inventoryplatform/app/controllers/material_controller.dart';
 import 'package:intl/intl.dart';
+import 'package:inventoryplatform/app/data/models/department_model.dart';
+import 'package:inventoryplatform/app/data/models/inventory_model.dart';
 import 'package:inventoryplatform/app/routes/app_routes.dart';
 import 'package:inventoryplatform/app/ui/device/theme/image_item.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -19,6 +21,7 @@ class MaterialForm extends StatefulWidget {
 
 class _MaterialFormState extends State<MaterialForm> {
   final MaterialController controller = Get.find<MaterialController>();
+  final InventoryModel inventory = Get.arguments;
   final _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
   Map<String, String>? _currentPosition;
@@ -279,8 +282,8 @@ class _MaterialFormState extends State<MaterialForm> {
                     : ElevatedButton(
                         onPressed: () async {
                           if (_formKey.currentState!.validate()) {
-                            await controller.saveMaterial(context, geolocationToStr());
-                            Get.offNamed(Routes.ALT_CAMERA, arguments: widget.codDepartment);
+                            await controller.saveMaterial(context, geolocationToStr(), inventory);
+                            Get.offNamed(Routes.ALT_CAMERA, arguments: inventory);
                           }
                         },
                         style: ElevatedButton.styleFrom(
