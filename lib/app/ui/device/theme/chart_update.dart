@@ -20,7 +20,7 @@ class UpdateChartState extends State<UpdateChart> {
   @override
   void initState() {
     super.initState();
-   // updatesPerDay = _getUpdatesPerDay();
+    updatesPerDay = _getUpdatesPerDay();
   }
 
   @override
@@ -138,11 +138,11 @@ class UpdateChartState extends State<UpdateChart> {
     );
   }
 
-  /*List<int> _getUpdatesPerDay() {
+  List<int> _getUpdatesPerDay() {
     final updates = <DateTime, int>{};
 
     for (var inventory in widget.inventories) {
-      final date = inventory.lastUpdatedAt?.toIso8601String().substring(0, 10);
+      final date = inventory.updatedAt?.toIso8601String().substring(0, 10);
       if (date != null) {
         updates[DateTime.parse(date)] =
             (updates[DateTime.parse(date)] ?? 0) + 1;
@@ -163,5 +163,5 @@ class UpdateChartState extends State<UpdateChart> {
           )
           .value;
     }).reversed.toList();
-  }*/
+  }
 }

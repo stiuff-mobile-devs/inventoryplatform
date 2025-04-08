@@ -3,12 +3,11 @@ import 'package:get/get.dart';
 import 'package:inventoryplatform/app/controllers/department_controller.dart';
 import 'package:inventoryplatform/app/controllers/inventory_controller.dart';
 import 'package:inventoryplatform/app/controllers/panel_controller.dart';
-import 'package:inventoryplatform/app/data/models/inventory_model.dart';
 import 'package:inventoryplatform/app/routes/app_routes.dart';
 import 'package:inventoryplatform/app/ui/device/theme/list_item_widget.dart';
 import 'package:inventoryplatform/app/ui/device/theme/search_bar_widget.dart';
 import 'package:inventoryplatform/app/ui/device/theme/temporary_message_display.dart';
-import 'package:intl/intl.dart'; // Adicione esta importação
+import 'package:intl/intl.dart'; 
 
 class InventoryPage extends StatefulWidget {
   const InventoryPage({super.key});
@@ -20,13 +19,16 @@ class InventoryPage extends StatefulWidget {
 class _InventoryPageState extends State<InventoryPage> {
   final PanelController _panelController = Get.find<PanelController>();
   final DepartmentController _departmentController = Get.find<DepartmentController>();
-
+  final InventoryController _inventoryController = Get.find<InventoryController>();
 
   final FocusNode searchFocusNode = FocusNode();
 
   @override
   void initState() {
     super.initState();
+
+    // Inicializa a lista de inventários
+    _inventoryController.loadInventories();
 
     _panelController.searchController.addListener(() {
       _filterInventories(_panelController.searchController.text);
@@ -58,7 +60,26 @@ class _InventoryPageState extends State<InventoryPage> {
     if (query.isEmpty) {
       _panelController
           .updateItemsBasedOnTab(_panelController.selectedTabIndex.value);
-      return;
+    /* final filteredList = _panelController.inventories
+        .where((inventory) =>
+            inventory?title.toLowerCase().contains(query.toLowerCase()))
+        .toList();*/
+
+    //_panelController.listedItems.assignAll(filteredList);
+    /* final filteredList = _panelController.inventories
+        .where((inventory) =>
+            inventory?title.toLowerCase().contains(query.toLowerCase()))
+        .toList();*/
+
+    //_panelController.listedItems.assignAll(filteredList);
+;
+
+    /* final filteredList = _panelController.inventories
+        .where((inventory) =>
+            inventory?title.toLowerCase().contains(query.toLowerCase()))
+        .toList();*/
+
+    //_panelController.listedItems.assignAll(filteredList);
     }
 
     /* final filteredList = _panelController.inventories
@@ -102,7 +123,7 @@ class _InventoryPageState extends State<InventoryPage> {
                 borderRadius: BorderRadius.circular(10.0),
               ),
               child: Text(
-                '${_panelController.listedItems.length}',
+                '${_inventoryController.inventories.length}',
                 style: const TextStyle(
                     fontSize: 16.0,
                     fontWeight: FontWeight.bold,
@@ -134,10 +155,11 @@ class _InventoryPageState extends State<InventoryPage> {
         Column(
           children: [
             TextButton.icon(
-              onPressed: () {
+              onPressed: () async {
                 searchFocusNode.unfocus();
-                Get.toNamed(Routes.INVENTORY,
+                await Get.toNamed(Routes.INVENTORY,
                     parameters: {'cod': organization!.id});
+                _inventoryController.loadInventories(); // Atualiza a lista ao retornar
               },
               icon: const Icon(Icons.add),
               label: const Text('Adicionar Inventário'),
@@ -151,154 +173,136 @@ class _InventoryPageState extends State<InventoryPage> {
 
   Widget _buildList() {
     return Expanded(
-      child: Obx(() {
-        final organization = _panelController.getCurrentDepartment();
-        final items = Get.find<InventoryController>().getInventories();
-        //final items = allItems.where((item) => item.departmentId == organization!.id).toList();
-
-        if (items.isEmpty) {
-          return const TemporaryMessageDisplay(
-            message: "Não há itens para serem listados.",
-          );
-        }
-
-        return ListView.builder(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
-          itemCount: items.isNotEmpty ? items.length + 1 : 0,
-          itemBuilder: (context, index) {
-            if (index == items.length) {
-              return const TemporaryMessageDisplay(
-                message: "Não há mais itens para serem listados.",
-              );
-            }
-
-            if (items[index] is InventoryModel) {
-              InventoryModel item = items[index];
-              return ListItemWidget(
-                attributes: {
-                  'Título': item.title,
-                  'Descrição': item.description,
-                  'Criado em': DateFormat('dd/MM/yyyy HH:mm').format(item.createdAt.toLocal()),
-                  'Atualizado em': item.updatedAt ?? "Nunca modificado",
-                },
-                isActive: 1,
-                icon: Icons.donut_large_rounded,
-                onTap: (context) {
-                  searchFocusNode.unfocus();
-                  showDialog(
-                    context: context,
-                    builder: (context) {
-                      return Dialog(
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10.0)),
-                        child: Stack(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.all(16.0),
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const SizedBox(
-                                      height: 8.0), // Espaço para o botão "X"
-                                  Text(
-                                    item.title,
-                                    style: const TextStyle(
-                                      fontSize: 20.0,
-                                      fontWeight: FontWeight.bold,
+      child: Obx(() => _inventoryController.inventories.isEmpty
+          ? const TemporaryMessageDisplay(
+              message: "Não há itens para serem listados.",
+            )
+          : ListView.builder(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
+              itemCount: _inventoryController.inventories.length,
+              itemBuilder: (context, index) {
+                final item = _inventoryController.inventories[index];
+                return ListItemWidget(
+                  attributes: {
+                    'Título': item.title,
+                    'Descrição': item.description,
+                    'Criado em': DateFormat('dd/MM/yyyy HH:mm').format(item.createdAt.toLocal()),
+                    'Atualizado em': item.updatedAt ?? "Nunca modificado",
+                  },
+                  isActive: 1,
+                  icon: Icons.donut_large_rounded,
+                  onTap: (context) {
+                    searchFocusNode.unfocus();
+                    showDialog(
+                      context: context,
+                      builder: (context) {
+                        return Dialog(
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10.0)),
+                          child: Stack(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.all(16.0),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const SizedBox(
+                                        height: 8.0), // Espaço para o botão "X"
+                                    Text(
+                                      item.title,
+                                      style: const TextStyle(
+                                        fontSize: 20.0,
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
-                                  ),
-                                  const SizedBox(height: 16.0),
-                                  Text("Descriçãos: ${item.description}"),
-                                  const SizedBox(height: 8.0),
-                                  Text(
-                                      "Número de Revisão: ${item.revisionNumber}"),
-                                  const SizedBox(height: 8.0),
-                                  Text("Data de Criação: ${DateFormat('dd/MM/yyyy HH:mm').format(item.createdAt.toLocal())}"), // Formata a data e hora
-                                  const SizedBox(height: 8.0),
-                                  Text("Última Atualização: ${item.updatedAt ?? "Nunca modificado"}"), 
-                                  const SizedBox(height: 8.0),
-                                  Text("Departamento de origem: ${_departmentController.getDepartmentTitleById(item.departmentId) ?? "Desconhecido"}"), 
+                                    const SizedBox(height: 16.0),
+                                    Text("Descriçãos: ${item.description}"),
+                                    const SizedBox(height: 8.0),
+                                    Text(
+                                        "Número de Revisão: ${item.revisionNumber}"),
+                                    const SizedBox(height: 8.0),
+                                    Text("Data de Criação: ${DateFormat('dd/MM/yyyy HH:mm').format(item.createdAt.toLocal())}"), // Formata a data e hora
+                                    const SizedBox(height: 8.0),
+                                    Text("Última Atualização: ${item.updatedAt ?? "Nunca modificado"}"), 
+                                    const SizedBox(height: 8.0),
+                                    Text("Departamento de origem: ${_departmentController.getDepartmentTitleById(item.departmentId) ?? "Desconhecido"}"), 
 
-
-                                  const SizedBox(height: 24.0),
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Expanded(
-                                        child: ElevatedButton(
-                                          onPressed: () {
-                                            Navigator.of(context).pop();
-                                            // Adicione a lógica para editar
-                                          },
-                                          style: ElevatedButton.styleFrom(
-                                            padding: const EdgeInsets.all(12.0),
+                                    const SizedBox(height: 24.0),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Expanded(
+                                          child: ElevatedButton(
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                              // Adicione a lógica para editar
+                                            },
+                                            style: ElevatedButton.styleFrom(
+                                              padding: const EdgeInsets.all(12.0),
+                                            ),
+                                            child: const Icon(Icons.edit),
                                           ),
-                                          child: const Icon(Icons.edit),
                                         ),
-                                      ),
-                                      const SizedBox(
-                                          width: 8.0), // Espaço entre os botões
-                                      Expanded(
-                                        child: ElevatedButton(
-                                          onPressed: () {
-                                            Navigator.of(context).pop();
-                                            Get.toNamed(
-                                              Routes.ALT_CAMERA,
-                                              parameters: {'codDepartment': item.id},
-                                            );
-                                          },
-                                          style: ElevatedButton.styleFrom(
-                                            padding: const EdgeInsets.all(12.0),
+                                        const SizedBox(
+                                            width: 8.0), // Espaço entre os botões
+                                        Expanded(
+                                          child: ElevatedButton(
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                              Get.toNamed(
+                                                Routes.ALT_CAMERA,
+                                                parameters: {'codDepartment': item.id},
+                                              );
+                                            },
+                                            style: ElevatedButton.styleFrom(
+                                              padding: const EdgeInsets.all(12.0),
+                                            ),
+                                            child: const Icon(Icons.add),
                                           ),
-                                          child: const Icon(Icons.add),
                                         ),
-                                      ),
-                                      const SizedBox(
-                                          width: 8.0), // Espaço entre os botões
-                                      Expanded(
-                                        child: ElevatedButton(
-                                          onPressed: () {
-                                            Navigator.of(context).pop();
-                                            // Adicione a lógica para visualizar
-                                          },
-                                          style: ElevatedButton.styleFrom(
-                                            padding: const EdgeInsets.all(12.0),
+                                        const SizedBox(
+                                            width: 8.0), // Espaço entre os botões
+                                        Expanded(
+                                          child: ElevatedButton(
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                              // Adicione a lógica para visualizar
+                                            },
+                                            style: ElevatedButton.styleFrom(
+                                              padding: const EdgeInsets.all(12.0),
+                                            ),
+                                            child: const Icon(Icons.search),
                                           ),
-                                          child: const Icon(Icons.search),
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Positioned(
-                              top: 8.0,
-                              right: 8.0,
-                              child: GestureDetector(
-                                onTap: () {
-                                  Navigator.of(context).pop();
-                                },
-                                child: const Icon(
-                                  Icons.close,
-                                  color: Colors.black,
+                                      ],
+                                    ),
+                                  ],
                                 ),
                               ),
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                  );
-                },
-              );
-            }
-            return null;
-          },
-        );
-      }),
+                              Positioned(
+                                top: 8.0,
+                                right: 8.0,
+                                child: GestureDetector(
+                                  onTap: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: const Icon(
+                                    Icons.close,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    );
+                  },
+                );
+              },
+            )),
     );
   }
 }

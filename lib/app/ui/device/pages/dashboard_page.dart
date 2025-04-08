@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:inventoryplatform/app/controllers/inventory_controller.dart';
 import 'package:inventoryplatform/app/controllers/panel_controller.dart';
 import 'package:inventoryplatform/app/data/models/department_model.dart';
 import 'package:inventoryplatform/app/ui/device/theme/chart_status.dart';
@@ -19,6 +20,9 @@ class _DashboardPageState extends State<DashboardPage> {
   late final PanelController _panelController;
   int _currentCarouselIndex = 0;
   late final String departmentId;
+  final InventoryController _inventoryController = Get.find<InventoryController>();
+  
+
 
   Widget _buildHeader(DepartmentModel department) {
     return Container(
@@ -113,6 +117,7 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
   Widget _buildCountersGrid() {
+    _inventoryController.loadInventories();
     return Container(
       color: Colors.grey.shade100,
       padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 12.0),
@@ -124,7 +129,7 @@ class _DashboardPageState extends State<DashboardPage> {
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
         children: [
-          _buildCard('Inventários', _panelController.inventories.length,
+          _buildCard('Inventários', _inventoryController.inventories.length,
               Icons.inventory_rounded, Colors.blueAccent),
           /*_buildCard('Domains', _panelController.domains.length,
               Icons.data_object, Colors.orangeAccent),
@@ -198,8 +203,8 @@ class _DashboardPageState extends State<DashboardPage> {
               children: [
                 CarouselSlider(
                   items: [
-                    StatusChart(inventories: _panelController.inventories),
-                    UpdateChart(inventories: _panelController.inventories),
+                    StatusChart(inventories: _inventoryController.inventories.value),
+                    UpdateChart(inventories: _inventoryController.inventories.value),
                   ],
                   options: CarouselOptions(
                     height: 350.0,
