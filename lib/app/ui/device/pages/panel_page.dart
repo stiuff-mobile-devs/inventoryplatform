@@ -7,6 +7,7 @@ import 'package:inventoryplatform/app/ui/device/pages/material_page.dart' as cus
 import 'package:inventoryplatform/app/ui/device/theme/base_scaffold.dart';
 import 'package:inventoryplatform/app/ui/device/theme/scrollable_bottom_nav_bar.dart';
 
+
 class PanelPage extends StatefulWidget {
   const PanelPage({super.key});
 

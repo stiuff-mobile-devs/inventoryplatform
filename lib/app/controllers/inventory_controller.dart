@@ -10,7 +10,9 @@ class InventoryController extends GetxController {
   final TextEditingController revisionController = TextEditingController();
 
   final isLoading = false.obs;
-  //final PanelController _panelController = Get.find<PanelController>();
+
+  // Variável reativa para armazenar os inventários
+  final RxList<InventoryModel> inventories= <InventoryModel>[].obs;
 
   void clearFields() {
     titleController.clear();
@@ -27,7 +29,6 @@ class InventoryController extends GetxController {
     isLoading.value = true;
 
     try {
-
       final box = Hive.box<InventoryModel>('inventories');
       final department = InventoryModel(
         title: titleController.text.trim(),
@@ -36,6 +37,41 @@ class InventoryController extends GetxController {
         departmentId: (context.widget as InventoryForm).cod,
       );
       await box.add(department);
+/* // Segurança firebase
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user == null) {
+        Get.snackbar("Erro", "Usuário não autenticado.");
+        isLoading.value = false;
+        return;
+      }
+
+      String departmentId = (context.widget as InventoryForm).cod;
+
+      DocumentReference departmentRef = FirebaseFirestore.instance
+          .collection("departments")
+          .doc(departmentId);
+
+      DocumentReference newInventoryRef = await departmentRef.collection("inventories").add({
+        "title": titleController.text.trim(),
+        "description": descriptionController.text.trim(),
+        "revision_number": revisionController.text.trim(),
+        "created_at": FieldValue.serverTimestamp(),
+        "created_by": user.uid,
+      });
+
+      // Adiciona o inventário criado à lista listedItems do PanelController
+      InventoryModel newInventory = InventoryModel(
+        id: newInventoryRef.id,
+        title: titleController.text.trim(),
+        description: descriptionController.text.trim(),
+        revisionNumber: revisionController.text.trim(),
+        createdAt: DateTime.now(),
+        isActive: 1, 
+      );
+      _panelController.listedItems.add(newInventory);
+
+      // Salva o inventário no banco de dados local
+      await _dbHelper.insert('inventories', newInventory.toMap());*/
      /* // Segurança firebase
       User? user = FirebaseAuth.instance.currentUser;
       if (user == null) {
@@ -71,7 +107,7 @@ class InventoryController extends GetxController {
 
       // Salva o inventário no banco de dados local
       await _dbHelper.insert('inventories', newInventory.toMap());*/
-      
+
       clearFields();
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -88,7 +124,11 @@ class InventoryController extends GetxController {
     }
   }
 
-   List<InventoryModel> getInventories() {
+  void loadInventories() {
+    inventories.assignAll(getInventories());
+  }
+
+  List<InventoryModel> getInventories() {
     final box = Hive.box<InventoryModel>('inventories');
     return box.values.toList();
   }
