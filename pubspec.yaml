@@ -32,6 +32,7 @@ dependencies:
   pdf: ^3.11.3
   file_picker: ^9.2.3
   share_plus: ^10.1.4
+  firebase_core: ^3.13.0
 
 dev_dependencies:
   flutter_test:
