@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:inventoryplatform/app/controllers/material_controller.dart';
-   import 'package:inventoryplatform/app/data/models/inventory_model.dart';
 import 'package:inventoryplatform/app/data/models/material_model.dart';
 import 'package:inventoryplatform/app/routes/app_routes.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
@@ -17,7 +16,7 @@ class AlternateCameraPage extends StatefulWidget {
 
 class _AlternateCameraPageState extends State<AlternateCameraPage> {
   String? _scannedCode;
-  final InventoryModel inventory = Get.arguments;
+  //final InventoryModel inventory = Get.arguments; //esse
   double _buttonBottomPosition = 0;
   double _buttonOpacity = 0.0;
   bool _isInFormPage = false;
@@ -122,7 +121,7 @@ class _AlternateCameraPageState extends State<AlternateCameraPage> {
                     MaterialModel checkMaterial =  await _materialController.checkMaterial(_scannedCode!, '');
                     if (checkMaterial.id.isEmpty && checkMaterial.barcode!.isEmpty){
                         Get.offNamed(Routes.MATERIAL,
-                          arguments: inventory,
+                          //arguments: inventory, ///aqui
                           parameters: {'codDepartment': widget.codDepartment!, 'barcode': _scannedCode!});
                       }
                     else{

@@ -47,7 +47,7 @@ class AppPages {
 
     GetPage(
       name: Routes.ALT_CAMERA,
-      page: () => AlternateCameraPage(codDepartment: Get.parameters['cod'] ?? ''),
+      page: () => AlternateCameraPage(codDepartment: Get.parameters['codDepartment'] ?? ''),
     ),
     GetPage(
       name: Routes.MATERIAL,
@@ -56,7 +56,5 @@ class AppPages {
         barcode: Get.parameters['barcode'],
       ),
     ),
-    
-
   ];
 }

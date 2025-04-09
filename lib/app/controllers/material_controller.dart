@@ -42,7 +42,7 @@ class MaterialController extends GetxController {
     locationController.clear();
     observationsController.clear();
     image.value = null;
-    images.clear();
+    //images.clear();
   }
 
   // Função para escolher ou capturar uma imagem
@@ -159,7 +159,7 @@ class MaterialController extends GetxController {
   }
 
   // Função para salvar os dados
-  Future<void> saveMaterial(BuildContext context, String geolocationStr, InventoryModel codDepartment) async {
+  Future<void> saveMaterial(BuildContext context, String geolocationStr, String codDepartment) async {
     try {
       String newId = convertToEPC(barcodeController.text.trim(), context);
       MaterialModel retornado =
@@ -174,7 +174,7 @@ class MaterialController extends GetxController {
           description: descriptionController.text.trim(),
           geolocation: geolocationStr,
           observations: observationsController.text.trim(),
-          inventoryId: codDepartment.id,
+          inventoryId: codDepartment,
           imagePaths: images.isNotEmpty ? images : null,
         );
         await box.add(material);
