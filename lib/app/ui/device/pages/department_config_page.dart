@@ -168,10 +168,8 @@ class _DepartmentConfigPageState extends State<DepartmentConfigPage> {
                 ElevatedButton.icon(
                   onPressed: () {
                     setState(() {
-                      editController.saveChanges(DepartmentModel(
-                          title: editController.titleController.toString(),
-                          description:
-                              editController.descriptionController.toString()));
+                      editController.saveChanges(
+                          _panelController.getCurrentDepartment()!);
                     });
                   },
                   label: const Text('Salvar'),
