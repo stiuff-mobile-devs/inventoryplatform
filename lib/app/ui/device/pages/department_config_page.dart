@@ -1,10 +1,11 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:get/get_utils/get_utils.dart';
+import 'package:get/get_state_manager/get_state_manager.dart';
 import 'package:get/instance_manager.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:inventoryplatform/app/controllers/department_controller.dart';
+import 'package:inventoryplatform/app/controllers/department_edit_controller.dart';
 import 'package:inventoryplatform/app/controllers/panel_controller.dart';
 import 'package:inventoryplatform/app/data/models/department_model.dart';
 
@@ -15,24 +16,92 @@ class DepartmentConfigPage extends StatefulWidget {
 }
 
 class _DepartmentConfigPageState extends State<DepartmentConfigPage> {
+  final DepartmentEditController editController =
+      Get.put(DepartmentEditController());
+
   late final PanelController _panelController;
   final DepartmentController controller = Get.find<DepartmentController>();
-  bool isEditing = false;
 
-  Widget _header(String departmentName) {
+  Widget _showDepartment(DepartmentModel department) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 20, top: 20, left: 16, right: 16),
-      child: !isEditing
-          ? Text(
-              departmentName,
-              style: const TextStyle(
-                fontSize: 25.0,
-                fontWeight: FontWeight.bold,
-                color: Colors.black87,
+        padding:
+            const EdgeInsets.only(bottom: 25, top: 25, left: 16, right: 16),
+        child: Column(
+          children: [
+            SizedBox(
+              width: double.infinity,
+              child: Card(
+                elevation: 4,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12.0),
+                ),
+                color: Colors.white,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 10.0,
+                    horizontal: 16.0,
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        department.title,
+                        style: const TextStyle(
+                          fontSize: 28.0,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87,
+                        ),
+                      ),
+                      department.description.isNotEmpty
+                          ? Column(
+                              children: [
+                                const Text(
+                                  "Descrição:",
+                                  style: TextStyle(
+                                    fontSize: 12.0,
+                                    color: Colors.black87,
+                                  ),
+                                ),
+                                Text(department.description,
+                                    style: const TextStyle(
+                                      fontSize: 16.0,
+                                      color: Colors.black87,
+                                    )),
+                              ],
+                            )
+                          : const SizedBox(),
+                    ],
+                  ),
+                ),
               ),
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            _image(editController.imagePath.value),
+            const SizedBox(
+              height: 10,
+            ),
+            ElevatedButton.icon(
+              onPressed: () {
+                editController.toggleEditing();
+              },
+              label: const Text('Editar Departamento'),
+              icon: const Icon(Icons.edit),
             )
-          : TextFormField(
-              initialValue: departmentName,
+          ],
+        ));
+  }
+
+  Widget _editingDepartment() {
+    return Padding(
+        padding:
+            const EdgeInsets.only(bottom: 20, top: 20, left: 16, right: 16),
+        child: Column(
+          children: [
+            TextFormField(
+              controller: editController.titleController,
               decoration: InputDecoration(
                 labelText: "Título",
                 border: OutlineInputBorder(
@@ -46,20 +115,11 @@ class _DepartmentConfigPageState extends State<DepartmentConfigPage> {
                 return null;
               },
             ),
-    );
-  }
-
-  Widget _description(String departmentDescription) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 20, top: 5, left: 16, right: 16),
-      child: !isEditing
-          ? Text(departmentDescription,
-              style: const TextStyle(
-                fontSize: 16.0,
-                color: Colors.black87,
-              ))
-          : TextFormField(
-              initialValue: departmentDescription,
+            const SizedBox(
+              height: 15,
+            ),
+            TextFormField(
+              controller: editController.descriptionController,
               decoration: InputDecoration(
                 labelText: "Descrição",
                 border: OutlineInputBorder(
@@ -68,7 +128,66 @@ class _DepartmentConfigPageState extends State<DepartmentConfigPage> {
               ),
               maxLines: 3,
             ),
-    );
+            const SizedBox(
+              height: 15,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _image(editController.imagePath.value),
+                Column(
+                  children: [
+                    ElevatedButton(
+                      onPressed: () =>
+                          editController.pickImage(ImageSource.camera),
+                      child: const Icon(Icons.camera),
+                    ),
+                    ElevatedButton(
+                      onPressed: () =>
+                          editController.pickImage(ImageSource.gallery),
+                      child: const Icon(Icons.photo_library),
+                    ),
+                    ElevatedButton(
+                      onPressed: () => {
+                        setState(() {
+                          editController.removeImage();
+                        })
+                      },
+                      child: const Icon(Icons.no_photography_outlined),
+                    ),
+                  ],
+                )
+              ],
+            ),
+            const SizedBox(
+              height: 15,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                ElevatedButton.icon(
+                  onPressed: () {
+                    setState(() {
+                      editController.saveChanges(DepartmentModel(
+                          title: editController.titleController.toString(),
+                          description:
+                              editController.descriptionController.toString()));
+                    });
+                  },
+                  label: const Text('Salvar'),
+                  icon: const Icon(Icons.save_rounded),
+                ),
+                ElevatedButton.icon(
+                  onPressed: () {
+                    editController.toggleEditing();
+                  },
+                  label: const Text('Cancelar'),
+                  icon: const Icon(Icons.cancel),
+                ),
+              ],
+            )
+          ],
+        ));
   }
 
   Widget _image(String imagePath) {
@@ -98,102 +217,6 @@ class _DepartmentConfigPageState extends State<DepartmentConfigPage> {
                   )));
   }
 
-  Widget _info(DepartmentModel department) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _header(department.title),
-        _description(department.description),
-        !isEditing
-            ? _image(department.imagePath ?? '')
-            : Column(
-                children: [
-                  _image(department.imagePath ?? ''),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      ElevatedButton.icon(
-                        onPressed: () =>
-                            controller.pickImage(ImageSource.camera),
-                        icon: const Icon(Icons.camera),
-                        label: const Text("Câmera"),
-                      ),
-                      ElevatedButton.icon(
-                        onPressed: () =>
-                            controller.pickImage(ImageSource.gallery),
-                        icon: const Icon(Icons.photo_library),
-                        label: const Text("Galeria"),
-                      ),
-                      ElevatedButton.icon(
-                        onPressed: () => {
-                          setState(() {
-                            debugPrint('Removendo Imagem');
-                          })
-                        },
-                        icon: const Icon(Icons.no_photography_outlined),
-                        label: const Text("Remover"),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-        Center(
-            child: Padding(
-                padding: const EdgeInsets.all(10),
-                child: !isEditing
-                    ? ElevatedButton.icon(
-                        onPressed: () {
-                          setState(() {
-                            isEditing = !isEditing;
-                          });
-                        },
-                        label: const Text('Editar Departamento'),
-                        icon: const Icon(Icons.edit),
-                      )
-                    : Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          ElevatedButton.icon(
-                            onPressed: () {
-                              setState(() {
-                                showDialog(
-                                  context: context,
-                                  builder: (context) => AlertDialog(
-                                    title: const Text("Em Desenvolvimento"),
-                                    content: const Text(
-                                        "Esta funcionalidade está em desenvolvimento."),
-                                    actions: [
-                                      TextButton(
-                                        onPressed: () =>
-                                            Navigator.of(context).pop(),
-                                        child: const Text("OK"),
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              });
-                            },
-                            label: const Text('Salvar'),
-                            icon: const Icon(Icons.save_rounded),
-                          ),
-                          ElevatedButton.icon(
-                            onPressed: () {
-                              setState(() {
-                                isEditing = !isEditing;
-                              });
-                            },
-                            label: const Text('Cancelar'),
-                            icon: const Icon(Icons.cancel),
-                          ),
-                        ],
-                      )))
-      ],
-    );
-  }
-
   @override
   void initState() {
     super.initState();
@@ -201,8 +224,16 @@ class _DepartmentConfigPageState extends State<DepartmentConfigPage> {
   }
 
   Widget build(BuildContext context) {
-    return Container(
-      child: _info(_panelController.getCurrentDepartment()!),
-    );
+    editController.setInitialData(_panelController.getCurrentDepartment()!);
+    final department = _panelController.getCurrentDepartment()!;
+
+    return Obx(() => Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            editController.isEditing.value
+                ? _editingDepartment()
+                : _showDepartment(department),
+          ],
+        ));
   }
 }

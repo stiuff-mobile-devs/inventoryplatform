@@ -19,8 +19,8 @@ class InventoryPage extends StatefulWidget {
 
 class _InventoryPageState extends State<InventoryPage> {
   final PanelController _panelController = Get.find<PanelController>();
-  final DepartmentController _departmentController = Get.find<DepartmentController>();
-
+  final DepartmentController _departmentController =
+      Get.find<DepartmentController>();
 
   final FocusNode searchFocusNode = FocusNode();
 
@@ -178,7 +178,8 @@ class _InventoryPageState extends State<InventoryPage> {
                 attributes: {
                   'Título': item.title,
                   'Descrição': item.description,
-                  'Criado em': DateFormat('dd/MM/yyyy HH:mm').format(item.createdAt.toLocal()),
+                  'Criado em': DateFormat('dd/MM/yyyy HH:mm')
+                      .format(item.createdAt.toLocal()),
                   'Atualizado em': item.updatedAt ?? "Nunca modificado",
                 },
                 isActive: 1,
@@ -214,12 +215,14 @@ class _InventoryPageState extends State<InventoryPage> {
                                   Text(
                                       "Número de Revisão: ${item.revisionNumber}"),
                                   const SizedBox(height: 8.0),
-                                  Text("Data de Criação: ${DateFormat('dd/MM/yyyy HH:mm').format(item.createdAt.toLocal())}"), // Formata a data e hora
+                                  Text(
+                                      "Data de Criação: ${DateFormat('dd/MM/yyyy HH:mm').format(item.createdAt.toLocal())}"), // Formata a data e hora
                                   const SizedBox(height: 8.0),
-                                  Text("Última Atualização: ${item.updatedAt ?? "Nunca modificado"}"), 
+                                  Text(
+                                      "Última Atualização: ${item.updatedAt ?? "Nunca modificado"}"),
                                   const SizedBox(height: 8.0),
-                                  Text("Departamento de origem: ${_departmentController.getDepartmentTitleById(item.departmentId) ?? "Desconhecido"}"), 
-
+                                  Text(
+                                      "Departamento de origem: ${_departmentController.getDepartmentTitleById(item.departmentId) ?? "Desconhecido"}"),
 
                                   const SizedBox(height: 24.0),
                                   Row(
@@ -246,7 +249,9 @@ class _InventoryPageState extends State<InventoryPage> {
                                             Navigator.of(context).pop();
                                             Get.toNamed(
                                               Routes.ALT_CAMERA,
-                                              parameters: {'codDepartment': item.id},
+                                              parameters: {
+                                                'codDepartment': item.id
+                                              },
                                             );
                                           },
                                           style: ElevatedButton.styleFrom(
