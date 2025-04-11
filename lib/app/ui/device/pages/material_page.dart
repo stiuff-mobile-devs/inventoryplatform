@@ -170,13 +170,19 @@ class _MaterialPageState extends State<MaterialPage> {
             shrinkWrap: true,
             itemCount: _allMaterials.length,
             itemBuilder: (context, index) {
-              return Row(children: [
-                Expanded(flex: 2, child: Text(_allMaterials[index].barcode!)),
-                Expanded(child: Text(_allMaterials[index].name)),
-                Expanded(
-                    child:
-                        Text(formatDatePortuguese(_allMaterials[index].date))),
-              ]);
+              return InkWell (
+                onTap: () {
+                  expandMaterialDetails(_allMaterials[index]);
+                },
+                child: Row(children: [
+                  const SizedBox(height: 30),
+                  Expanded(flex: 2, child: Text(_allMaterials[index].barcode!)),
+                  Expanded(child: Text(_allMaterials[index].name)),
+                  Expanded(
+                      child:
+                      Text(formatDatePortuguese(_allMaterials[index].date))),
+                ])
+              );
             },
             separatorBuilder: (context, index) {
               return const Divider(
@@ -332,5 +338,9 @@ class _MaterialPageState extends State<MaterialPage> {
     return date != null
         ? DateFormat("dd/MM/yyyy").format(date)
         : "Data Indisponível";
+  }
+
+  Future<void> expandMaterialDetails(MaterialModel material) async {
+    await controller.navigateToMaterialDetails(context, material);
   }
 }
