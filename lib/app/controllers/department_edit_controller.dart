@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
@@ -8,7 +10,8 @@ class DepartmentEditController extends GetxController {
   final TextEditingController titleController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
   final ImagePicker imagePicker = ImagePicker();
-  final RxString imagePath = ''.obs;
+
+  Rx<File?> image = Rx<File?>(null);
 
   var isEditing = false.obs;
   void toggleEditing() {
@@ -18,36 +21,32 @@ class DepartmentEditController extends GetxController {
   void setInitialData(DepartmentModel department) {
     titleController.text = department.title;
     descriptionController.text = department.description;
-    imagePath.value = department.imagePath ?? '';
+    image.value =
+        department.imagePath != null ? File(department.imagePath!) : null;
   }
 
   Future<void> pickImage(ImageSource source) async {
     final pickedImage = await imagePicker.pickImage(source: source);
-    imagePath.value = pickedImage?.path ?? '';
+    image.value = pickedImage != null ? File(pickedImage.path) : null;
+    debugPrint('pickedImage: ${pickedImage?.path}');
   }
 
   void removeImage() {
-    imagePath.value = '';
+    debugPrint('removeImage');
+    image.value = null;
   }
 
   void cancelEditing(DepartmentModel department) {
     titleController.text = department.title;
     descriptionController.text = department.description;
-    imagePath.value = department.imagePath ?? '';
     toggleEditing();
   }
 
-  void saveChanges(DepartmentModel department) async {
+  void saveChanges(DepartmentModel department, BuildContext context) async {
     if (titleController.text.isEmpty) {
       Get.snackbar('Error', 'O título é obrigatório');
       return;
     }
-
-    debugPrint("Departamento salvo:");
-    debugPrint("Título: ${titleController.text}");
-    debugPrint("Descrição: ${descriptionController.text}");
-    debugPrint("Imagem: ${imagePath.value}");
-    debugPrint("ID: ${department.id}");
 
     final box = Hive.box<DepartmentModel>('departments');
 
@@ -56,10 +55,12 @@ class DepartmentEditController extends GetxController {
 
     dp.title = titleController.text;
     dp.description = descriptionController.text;
-    dp.imagePath = imagePath.value;
+    dp.imagePath = image.value?.path;
     await dp.save();
 
-    Get.snackbar("Sucesso", "Departamento salvo com sucesso!");
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Departamento atualizado com sucesso!!")),
+    );
 
     toggleEditing();
   }

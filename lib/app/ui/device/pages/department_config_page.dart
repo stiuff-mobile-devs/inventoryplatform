@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:get/get_state_manager/get_state_manager.dart';
 import 'package:get/instance_manager.dart';
 import 'package:image_picker/image_picker.dart';
@@ -53,33 +54,36 @@ class _DepartmentConfigPageState extends State<DepartmentConfigPage> {
                           color: Colors.black87,
                         ),
                       ),
-                      department.description.isNotEmpty
-                          ? Column(
-                              children: [
-                                const Text(
-                                  "Descrição:",
-                                  style: TextStyle(
-                                    fontSize: 12.0,
-                                    color: Colors.black87,
-                                  ),
-                                ),
-                                Text(department.description,
-                                    style: const TextStyle(
-                                      fontSize: 16.0,
-                                      color: Colors.black87,
-                                    )),
-                              ],
-                            )
-                          : const SizedBox(),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      const Text(
+                        "Descrição:",
+                        style: TextStyle(
+                          fontSize: 12.0,
+                          color: Colors.black87,
+                        ),
+                      ),
+                      Text(
+                          department.description.isEmpty
+                              ? "Sem descrição"
+                              : department.description,
+                          style: const TextStyle(
+                            fontSize: 16.0,
+                            color: Colors.black87,
+                          )),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      _image(editController.image),
+                      const SizedBox(
+                        height: 10,
+                      ),
                     ],
                   ),
                 ),
               ),
             ),
-            const SizedBox(
-              height: 10,
-            ),
-            _image(editController.imagePath.value),
             const SizedBox(
               height: 10,
             ),
@@ -134,7 +138,7 @@ class _DepartmentConfigPageState extends State<DepartmentConfigPage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                _image(editController.imagePath.value),
+                _image(editController.image),
                 Column(
                   children: [
                     ElevatedButton(
@@ -148,11 +152,7 @@ class _DepartmentConfigPageState extends State<DepartmentConfigPage> {
                       child: const Icon(Icons.photo_library),
                     ),
                     ElevatedButton(
-                      onPressed: () => {
-                        setState(() {
-                          editController.removeImage();
-                        })
-                      },
+                      onPressed: () => {editController.removeImage()},
                       child: const Icon(Icons.no_photography_outlined),
                     ),
                   ],
@@ -169,7 +169,7 @@ class _DepartmentConfigPageState extends State<DepartmentConfigPage> {
                   onPressed: () {
                     setState(() {
                       editController.saveChanges(
-                          _panelController.getCurrentDepartment()!);
+                          _panelController.getCurrentDepartment()!, context);
                     });
                   },
                   label: const Text('Salvar'),
@@ -188,14 +188,14 @@ class _DepartmentConfigPageState extends State<DepartmentConfigPage> {
         ));
   }
 
-  Widget _image(String imagePath) {
+  Widget _image(Rx<File?> imagePath) {
     return SizedBox(
         child: Center(
-            child: (imagePath.isNotEmpty)
+            child: (imagePath.value != null)
                 ? ClipRRect(
                     borderRadius: BorderRadius.circular(20),
                     child: Image.file(
-                      File(imagePath),
+                      File(imagePath.value!.path),
                       height: 200,
                       width: 200,
                       fit: BoxFit.cover,
