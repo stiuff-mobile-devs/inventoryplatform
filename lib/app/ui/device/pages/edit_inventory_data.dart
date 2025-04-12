@@ -2,22 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:inventoryplatform/app/controllers/inventory_controller.dart';
 
-class InventoryForm extends StatelessWidget {
+class InventoryFormEdit extends StatelessWidget {
   final InventoryController controller = Get.find<InventoryController>();
-  final String cod;
   final _formKey = GlobalKey<FormState>();
+  final String? cod;
 
-  InventoryForm({required this.cod}) {
-    controller.clearControllers();
-    controller.revisionController.text = "0.0.1";
-  }
+  InventoryFormEdit({super.key, required this.cod});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          "Criar Novo Inventário",
+          "Editar Inventário",
           style: TextStyle(color: Colors.white),
           textAlign: TextAlign.center,
         ),
@@ -107,23 +104,23 @@ class InventoryForm extends StatelessWidget {
                 child: controller.isLoading.value
                     ? const CircularProgressIndicator()
                     : ElevatedButton(
-                        onPressed: () {
-                          if (_formKey.currentState!.validate()) {
-                            controller.saveInventory(context);
-                          }
-                        },
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
-                          backgroundColor: Colors.blue,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8.0),
-                          ),
-                        ),
-                        child: const Text(
-                          "Salvar Inventário",
-                          style: TextStyle(color: Colors.white, fontSize: 16),
-                        ),
-                      ),
+                  onPressed: () {
+                    if (_formKey.currentState!.validate()) {
+                      controller.saveInventoryChanges(context,cod!);
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                    backgroundColor: Colors.blue,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                  ),
+                  child: const Text(
+                    "Salvar Alterações",
+                    style: TextStyle(color: Colors.white, fontSize: 16),
+                  ),
+                ),
               ),
             ],
           ),

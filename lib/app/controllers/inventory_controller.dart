@@ -10,6 +10,8 @@ class InventoryController extends GetxController {
   final TextEditingController revisionController = TextEditingController();
 
   final isLoading = false.obs;
+  String? currentInventoryId;
+
   //final PanelController _panelController = Get.find<PanelController>();
 
   Future<void> saveInventory(BuildContext context) async {
@@ -21,7 +23,6 @@ class InventoryController extends GetxController {
     isLoading.value = true;
 
     try {
-
       final box = Hive.box<InventoryModel>('inventories');
       final department = InventoryModel(
         title: titleController.text.trim(),
@@ -29,8 +30,8 @@ class InventoryController extends GetxController {
         revisionNumber: revisionController.text.trim(),
         departmentId: (context.widget as InventoryForm).cod,
       );
-      await box.add(department);
-     /* // Segurança firebase
+      await box.put(department.id, department);
+      /* // Segurança firebase
       User? user = FirebaseAuth.instance.currentUser;
       if (user == null) {
         Get.snackbar("Erro", "Usuário não autenticado.");
@@ -82,8 +83,9 @@ class InventoryController extends GetxController {
     }
   }
 
-   List<InventoryModel> getInventories() {
+  List<InventoryModel> getInventories() {
     final box = Hive.box<InventoryModel>('inventories');
+
     return box.values.toList();
   }
 
@@ -103,5 +105,62 @@ class InventoryController extends GetxController {
       // Retorna null se nenhum departamento for encontrado
       return null;
     }
+  }
+
+  Future<void> saveInventoryChanges(
+      BuildContext context, String inventoryId) async {
+    if (inventoryId == null) {
+      Get.snackbar("Erro", "Nenhum inventário selecionado para edição.");
+      return;
+    }
+
+    if (titleController.text.isEmpty || revisionController.text.isEmpty) {
+      Get.snackbar("Erro", "Preencha o campo título e número de revisão.");
+      return;
+    }
+
+    isLoading.value = true;
+    try {
+      final box = Hive.box<InventoryModel>('inventories');
+      final inventory = box.get(inventoryId);
+      debugPrint(inventoryId);
+      print(inventory);
+
+      if (inventory != null) {
+        print("rafael");
+        inventory.title = titleController.text.trim();
+        inventory.description = descriptionController.text.trim();
+        inventory.revisionNumber = revisionController.text.trim();
+        await box.put(inventoryId, inventory);
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Alterações salvas com sucesso!"),
+        ),
+      );
+      Navigator.pop(context);
+    } catch (e) {
+      print(e.toString());
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Erro ao salvar alterações: $e")),
+      );
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  void loadInventoryForEdit(InventoryModel inventory, String inventoryId) {
+    inventoryId = inventory.id;
+    titleController.text = inventory.title;
+    descriptionController.text = inventory.description ?? '';
+    revisionController.text = inventory.revisionNumber ?? '0.0.1';
+  }
+
+  void clearControllers() {
+    titleController.clear();
+    descriptionController.clear();
+    revisionController.clear();
+    currentInventoryId = null;
   }
 }

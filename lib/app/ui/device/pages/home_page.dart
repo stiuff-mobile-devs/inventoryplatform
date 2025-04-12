@@ -38,7 +38,7 @@ class HomePage extends StatelessWidget {
   Widget _buildHeader(BuildContext context) {
     return InkWell(
       onTap: () {
-        Get.toNamed(Routes.LOGIN);
+          Get.toNamed(Routes.EDITINVENTORY);
       },
       borderRadius: BorderRadius.circular(12.0),
       splashColor: Colors.blueAccent.withOpacity(0.3),

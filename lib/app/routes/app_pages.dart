@@ -14,6 +14,11 @@ import 'package:inventoryplatform/app/ui/device/forms/inventory_form.dart';
 import 'package:inventoryplatform/app/ui/device/forms/material_form.dart';
 import 'package:inventoryplatform/app/ui/device/pages/alternate_camera_page.dart';
 import 'package:inventoryplatform/app/ui/device/pages/panel_page.dart';
+import 'package:inventoryplatform/app/ui/device/pages/edit_inventory_data.dart';
+
+import '../controllers/inventory_controller.dart';
+import '../data/models/inventory_model.dart';
+import '../ui/device/pages/edit_inventory_data.dart';
 
 class AppPages {
   static final routes = [
@@ -60,7 +65,11 @@ class AppPages {
     GetPage(
         name: Routes.LOGIN,
         page: () => LoginPage()
-    )
+    ),
+    GetPage(
+      name: Routes.EDITINVENTORY,
+      page: () => InventoryFormEdit(cod: Get.parameters['id']),
+    ),
     
 
   ];
