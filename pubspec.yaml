@@ -33,6 +33,10 @@ dependencies:
   file_picker: ^9.2.3
   share_plus: ^10.1.4
   firebase_core: ^3.13.0
+  firebase_auth: ^5.5.2
+  google_sign_in: ^6.3.0
+  cloud_firestore: ^5.6.6
+  awesome_snackbar_content: ^0.1.5
 
 dev_dependencies:
   flutter_test:

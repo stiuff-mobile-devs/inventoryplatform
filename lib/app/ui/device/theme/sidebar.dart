@@ -3,13 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:inventoryplatform/app/controllers/sidebar_controller.dart';
 import 'package:inventoryplatform/app/routes/app_routes.dart';
+import 'package:inventoryplatform/app/services/utils_service.dart';
 import 'package:sidebarx/sidebarx.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class CustomSidebar extends StatelessWidget {
   CustomSidebar({super.key});
   final controller = Get.put(SidebarController());
-  //final UtilsService utilsService = UtilsService();
+  final UtilsService utilsService = UtilsService();
 
   final SidebarXController sidebarController =
       SidebarXController(selectedIndex: 0, extended: true);
@@ -100,7 +101,7 @@ class CustomSidebar extends StatelessWidget {
               throw Exception('Could not launch $_url');
             }
           },
-        )
+        ),
         /*SidebarXItem(
           icon: Icons.settings_applications,
           label: 'Configurações',
@@ -116,13 +117,13 @@ class CustomSidebar extends StatelessWidget {
             Get.offAllNamed(AppRoutes.help);
             sidebarController.selectIndex(2);
           },
-        ),
+        ),*/
         SidebarXItem(
           icon: Icons.logout,
           label: 'Logout',
           onTap: () =>
               utilsService.showLogoutNotice(context, controller.signOut),
-        ),*/
+        ),
       ],
     );
   }
@@ -138,7 +139,7 @@ class CustomSidebar extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              //_buildUserAvatar(controller, extended),
+              _buildUserAvatar(controller, extended),
               if (extended) const SizedBox(width: 16),
               if (extended) _buildUserInfo(controller),
             ],
@@ -148,7 +149,7 @@ class CustomSidebar extends StatelessWidget {
     );
   }
 
-  /* Widget _buildUserAvatar(SidebarController controller, bool extended) {
+   Widget _buildUserAvatar(SidebarController controller, bool extended) {
     final double radius = extended ? 30 : 16;
     final double size = extended ? 60 : 32;
     final double iconSize = extended ? 48 : 24;
@@ -198,7 +199,7 @@ class CustomSidebar extends StatelessWidget {
         );
       },
     );
-  }*/
+  }
 
   Widget _buildUserInfo(SidebarController controller) {
     return Column(

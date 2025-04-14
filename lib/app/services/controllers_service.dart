@@ -3,8 +3,11 @@ import 'package:inventoryplatform/app/controllers/carousel_section_controller.da
 import 'package:inventoryplatform/app/controllers/connection_controller.dart';
 import 'package:inventoryplatform/app/controllers/department_controller.dart';
 import 'package:inventoryplatform/app/controllers/inventory_controller.dart';
+import 'package:inventoryplatform/app/controllers/login_controller.dart';
 import 'package:inventoryplatform/app/controllers/material_controller.dart';
 import 'package:inventoryplatform/app/controllers/panel_controller.dart';
+import 'package:inventoryplatform/app/services/auth_service.dart';
+import 'package:inventoryplatform/app/services/error_service.dart';
 
 class ControllerInitializer {
   static void initialize() {
@@ -14,5 +17,8 @@ class ControllerInitializer {
     Get.put(InventoryController());
     Get.put(MaterialController());
     Get.put(PanelController());
+    Get.put(AuthService());
+    Get.put(ErrorService());
+    Get.put(LoginController());
   }
 }

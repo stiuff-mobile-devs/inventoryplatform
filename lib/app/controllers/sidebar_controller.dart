@@ -1,6 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
+import 'package:inventoryplatform/app/routes/app_routes.dart';
+import 'package:inventoryplatform/app/services/auth_service.dart';
 
 class SidebarController extends GetxController {
+  final AuthService _authService = Get.find<AuthService>();
 
   var userId = ''.obs;
   var userName = ''.obs;
@@ -10,13 +14,14 @@ class SidebarController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    _loadUserInfo();
   }
 
-  /*Future<String?> getProfileImageUrl() {
+  Future<String?> getProfileImageUrl() {
     return _authService.getProfileImageUrl();
-  }*/
+  }
 
-  /*Future<String> getName(String uid) async {
+  Future<String> getName(String uid) async {
     DocumentSnapshot user = await FirebaseFirestore.instance
         .collection("users").doc(uid).get();
 
@@ -39,6 +44,6 @@ class SidebarController extends GetxController {
 
   Future<void> signOut() async {
     await _authService.signOut();
-    Get.offAllNamed(AppRoutes.login);
-  }*/
+    Get.offAllNamed(Routes.LOGIN);
+  }
 }

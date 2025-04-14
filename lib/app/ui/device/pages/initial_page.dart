@@ -1,7 +1,7 @@
 import 'package:animated_splash_screen/animated_splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:inventoryplatform/app/ui/device/pages/home_page.dart';
+import 'package:inventoryplatform/app/ui/device/pages/login_page.dart';
 
 class InitialPage extends StatelessWidget {
   const InitialPage({super.key});
@@ -15,8 +15,8 @@ class InitialPage extends StatelessWidget {
               begin: Alignment.topRight,
               end: Alignment.bottomLeft,
               colors: [
-                Colors.blue,
-                Colors.black,
+                Colors.purple,
+                Colors.deepPurple,
               ],
             ),
           ),
@@ -26,7 +26,7 @@ class InitialPage extends StatelessWidget {
           splash: SvgPicture.asset(
             'assets/icons/JustLogoColetor.svg',
           ),
-          nextScreen:  HomePage(),
+          nextScreen:  const LoginPage(),
           splashTransition: SplashTransition.fadeTransition,
           backgroundColor: Colors.transparent,
         ),
