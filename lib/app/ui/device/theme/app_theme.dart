@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 
 final ThemeData globalTheme = ThemeData(
-  primarySwatch: Colors.blue,
-  primaryColor: Colors.blue,
+  primarySwatch: Colors.purple,
+  primaryColor: Colors.purple,
   scaffoldBackgroundColor: Colors.white,
   bottomNavigationBarTheme: const BottomNavigationBarThemeData(
     backgroundColor: Colors.deepPurple,
   ),
   appBarTheme: const AppBarTheme(
-    color: Colors.blue,
+    color: Colors.purple,
     elevation: 0,
     iconTheme: IconThemeData(color: Colors.white),
   ),
@@ -17,10 +17,10 @@ final ThemeData globalTheme = ThemeData(
     bodySmall: TextStyle(color: Colors.grey, fontSize: 12),
   ),
   buttonTheme: const ButtonThemeData(
-    buttonColor: Colors.blue,
+    buttonColor: Colors.purple,
     textTheme: ButtonTextTheme.primary,
   ),
   iconTheme: const IconThemeData(
-    color: Colors.blue,
+    color: Colors.purple,
   ),
 );

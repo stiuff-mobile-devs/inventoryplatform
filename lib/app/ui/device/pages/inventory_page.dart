@@ -163,7 +163,7 @@ class _InventoryPageState extends State<InventoryPage> {
               },
               icon: const Icon(Icons.add),
               label: const Text('Adicionar Inventário'),
-              style: TextButton.styleFrom(foregroundColor: Colors.blue),
+              style: TextButton.styleFrom(foregroundColor: Colors.purple),
             ),
           ],
         ),

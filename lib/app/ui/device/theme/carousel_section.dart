@@ -183,7 +183,7 @@ class CarouselSection extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 4.0),
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: currentIndex == index ? Colors.blue : Colors.grey.shade400,
+        color: currentIndex == index ? Colors.purple : Colors.grey.shade400,
       ),
     );
   }

@@ -130,7 +130,7 @@ class _DashboardPageState extends State<DashboardPage> {
         physics: const NeverScrollableScrollPhysics(),
         children: [
           _buildCard('Inventários', _inventoryController.inventories.length,
-              Icons.inventory_rounded, Colors.blueAccent),
+              Icons.inventory_rounded, Colors.purple),
           /*_buildCard('Domains', _panelController.domains.length,
               Icons.data_object, Colors.orangeAccent),
           _buildCard('Tags', _panelController.tags.length, Icons.tag,
@@ -229,7 +229,7 @@ class _DashboardPageState extends State<DashboardPage> {
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         color: _currentCarouselIndex == index
-                            ? Colors.blueAccent
+                            ? Colors.purple
                             : Colors.grey,
                       ),
                     ),

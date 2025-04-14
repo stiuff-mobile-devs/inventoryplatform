@@ -12,7 +12,11 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        gradient: const LinearGradient(
+          colors: [Colors.purple, Colors.deepPurple],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.1),
@@ -53,7 +57,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                 'Inventário Universal',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  color: Color.fromARGB(255, 36, 36, 36),
+                  color: Colors.white,
                   fontSize: 18.0,
                 ),
               ),
@@ -73,7 +77,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
             icon: const Icon(
               Icons.list,
               size: 28,
-              color: Colors.black,
+              color: Colors.white,
             ),
           );
         },
@@ -93,7 +97,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
           icon: const Icon(
             Icons.keyboard_return,
             size: 28,
-            color: Colors.black,
+            color: Colors.white,
           ),
         ),
       ),

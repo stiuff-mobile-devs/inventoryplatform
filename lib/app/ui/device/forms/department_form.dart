@@ -14,6 +14,7 @@ class DepartmentForm extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.purple,
         title: const Text(
           "Criar Novo Departamento",
           style: TextStyle(color: Colors.white),
@@ -146,7 +147,7 @@ class DepartmentForm extends StatelessWidget {
                         },
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
-                          backgroundColor: Colors.blue,
+                          backgroundColor: Colors.purple,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8.0),
                           ),

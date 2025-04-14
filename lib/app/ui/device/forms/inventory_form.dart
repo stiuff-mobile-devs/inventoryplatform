@@ -16,6 +16,7 @@ class InventoryForm extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.purple,
         title: const Text(
           "Criar Novo Inventário",
           style: TextStyle(color: Colors.white),
@@ -114,7 +115,7 @@ class InventoryForm extends StatelessWidget {
                         },
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
-                          backgroundColor: Colors.blue,
+                          backgroundColor: Colors.purple,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8.0),
                           ),

@@ -39,7 +39,7 @@ class HomePage extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
-        color: Colors.blueAccent.shade100,
+        color: Colors.purple,
         borderRadius: BorderRadius.circular(12.0),
         boxShadow: [
           BoxShadow(
@@ -51,10 +51,10 @@ class HomePage extends StatelessWidget {
       ),
       child: Row(
         children: [
-          CircleAvatar(
+          const CircleAvatar(
             radius: 36,
-            backgroundColor: Colors.blueAccent.shade200,
-            child: const Icon(Icons.dashboard, size: 36, color: Colors.white),
+            backgroundColor: Colors.purple,
+            child:  Icon(Icons.dashboard, size: 36, color: Colors.white),
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -72,7 +72,7 @@ class HomePage extends StatelessWidget {
                 Text(
                   'Crie ou acesse uma organização para gerenciar seus itens de inventário.',
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Colors.white70,
+                        color: Colors.white,
                       ),
                 ),
               ],
@@ -113,15 +113,15 @@ class HomePage extends StatelessWidget {
             _buildQuickActionButton(
               icon: Icons.add_circle_rounded,
               label: 'Criar um novo Departamento',
-              color: Colors.blue,
+              color: Colors.purple,
               onPressed: () => controller.createDepartment(context),
             ),
-            _buildQuickActionButton(
+           /* _buildQuickActionButton(
               icon: Icons.supervised_user_circle,
               label: 'Participar de um Departamento',
               color: Colors.green,
               onPressed: () {},
-            ),
+            ),*/
           ],
         ),
       ],
