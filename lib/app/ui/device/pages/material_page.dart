@@ -1,6 +1,8 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:path/path.dart' as p;
 import 'package:intl/intl.dart';
 import 'package:inventoryplatform/app/ui/device/theme/temporary_message_display.dart';
 import 'dart:io';
@@ -170,13 +172,19 @@ class _MaterialPageState extends State<MaterialPage> {
             shrinkWrap: true,
             itemCount: _allMaterials.length,
             itemBuilder: (context, index) {
-              return Row(children: [
-                Expanded(flex: 2, child: Text(_allMaterials[index].barcode!)),
-                Expanded(child: Text(_allMaterials[index].name)),
-                Expanded(
-                    child:
-                        Text(formatDatePortuguese(_allMaterials[index].date))),
-              ]);
+              return InkWell (
+                onTap: () {
+                  expandMaterialDetails(_allMaterials[index]);
+                },
+                child: Row(children: [
+                  const SizedBox(height: 30),
+                  Expanded(flex: 2, child: Text(_allMaterials[index].barcode!)),
+                  Expanded(child: Text(_allMaterials[index].name)),
+                  Expanded(
+                      child:
+                      Text(formatDatePortuguese(_allMaterials[index].date))),
+                ])
+              );
             },
             separatorBuilder: (context, index) {
               return const Divider(
@@ -190,7 +198,7 @@ class _MaterialPageState extends State<MaterialPage> {
           const SizedBox(height: 20.0),
           Center (
             child: ElevatedButton(
-            onPressed: sharePdf,
+            onPressed: openDialog,
             child: const Text("Gerar PDF"),
             )
           )
@@ -199,11 +207,11 @@ class _MaterialPageState extends State<MaterialPage> {
     );
   }
 
-  /*Future<void> savePdf() async {
-    PermissionStatus status = await Permission.manageExternalStorage.request();
+  Future<void> savePdf() async {
+    /*PermissionStatus status = await Permission.manageExternalStorage.request();
     if (!status.isGranted) {
       return;
-    }
+    }*/
 
     final pdf = generatePdf();
     final Uint8List pdfData = await pdf.save();
@@ -214,7 +222,7 @@ class _MaterialPageState extends State<MaterialPage> {
       final file = File(filePath);
       await file.writeAsBytes(pdfData);
     }
-  }*/
+  }
 
   Future<void> sharePdf() async {
     final pdf = generatePdf();
@@ -332,5 +340,64 @@ class _MaterialPageState extends State<MaterialPage> {
     return date != null
         ? DateFormat("dd/MM/yyyy").format(date)
         : "Data Indisponível";
+  }
+
+  Future<void> expandMaterialDetails(MaterialModel material) async {
+    await controller.navigateToMaterialDetails(context, material);
+  }
+
+  void openDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("O que fazer com o PDF?"),
+        actions: [
+          Center (
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: const Size(180, 40),
+                  ),
+                  onPressed: () async {
+                    await savePdf();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Relatório salvo com sucesso.')),
+                    );
+                    Navigator.pop(context);
+                  },
+                  child: const Text("Salvar"),
+                ),
+                const SizedBox(width: 10),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: const Size(180, 40),
+                  ),
+                  onPressed: () {
+                    sharePdf();
+                  },
+                  child: const Text("Compartilhar"),
+                ),
+                const SizedBox(width: 10),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: const Size(180, 40),
+                  ),
+                  onPressed: () {
+
+                  },
+                  child: const Text("Salvar no Google Drive"),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text("Fechar"),
+                ),
+              ]
+            ),
+          )
+        ],
+      ),
+    );
   }
 }
