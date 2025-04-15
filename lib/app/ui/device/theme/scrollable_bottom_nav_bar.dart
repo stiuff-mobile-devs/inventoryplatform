@@ -104,6 +104,8 @@ class ScrollableBottomNavigationBarState
                           1, Icons.inventory_rounded, 'Inventories'),
                       _buildNavigationBarItem(2, Icons.summarize, 'Materials'),
                       _buildNavigationBarItem(3, Icons.engineering, 'Configs'),
+                      _buildNavigationBarItem(4, Icons.label, 'Tags'),
+
                     ],
                   ),
                 ),

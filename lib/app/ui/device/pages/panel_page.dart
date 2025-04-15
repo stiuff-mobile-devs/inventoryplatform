@@ -6,6 +6,7 @@ import 'package:inventoryplatform/app/ui/device/pages/department_config_page.dar
 import 'package:inventoryplatform/app/ui/device/pages/inventory_page.dart';
 import 'package:inventoryplatform/app/ui/device/pages/material_page.dart'
     as custom;
+import 'package:inventoryplatform/app/ui/device/pages/tag_page.dart';
 import 'package:inventoryplatform/app/ui/device/theme/base_scaffold.dart';
 import 'package:inventoryplatform/app/ui/device/theme/scrollable_bottom_nav_bar.dart';
 
@@ -24,7 +25,9 @@ class _PanelPageState extends State<PanelPage> {
     const DashboardPage(),
     const InventoryPage(),
     const custom.MaterialPage(),
-    const DepartmentConfigPage()
+    const DepartmentConfigPage(),
+    const TagPage()
+
   ];
 
   @override
@@ -39,7 +42,9 @@ class _PanelPageState extends State<PanelPage> {
         const DashboardPage(),
         const InventoryPage(),
         const custom.MaterialPage(),
-        const DepartmentConfigPage()
+        const DepartmentConfigPage(),
+        const TagPage()
+
       ];
     });
 

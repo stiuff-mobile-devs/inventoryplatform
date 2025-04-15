@@ -10,5 +10,6 @@ abstract class Routes {
   static const SETTINGS = '/settings';
   static const ALT_CAMERA = '/alternate-camera';
   static const MATERIAL = '/material-form';
+  static const TAG_FORM = '/tag-form';
   static const NOT_FOUND = '/404';
 }
