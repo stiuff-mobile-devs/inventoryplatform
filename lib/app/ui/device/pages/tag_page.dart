@@ -5,6 +5,7 @@ import 'package:inventoryplatform/app/data/models/department_model.dart';
 import 'package:inventoryplatform/app/data/models/tag_model.dart';
 import 'package:inventoryplatform/app/routes/app_routes.dart';
 import 'package:inventoryplatform/app/ui/device/theme/temporary_message_display.dart';
+import 'package:hive/hive.dart';
 
 class TagPage extends StatefulWidget {
   const TagPage({super.key});
@@ -20,7 +21,7 @@ class _TagPageState extends State<TagPage> {
   @override
   void initState() {
     super.initState();
-    _loadTags(); // Carrega as tags (simulação)
+    _loadTags(); // Carrega as tags do Hive
   }
 
   Future<void> _onRefresh() async {
@@ -28,20 +29,26 @@ class _TagPageState extends State<TagPage> {
   }
 
   Future<void> _loadTags() async {
-    // Simulação de carregamento de tags
-    setState(() {
-      //_allTags =  // Substituir por lógica real
-    });
+    try {
+      // Abre a box do Hive
+      final box = Hive.box<TagModel>('tags');
+
+      // Carrega todas as tags e atualiza o estado
+      setState(() {
+        _allTags = box.values.toList();
+      });
+    } catch (e) {
+      print('Erro ao carregar as tags: $e');
+    }
   }
 
-    String formatDatePortuguese(DateTime? date) {
+  String formatDatePortuguese(DateTime? date) {
     return date != null
         ? DateFormat("dd/MM/yyyy").format(date)
         : "Data Indisponível";
   }
 
-
-   @override
+  @override
   Widget build(BuildContext context) {
     return RefreshIndicator(
       backgroundColor: Colors.white,
@@ -50,11 +57,12 @@ class _TagPageState extends State<TagPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildHeader(department.title),
-         // _buildInventoryOption(),
-          _allTags.isNotEmpty ? _buildItemList() :
-          const TemporaryMessageDisplay(
-            message: "Não há itens para serem listados.",
-          ),
+          // _buildInventoryOption(),
+          _allTags.isNotEmpty
+              ? _buildItemList()
+              : const TemporaryMessageDisplay(
+                  message: "Não há itens para serem listados.",
+                ),
         ],
       ),
     );
@@ -80,7 +88,7 @@ class _TagPageState extends State<TagPage> {
               ),
               ElevatedButton.icon(
                 onPressed: () {
-                  Get.toNamed(Routes.TAG_FORM);
+                  _showTagOptionsDialog(context);
                 },
                 icon: const Icon(Icons.label),
                 label: const Text('Adicionar Tag'),
@@ -149,19 +157,18 @@ class _TagPageState extends State<TagPage> {
             shrinkWrap: true,
             itemCount: _allTags.length,
             itemBuilder: (context, index) {
-              return InkWell (
-                onTap: () {
-                  print("TAG SELECIONADA");
-                },
-                child: Row(children: [
-                  const SizedBox(height: 30),
-                  Expanded(flex: 2, child: Text(_allTags[index].id)),
-                  Expanded(child: Text(_allTags[index].type)),
-                  Expanded(
-                      child:
-                      Text(formatDatePortuguese(_allTags[index].date))),
-                ])
-              );
+              return InkWell(
+                  onTap: () {
+                    print("TAG SELECIONADA");
+                  },
+                  child: Row(children: [
+                    const SizedBox(height: 30),
+                    Expanded(flex: 2, child: Text(_allTags[index].id)),
+                    Expanded(child: Text(_allTags[index].type)),
+                    Expanded(
+                        child:
+                            Text(formatDatePortuguese(_allTags[index].date))),
+                  ]));
             },
             separatorBuilder: (context, index) {
               return const Divider(
@@ -177,23 +184,49 @@ class _TagPageState extends State<TagPage> {
       ),
     );
   }
-  /*Widget _buildInventoryOption() {
-    return Padding(
-        padding: const EdgeInsets.symmetric(),
-        child: Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-          IconButton(
-              color: Colors.deepPurple,
-              onPressed: print("oi"), //_backInventoryOption,
-              icon: const Icon(Icons.arrow_back)),
-          const SizedBox(width: 20),
-          Text(_handleInventoryTitle()),
-          const SizedBox(width: 20),
-          IconButton(
-              color: Colors.deepPurple,
-              onPressed: _forwardInventoryOption,
-              icon: const Icon(Icons.arrow_forward))
-        ]));
-  }*/
 
-  
+  void _showTagOptionsDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Escolha o tipo de Tag'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: const Icon(Icons.nfc),
+                title: const Text('RFID'),
+                onTap: () {
+                  print('RFID escolhido');
+                  Navigator.of(context).pop();
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.qr_code),
+                title: const Text('QR Code'),
+                onTap: () {
+                  print('QR Code escolhido');
+                  Navigator.of(context).pop();
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.barcode_reader),
+                title: const Text('Barcode'),
+                onTap: () async {
+                  await Get.offNamed(
+                    Routes.ALT_CAMERA,
+                    parameters: {
+                      'codChoice': '3',
+                    },
+                  );
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
 }

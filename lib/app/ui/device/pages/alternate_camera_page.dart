@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:inventoryplatform/app/controllers/material_controller.dart';
+import 'package:inventoryplatform/app/controllers/tag_controller.dart';
 import 'package:inventoryplatform/app/data/models/material_model.dart';
 import 'package:inventoryplatform/app/routes/app_routes.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
 class AlternateCameraPage extends StatefulWidget {
   final String? codDepartment;
+  final int? codChoice;
 
-  const AlternateCameraPage({super.key, this.codDepartment});
+  const AlternateCameraPage({super.key, this.codDepartment, this.codChoice});
 
   @override
   State<AlternateCameraPage> createState() => _AlternateCameraPageState();
@@ -16,13 +18,12 @@ class AlternateCameraPage extends StatefulWidget {
 
 class _AlternateCameraPageState extends State<AlternateCameraPage> {
   String? _scannedCode;
-  //final InventoryModel inventory = Get.arguments; //esse
   double _buttonBottomPosition = 0;
   double _buttonOpacity = 0.0;
   bool _isInFormPage = false;
   final MobileScannerController _scannerController = MobileScannerController();
   final MaterialController _materialController = MaterialController();
-
+  final TagController _tagController = TagController();
 
   List<Rect> _barcodeRects = [];
 
@@ -118,16 +119,27 @@ class _AlternateCameraPageState extends State<AlternateCameraPage> {
                     setState(() {
                       _isInFormPage = true;
                     });
-                    MaterialModel checkMaterial =  await _materialController.checkMaterial(_scannedCode!, '');
-                    if (checkMaterial.id.isEmpty && checkMaterial.barcode!.isEmpty){
-                        Get.offNamed(Routes.MATERIAL,
-                          //arguments: inventory, ///aqui
-                          parameters: {'codDepartment': widget.codDepartment!, 'barcode': _scannedCode!});
+                    MaterialModel checkMaterial = await _materialController.checkMaterial(_scannedCode!, '');
+
+                    if (checkMaterial.id.isEmpty && checkMaterial.barcode!.isEmpty) {
+                      // Executa apenas o case 1
+                      if (widget.codChoice == 1) {
+                        Get.offNamed(
+                          Routes.MATERIAL,
+                          parameters: {
+                            'codDepartment': widget.codDepartment!,
+                            'barcode': _scannedCode!
+                          },
+                        );
                       }
-                    else{
-                      MaterialModel checkMaterial =  await _materialController.checkMaterial(_scannedCode!, '');
-                      await _materialController.navigateToMaterialDetails(context, checkMaterial);
-                      Navigator.of(context).pop(); // Fecha a página atual
+                      else if (widget.codChoice == 3) {
+                        _tagController.saveTag(context, _scannedCode, "Barcode");
+                      }
+                    } else {
+                      
+                        await _materialController.navigateToMaterialDetails(context, checkMaterial);
+                        Navigator.of(context).pop(); // Fecha a página atual
+                        
                     }
                   }
                 },

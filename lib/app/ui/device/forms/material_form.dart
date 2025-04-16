@@ -283,7 +283,8 @@ class _MaterialFormState extends State<MaterialForm> {
                         onPressed: () async {
                           if (_formKey.currentState!.validate()) {
                             await controller.saveMaterial(context, geolocationToStr(), widget.codDepartment);
-                            Get.offNamed(Routes.ALT_CAMERA);
+                            Get.offNamed(Routes.ALT_CAMERA, parameters: {'codChoice': '1',},
+                            );
                           }
                         },
                         style: ElevatedButton.styleFrom(
