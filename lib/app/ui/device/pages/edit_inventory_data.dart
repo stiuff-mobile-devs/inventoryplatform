@@ -11,6 +11,9 @@ class InventoryFormEdit extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    String newRevision = incrementRevision(controller.revisionController.text);
+    controller.revisionController.text = newRevision;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -86,6 +89,7 @@ class InventoryFormEdit extends StatelessWidget {
               const SizedBox(height: 10),
               TextFormField(
                 controller: controller.revisionController,
+                enabled: false,
                 decoration: InputDecoration(
                   labelText: "Número de Revisão *",
                   border: OutlineInputBorder(
@@ -127,6 +131,33 @@ class InventoryFormEdit extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+String incrementRevision(String currentRevision) {
+  try {
+    List<String> parts = currentRevision.split('.');
+    if (parts.length != 3) return currentRevision;
+
+    int maior = int.tryParse(parts[0]) ?? 0;
+    int menor = int.tryParse(parts[1]) ?? 0;
+    int patch = int.tryParse(parts[2]) ?? 0;
+
+    patch++;
+
+    if (patch > 9) {
+      patch = 0;
+      menor++;
+
+      if (menor > 9) {
+        menor = 0;
+        maior++;
+      }
+    }
+
+    return '$maior.$menor.$patch';
+  } catch (e) {
+    return currentRevision;
   }
 }
 

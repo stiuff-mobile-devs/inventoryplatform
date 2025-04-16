@@ -89,6 +89,7 @@ class InventoryForm extends StatelessWidget {
               const SizedBox(height: 10),
               TextFormField(
                 controller: controller.revisionController,
+                enabled: false,
                 decoration: InputDecoration(
                   labelText: "Número de Revisão *",
                   border: OutlineInputBorder(

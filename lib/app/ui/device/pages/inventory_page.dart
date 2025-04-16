@@ -180,7 +180,9 @@ class _InventoryPageState extends State<InventoryPage> {
                 'Descrição': item.description,
                 'Criado em': DateFormat('dd/MM/yyyy HH:mm')
                     .format(item.createdAt.toLocal()),
-                'Atualizado em': item.updatedAt ?? "Nunca modificado",
+                'Atualizado em': item.updatedAt != null
+                    ? DateFormat('dd/MM/yyyy HH:mm').format(item.updatedAt!.toLocal())
+                    : "Nunca modificado",
               },
               isActive: 1,
               icon: Icons.donut_large_rounded,

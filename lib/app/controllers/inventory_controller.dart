@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
+import 'package:intl/intl.dart';
 import 'package:inventoryplatform/app/data/models/inventory_model.dart';
 import 'package:inventoryplatform/app/ui/device/forms/inventory_form.dart';
 
@@ -107,8 +108,9 @@ class InventoryController extends GetxController {
     }
   }
 
-  Future<void> saveInventoryChanges(
-      BuildContext context, String inventoryId) async {
+  Future<void> saveInventoryChanges(BuildContext context, String inventoryId) async {
+    DateTime now = DateTime.now();
+
     if (inventoryId == null) {
       Get.snackbar("Erro", "Nenhum inventário selecionado para edição.");
       return;
@@ -123,14 +125,12 @@ class InventoryController extends GetxController {
     try {
       final box = Hive.box<InventoryModel>('inventories');
       final inventory = box.get(inventoryId);
-      debugPrint(inventoryId);
-      print(inventory);
 
       if (inventory != null) {
-        print("rafael");
         inventory.title = titleController.text.trim();
         inventory.description = descriptionController.text.trim();
         inventory.revisionNumber = revisionController.text.trim();
+        inventory.updatedAt = now;
         await box.put(inventoryId, inventory);
       }
 
