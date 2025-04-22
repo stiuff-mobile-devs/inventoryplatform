@@ -11,4 +11,5 @@ abstract class Routes {
   static const ALT_CAMERA = '/alternate-camera';
   static const MATERIAL = '/material-form';
   static const NOT_FOUND = '/404';
+  static const EDITINVENTORY = '/edit_iventory_data';
 }

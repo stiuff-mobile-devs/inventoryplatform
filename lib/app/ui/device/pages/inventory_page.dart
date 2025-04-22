@@ -3,11 +3,12 @@ import 'package:get/get.dart';
 import 'package:inventoryplatform/app/controllers/department_controller.dart';
 import 'package:inventoryplatform/app/controllers/inventory_controller.dart';
 import 'package:inventoryplatform/app/controllers/panel_controller.dart';
+import 'package:inventoryplatform/app/data/models/inventory_model.dart';
 import 'package:inventoryplatform/app/routes/app_routes.dart';
 import 'package:inventoryplatform/app/ui/device/theme/list_item_widget.dart';
 import 'package:inventoryplatform/app/ui/device/theme/search_bar_widget.dart';
 import 'package:inventoryplatform/app/ui/device/theme/temporary_message_display.dart';
-import 'package:intl/intl.dart'; 
+import 'package:intl/intl.dart';
 
 class InventoryPage extends StatefulWidget {
   const InventoryPage({super.key});
@@ -18,6 +19,8 @@ class InventoryPage extends StatefulWidget {
 
 class _InventoryPageState extends State<InventoryPage> {
   final PanelController _panelController = Get.find<PanelController>();
+  final DepartmentController _departmentController =
+      Get.find<DepartmentController>();
   final DepartmentController _departmentController = Get.find<DepartmentController>();
   final InventoryController _inventoryController = Get.find<InventoryController>();
 
@@ -60,26 +63,7 @@ class _InventoryPageState extends State<InventoryPage> {
     if (query.isEmpty) {
       _panelController
           .updateItemsBasedOnTab(_panelController.selectedTabIndex.value);
-    /* final filteredList = _panelController.inventories
-        .where((inventory) =>
-            inventory?title.toLowerCase().contains(query.toLowerCase()))
-        .toList();*/
-
-    //_panelController.listedItems.assignAll(filteredList);
-    /* final filteredList = _panelController.inventories
-        .where((inventory) =>
-            inventory?title.toLowerCase().contains(query.toLowerCase()))
-        .toList();*/
-
-    //_panelController.listedItems.assignAll(filteredList);
-;
-
-    /* final filteredList = _panelController.inventories
-        .where((inventory) =>
-            inventory?title.toLowerCase().contains(query.toLowerCase()))
-        .toList();*/
-
-    //_panelController.listedItems.assignAll(filteredList);
+      return;
     }
 
     /* final filteredList = _panelController.inventories
@@ -224,9 +208,9 @@ class _InventoryPageState extends State<InventoryPage> {
                                     const SizedBox(height: 8.0),
                                     Text("Data de Criação: ${DateFormat('dd/MM/yyyy HH:mm').format(item.createdAt.toLocal())}"), // Formata a data e hora
                                     const SizedBox(height: 8.0),
-                                    Text("Última Atualização: ${item.updatedAt ?? "Nunca modificado"}"), 
+                                    Text("Última Atualização: ${item.updatedAt ?? "Nunca modificado"}"),
                                     const SizedBox(height: 8.0),
-                                    Text("Departamento de origem: ${_departmentController.getDepartmentTitleById(item.departmentId) ?? "Desconhecido"}"), 
+                                    Text("Departamento de origem: ${_departmentController.getDepartmentTitleById(item.departmentId) ?? "Desconhecido"}"),
 
                                     const SizedBox(height: 24.0),
                                     Row(

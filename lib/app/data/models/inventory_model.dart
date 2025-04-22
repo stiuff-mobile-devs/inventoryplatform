@@ -35,5 +35,5 @@ class InventoryModel extends HiveObject {
     required this.revisionNumber,
     required this.departmentId,
     this.updatedAt,
-  }) : id = Uuid().v4(); // Generate a unique ID
+  }) : id = Uuid().v4();
 }

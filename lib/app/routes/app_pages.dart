@@ -1,17 +1,24 @@
 import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:get/get_navigation/src/routes/get_route.dart';
 import 'package:inventoryplatform/app/bindings/department_bindings.dart';
 import 'package:inventoryplatform/app/bindings/home_bindings.dart';
 import 'package:inventoryplatform/app/bindings/inventory_bindings.dart';
 import 'package:inventoryplatform/app/bindings/panel_binding.dart';
 import 'package:inventoryplatform/app/routes/app_routes.dart';
 import 'package:inventoryplatform/app/ui/device/forms/department_form.dart';
+import 'package:inventoryplatform/app/ui/device/login/login_page.dart';
 import 'package:inventoryplatform/app/ui/device/pages/home_page.dart';
 import 'package:inventoryplatform/app/ui/device/pages/initial_page.dart';
 import 'package:inventoryplatform/app/ui/device/forms/inventory_form.dart';
 import 'package:inventoryplatform/app/ui/device/forms/material_form.dart';
 import 'package:inventoryplatform/app/ui/device/pages/alternate_camera_page.dart';
-import 'package:inventoryplatform/app/ui/device/pages/login_page.dart';
 import 'package:inventoryplatform/app/ui/device/pages/panel_page.dart';
+import 'package:inventoryplatform/app/ui/device/pages/edit_inventory_data.dart';
+
+import '../controllers/inventory_controller.dart';
+import '../data/models/inventory_model.dart';
+import '../ui/device/pages/edit_inventory_data.dart';
 
 class AppPages {
   static final routes = [
@@ -56,9 +63,15 @@ class AppPages {
       ),
     ),
     GetPage(
+      name: Routes.EDITINVENTORY,
+      page: () => InventoryFormEdit(cod: Get.parameters['id']),
+    ),
+
+
+    GetPage(
       name: Routes.LOGIN,
       page: () => const LoginPage(),
       ),
-   
+
   ];
 }

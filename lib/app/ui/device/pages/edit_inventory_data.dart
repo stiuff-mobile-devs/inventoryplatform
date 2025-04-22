@@ -1,0 +1,163 @@
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:inventoryplatform/app/controllers/inventory_controller.dart';
+
+class InventoryFormEdit extends StatelessWidget {
+  final InventoryController controller = Get.find<InventoryController>();
+  final _formKey = GlobalKey<FormState>();
+  final String? cod;
+
+  InventoryFormEdit({super.key, required this.cod});
+
+  @override
+  Widget build(BuildContext context) {
+    String newRevision = incrementRevision(controller.revisionController.text);
+    controller.revisionController.text = newRevision;
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text(
+          "Editar Inventário",
+          style: TextStyle(color: Colors.white),
+          textAlign: TextAlign.center,
+        ),
+        actions: [
+          TextButton.icon(
+            onPressed: () {
+              // Exibe um diálogo ou mensagem indicando que está em desenvolvimento
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: const Text("Em Desenvolvimento"),
+                  content: const Text("Esta funcionalidade está em desenvolvimento."),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      child: const Text("OK"),
+                    ),
+                  ],
+                ),
+              );
+            },
+            icon: const Icon(Icons.help_outline, color: Colors.white),
+            label: const Text(
+              "",
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+        ],
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                "Informações do Inventário",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 10),
+              TextFormField(
+                controller: controller.titleController,
+                decoration: InputDecoration(
+                  labelText: "Título *",
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return "Título é obrigatório";
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 10),
+              TextFormField(
+                controller: controller.descriptionController,
+                decoration: InputDecoration(
+                  labelText: "Descrição",
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                ),
+                maxLines: 3,
+                keyboardType: TextInputType.multiline,
+              ),
+              const SizedBox(height: 10),
+              TextFormField(
+                controller: controller.revisionController,
+                enabled: false,
+                decoration: InputDecoration(
+                  labelText: "Número de Revisão *",
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return "Número de Revisão é obrigatório";
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 20),
+              Center(
+                child: controller.isLoading.value
+                    ? const CircularProgressIndicator()
+                    : ElevatedButton(
+                  onPressed: () {
+                    if (_formKey.currentState!.validate()) {
+                      controller.saveInventoryChanges(context,cod!);
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                    backgroundColor: Colors.blue,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                  ),
+                  child: const Text(
+                    "Salvar Alterações",
+                    style: TextStyle(color: Colors.white, fontSize: 16),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+String incrementRevision(String currentRevision) {
+  try {
+    List<String> parts = currentRevision.split('.');
+    if (parts.length != 3) return currentRevision;
+
+    int maior = int.tryParse(parts[0]) ?? 0;
+    int menor = int.tryParse(parts[1]) ?? 0;
+    int patch = int.tryParse(parts[2]) ?? 0;
+
+    patch++;
+
+    if (patch > 9) {
+      patch = 0;
+      menor++;
+
+      if (menor > 9) {
+        menor = 0;
+        maior++;
+      }
+    }
+
+    return '$maior.$menor.$patch';
+  } catch (e) {
+    return currentRevision;
+  }
+}
+

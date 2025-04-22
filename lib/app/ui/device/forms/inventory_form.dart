@@ -8,7 +8,7 @@ class InventoryForm extends StatelessWidget {
   final _formKey = GlobalKey<FormState>();
 
   InventoryForm({required this.cod}) {
-    // Define o valor inicial do campo de revisão
+    controller.clearControllers();
     controller.revisionController.text = "0.0.1";
   }
 
@@ -90,6 +90,7 @@ class InventoryForm extends StatelessWidget {
               const SizedBox(height: 10),
               TextFormField(
                 controller: controller.revisionController,
+                enabled: false,
                 decoration: InputDecoration(
                   labelText: "Número de Revisão *",
                   border: OutlineInputBorder(
