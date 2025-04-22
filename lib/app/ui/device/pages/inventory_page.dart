@@ -19,8 +19,6 @@ class InventoryPage extends StatefulWidget {
 
 class _InventoryPageState extends State<InventoryPage> {
   final PanelController _panelController = Get.find<PanelController>();
-  final DepartmentController _departmentController =
-      Get.find<DepartmentController>();
   final DepartmentController _departmentController = Get.find<DepartmentController>();
   final InventoryController _inventoryController = Get.find<InventoryController>();
 

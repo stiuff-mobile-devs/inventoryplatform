@@ -13,6 +13,9 @@ class InventoryController extends GetxController {
   final isLoading = false.obs;
   String? currentInventoryId;
 
+  final RxList<InventoryModel> inventories= <InventoryModel>[].obs;
+
+
   //final PanelController _panelController = Get.find<PanelController>();
 
   Future<void> saveInventory(BuildContext context) async {
@@ -94,6 +97,10 @@ class InventoryController extends GetxController {
   List<InventoryModel> getInventoriesByDepartment(String deptId) {
     final inventories = getInventories();
     return inventories.where((item) => item.departmentId == deptId).toList();
+  }
+
+  void loadInventories() {
+    inventories.assignAll(getInventories());
   }
 
   String? getInventoryTitleById(String id) {
