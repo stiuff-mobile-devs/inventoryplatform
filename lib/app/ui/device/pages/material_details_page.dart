@@ -8,7 +8,6 @@ class MaterialDetailsPage extends StatelessWidget {
   final MaterialModel material;
   late final InventoryController _inventoryController;
 
-
   MaterialDetailsPage({Key? key, required this.material}) : super(key: key) {
     _inventoryController = Get.find<InventoryController>();
   }
@@ -29,7 +28,8 @@ class MaterialDetailsPage extends StatelessWidget {
                 context: context,
                 builder: (context) => AlertDialog(
                   title: const Text("Em Desenvolvimento"),
-                  content: const Text("Esta funcionalidade está em desenvolvimento."),
+                  content: const Text(
+                      "Esta funcionalidade está em desenvolvimento."),
                   actions: [
                     TextButton(
                       onPressed: () => Navigator.of(context).pop(),
@@ -80,7 +80,7 @@ class MaterialDetailsPage extends StatelessWidget {
                       const SizedBox(height: 8.0),
                       Text('Nome: ${material.name}'),
                       const SizedBox(height: 8.0),
-                      Text('Código de Barras: ${material.barcode}'),
+                      Text('Tag: ${material.barcode}'),
                       const SizedBox(height: 8.0),
                       Text('Data: ${material.date.toLocal()}'),
                       const SizedBox(height: 8.0),
@@ -90,9 +90,11 @@ class MaterialDetailsPage extends StatelessWidget {
                       const SizedBox(height: 8.0),
                       Text('Observações: ${material.observations}'),
                       const SizedBox(height: 8.0),
-                      Text('Inventário: ${_inventoryController.getInventoryTitleById(material.inventoryId)}'),
+                      Text(
+                          'Inventário: ${_inventoryController.getInventoryTitleById(material.inventoryId)}'),
                       const SizedBox(height: 16.0),
-                      if (material.imagePaths != null && material.imagePaths!.isNotEmpty)
+                      if (material.imagePaths != null &&
+                          material.imagePaths!.isNotEmpty)
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -106,8 +108,8 @@ class MaterialDetailsPage extends StatelessWidget {
                                 padding: const EdgeInsets.only(bottom: 8.0),
                                 child: Image.file(
                                   File(path),
-                                  fit: BoxFit.contain, 
-                                  height: 200, 
+                                  fit: BoxFit.contain,
+                                  height: 200,
                                   width: double.infinity,
                                 ),
                               ),
