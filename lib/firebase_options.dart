@@ -64,6 +64,8 @@ class DefaultFirebaseOptions {
     messagingSenderId: '1010918109842',
     projectId: 'inventoryplatform-3a2ae',
     storageBucket: 'inventoryplatform-3a2ae.firebasestorage.app',
+    androidClientId: '1010918109842-e3gf5ne91iule4r1caik3jg831j7uju6.apps.googleusercontent.com',
+    iosClientId: '1010918109842-0g4i60h19uh8u401npbi1ll55s7ave2j.apps.googleusercontent.com',
     iosBundleId: 'com.example.inventoryplatform',
   );
 
@@ -73,6 +75,8 @@ class DefaultFirebaseOptions {
     messagingSenderId: '1010918109842',
     projectId: 'inventoryplatform-3a2ae',
     storageBucket: 'inventoryplatform-3a2ae.firebasestorage.app',
+    androidClientId: '1010918109842-e3gf5ne91iule4r1caik3jg831j7uju6.apps.googleusercontent.com',
+    iosClientId: '1010918109842-0g4i60h19uh8u401npbi1ll55s7ave2j.apps.googleusercontent.com',
     iosBundleId: 'com.example.inventoryplatform',
   );
 
@@ -85,4 +89,5 @@ class DefaultFirebaseOptions {
     storageBucket: 'inventoryplatform-3a2ae.firebasestorage.app',
     measurementId: 'G-8TKXF86512',
   );
+
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:inventoryplatform/app/controllers/department_controller.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class DepartmentForm extends StatelessWidget {
   DepartmentForm({super.key});
@@ -22,21 +23,13 @@ class DepartmentForm extends StatelessWidget {
         ),
         actions: [
           TextButton.icon(
-            onPressed: () {
+            onPressed: () async {
               // Exibe um diálogo ou mensagem indicando que está em desenvolvimento
-              showDialog(
-                context: context,
-                builder: (context) => AlertDialog(
-                  title: const Text("Em Desenvolvimento"),
-                  content: const Text("Esta funcionalidade está em desenvolvimento."),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.of(context).pop(),
-                      child: const Text("OK"),
-                    ),
-                  ],
-                ),
-              );
+              final Uri url = Uri.parse(
+                  'https://github.com/stiuff-mobile-devs/inventoryplatform/wiki/Manual#-departamentos');
+              if (!await launchUrl(url)) {
+                throw Exception('Could not launch $url');
+              }
             },
             icon: const Icon(Icons.help_outline, color: Colors.white),
             label: const Text(
@@ -121,12 +114,14 @@ class DepartmentForm extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         ElevatedButton.icon(
-                          onPressed: () => controller.pickImage(ImageSource.camera),
+                          onPressed: () =>
+                              controller.pickImage(ImageSource.camera),
                           icon: const Icon(Icons.camera),
                           label: const Text("Câmera"),
                         ),
                         ElevatedButton.icon(
-                          onPressed: () => controller.pickImage(ImageSource.gallery),
+                          onPressed: () =>
+                              controller.pickImage(ImageSource.gallery),
                           icon: const Icon(Icons.photo_library),
                           label: const Text("Galeria"),
                         ),
@@ -146,7 +141,8 @@ class DepartmentForm extends StatelessWidget {
                           }
                         },
                         style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 32, vertical: 12),
                           backgroundColor: Colors.purple,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8.0),
