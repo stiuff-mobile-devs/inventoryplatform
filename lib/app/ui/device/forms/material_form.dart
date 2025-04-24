@@ -126,15 +126,20 @@ class _MaterialFormState extends State<MaterialForm> {
               ),
               const SizedBox(height: 10),
               TextFormField(
-                controller: controller.tagController,
-                readOnly: false, // Impede edição
-                decoration: InputDecoration(
-                  labelText: "Tag",
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8.0),
+                  controller: controller.tagController,
+                  readOnly: false, // Impede edição
+                  decoration: InputDecoration(
+                    labelText: "Tag *",
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
                   ),
-                ),
-              ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Tag é obrigatória';
+                    }
+                    return null;
+                  }),
               const SizedBox(height: 10),
               TextFormField(
                 controller: controller.nameController,
