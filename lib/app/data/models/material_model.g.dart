@@ -20,16 +20,16 @@ class MaterialModelAdapter extends TypeAdapter<MaterialModel> {
       tag: fields[1] as String?,
       name: fields[2] as String,
       observations: fields[3] as String,
-      createdAt: fields[4] as DateTime,
       geolocation: fields[5] as String,
       description: fields[6] as String,
       inventoryId: fields[7] as String?,
-      createBy: fields[9] as String,
+      createdBy: fields[9] as String,
       imagePaths: (fields[8] as List?)?.cast<String>(),
+      updatedAt: fields[10] as DateTime?,
+      updatedBy: fields[11] as String?,
     )
       ..id = fields[0] as String
-      ..updatedAt = fields[10] as DateTime?
-      ..updatedBy = fields[11] as String?
+      ..createdAt = fields[4] as DateTime
       ..active = fields[12] as bool;
   }
 
@@ -56,7 +56,7 @@ class MaterialModelAdapter extends TypeAdapter<MaterialModel> {
       ..writeByte(8)
       ..write(obj.imagePaths)
       ..writeByte(9)
-      ..write(obj.createBy)
+      ..write(obj.createdBy)
       ..writeByte(10)
       ..write(obj.updatedAt)
       ..writeByte(11)

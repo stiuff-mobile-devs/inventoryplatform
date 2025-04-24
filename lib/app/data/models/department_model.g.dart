@@ -20,7 +20,7 @@ class DepartmentModelAdapter extends TypeAdapter<DepartmentModel> {
       title: fields[1] as String,
       description: fields[2] as String,
       imagePath: fields[3] as String?,
-      createdBy: fields[5] as String?,
+      createdBy: fields[5] as String,
       updateBy: fields[6] as String?,
       updateAt: fields[7] as String?,
     )

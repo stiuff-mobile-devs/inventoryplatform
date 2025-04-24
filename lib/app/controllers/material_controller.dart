@@ -104,8 +104,7 @@ class MaterialController extends GetxController {
     MaterialModel material = MaterialModel(
         name: '',
         tag: '',
-        createdAt: DateTime.now(),
-        createBy: "",
+        createdBy: "",
         description: '',
         geolocation: '',
         observations: '',
@@ -168,8 +167,7 @@ class MaterialController extends GetxController {
         final material = MaterialModel(
           name: nameController.text.trim(),
           tag: tagController.text.trim(),
-          createdAt: DateTime.parse(dateController.text.trim()),
-          createBy: user.email,
+          createdBy: user.email,
           description: descriptionController.text.trim(),
           geolocation: geolocationStr,
           observations: observationsController.text.trim(),

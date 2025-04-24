@@ -17,11 +17,11 @@ class DepartmentModel extends HiveObject {
   @HiveField(3)
   String? imagePath;
 
-   @HiveField(4)
+  @HiveField(4)
   DateTime createdAt = DateTime.now();
 
   @HiveField(5)
-  String? createdBy;
+  String createdBy;
 
   @HiveField(6)
   String? updateBy;
@@ -36,7 +36,7 @@ class DepartmentModel extends HiveObject {
     required this.title,
     required this.description,
     this.imagePath,
-    this.createdBy,
+    required this.createdBy,
     this.updateBy,
     this.updateAt,
   }) : id = Uuid().v4(); // Generate a unique ID

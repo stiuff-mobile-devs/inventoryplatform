@@ -44,6 +44,7 @@ class DepartmentController extends GetxController {
       Map<String, dynamic> data = {
         "title": titleController.text.trim(),
         "description": descriptionController.text.trim(),
+        "image": null,
         "reports": {
           "created_at": FieldValue.serverTimestamp(),
           "created_by": user.email ?? "",

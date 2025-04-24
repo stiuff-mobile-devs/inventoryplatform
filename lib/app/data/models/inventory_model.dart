@@ -24,7 +24,7 @@ class InventoryModel extends HiveObject {
   DateTime? updatedAt;
 
   @HiveField(6)
-  bool isDeleted = false;
+  bool active = true;
 
   @HiveField(7)
   String departmentId;
@@ -34,10 +34,6 @@ class InventoryModel extends HiveObject {
 
   @HiveField(9)
   String? updatedBy;
-
-  @HiveField(10)
-  bool active = true;
-
 
   InventoryModel({
     required this.title,

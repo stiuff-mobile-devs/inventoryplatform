@@ -18,7 +18,7 @@ class MaterialModel extends HiveObject {
   String observations;
 
   @HiveField(4)
-  DateTime createdAt;
+  DateTime createdAt = DateTime.now();
 
   @HiveField(5)
   String geolocation;
@@ -33,7 +33,7 @@ class MaterialModel extends HiveObject {
   List<String>? imagePaths;
 
   @HiveField(9)
-  String createBy;
+  String createdBy;
 
   @HiveField(10)
   DateTime? updatedAt;
@@ -48,12 +48,13 @@ class MaterialModel extends HiveObject {
     this.tag,
     required this.name,
     required this.observations,
-    required this.createdAt,
     required this.geolocation,
     required this.description,
     required this.inventoryId,
-    required this.createBy,
+    required this.createdBy,
     this.imagePaths,
+    this.updatedAt,
+    this.updatedBy,
 
   }) : id = Uuid().v4(); // Generate a unique ID
 }
