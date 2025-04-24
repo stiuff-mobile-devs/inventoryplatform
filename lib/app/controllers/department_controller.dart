@@ -1,15 +1,18 @@
 import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:get/get.dart';
 import 'package:inventoryplatform/app/data/models/department_model.dart';
 import 'package:inventoryplatform/app/routes/app_routes.dart';
+import 'package:inventoryplatform/app/services/auth_service.dart';
 
 class DepartmentController extends GetxController {
   final TextEditingController titleController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
   final ImagePicker picker = ImagePicker();
+  final AuthService _authService = Get.find<AuthService>();
 
   Rx<File?> image = Rx<File?>(null);
   var isLoading = false.obs;
@@ -25,7 +28,7 @@ class DepartmentController extends GetxController {
     descriptionController.clear();
     image.value = null;
   }
-  
+
   Future<void> pickImage(ImageSource source) async {
     final pickedFile = await picker.pickImage(source: source);
     if (pickedFile != null) {
@@ -34,50 +37,55 @@ class DepartmentController extends GetxController {
     }
   }
 
-  Future<void> saveDepartment(BuildContext context) async {
-    isLoading.value = true;
-
+  Future<void> saveDepartmentToFirestore(var user) async {
     try {
-      /*
-      //Segurança firebase
-      User? user = FirebaseAuth.instance.currentUser;
-      if (user == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Usuário não autenticado.")),
-        );
-        isLoading.value = false;
-        return;
-      }
-
-      await FirebaseFirestore.instance.collection("departments").add({
+      CollectionReference departments =
+          FirebaseFirestore.instance.collection('departments');
+      Map<String, dynamic> data = {
         "title": titleController.text.trim(),
         "description": descriptionController.text.trim(),
-        "created_at": FieldValue.serverTimestamp(),
-        "created_by": user.uid,
-      });
+        "reports": {
+          "created_at": FieldValue.serverTimestamp(),
+          "created_by": user.email ?? "",
+          "updated_at": "",
+          "updated_by": "",
+        },
+        "active": true,
+      };
+      await departments.add(data);
+      print("Departamento salvo no Firestore com sucesso!");
+    } catch (e) {
+      print("Erro ao salvar departamento: $e");
+    }
+  }
 
-      mockService.addSampleOrganizations();
-      */
-      //SALVANDO NO BD LOCAL 
+  Future<void> saveDepartmentToHive(var user) async {
+    try {
       final box = Hive.box<DepartmentModel>('departments');
       final department = DepartmentModel(
         title: titleController.text.trim(),
         description: descriptionController.text.trim(),
         imagePath: image.value?.path,
+        createdBy: user.email ?? "",
       );
       await box.add(department);
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Departamento criado com sucesso!")),
-      );
-      clearData();
-      Get.offAllNamed(Routes.HOME);
+      print("Departamento salvo no Hive com sucesso!");
     } catch (e) {
       print(e.toString());
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Erro ao salvar departamento: $e")),
-      );
     }
+  }
+
+  Future<void> saveDepartment(BuildContext context) async {
+    isLoading.value = true;
+    var user = _authService.currentUser;
+
+    await saveDepartmentToFirestore(user);
+    await saveDepartmentToHive(user);
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Departamento criado com sucesso!")),
+    );
+    clearData();
+    Get.offAllNamed(Routes.HOME);
     isLoading.value = false;
   }
 

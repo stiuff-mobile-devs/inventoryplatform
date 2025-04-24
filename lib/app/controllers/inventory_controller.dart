@@ -1,18 +1,21 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:inventoryplatform/app/data/models/inventory_model.dart';
+import 'package:inventoryplatform/app/services/auth_service.dart';
 import 'package:inventoryplatform/app/ui/device/forms/inventory_form.dart';
 
 class InventoryController extends GetxController {
   final TextEditingController titleController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
   final TextEditingController revisionController = TextEditingController();
+  final AuthService _authService = Get.find<AuthService>();
 
   final isLoading = false.obs;
 
   // Variável reativa para armazenar os inventários
-  final RxList<InventoryModel> inventories= <InventoryModel>[].obs;
+  final RxList<InventoryModel> inventories = <InventoryModel>[].obs;
 
   void clearFields() {
     titleController.clear();
@@ -20,14 +23,35 @@ class InventoryController extends GetxController {
     revisionController.clear();
   }
 
-  Future<void> saveInventory(BuildContext context) async {
-    if (titleController.text.isEmpty || revisionController.text.isEmpty) {
-      Get.snackbar("Erro", "Preencha o campo título e número de revisão.");
-      return;
+  Future<void> saveInventoryToFirestore(var user) async {
+    try {
+      CollectionReference inventories =
+          FirebaseFirestore.instance.collection('inventories');
+      Map<String, dynamic> data = {
+        "title": titleController.text.trim(),
+        "description": descriptionController.text.trim(),
+        "revisionNumber": revisionController.text.trim(),
+        "departament": {
+          "departmentId": null, // Adicione o ID do departamento aqui
+          "name": null, 
+          "description departament": null,
+        },
+        "reports": {
+          "created_at": FieldValue.serverTimestamp(),
+          "created_by": user.email ?? "",
+          "updated_at": "",
+          "updated_by": "",
+        },
+        "active": true,
+      };
+      await inventories.add(data);
+      print("Inventário salvo no Firestore com sucesso!");
+    } catch (e) {
+      print("Erro ao salvar Inventário: $e");
     }
+  }
 
-    isLoading.value = true;
-
+  Future<void> saveInventoryToHive(var user, BuildContext context) async {
     try {
       final box = Hive.box<InventoryModel>('inventories');
       final department = InventoryModel(
@@ -35,94 +59,30 @@ class InventoryController extends GetxController {
         description: descriptionController.text.trim(),
         revisionNumber: revisionController.text.trim(),
         departmentId: (context.widget as InventoryForm).cod,
+        createdBy: user.email ?? "",
       );
       await box.add(department);
-/* // Segurança firebase
-      User? user = FirebaseAuth.instance.currentUser;
-      if (user == null) {
-        Get.snackbar("Erro", "Usuário não autenticado.");
-        isLoading.value = false;
-        return;
-      }
-
-      String departmentId = (context.widget as InventoryForm).cod;
-
-      DocumentReference departmentRef = FirebaseFirestore.instance
-          .collection("departments")
-          .doc(departmentId);
-
-      DocumentReference newInventoryRef = await departmentRef.collection("inventories").add({
-        "title": titleController.text.trim(),
-        "description": descriptionController.text.trim(),
-        "revision_number": revisionController.text.trim(),
-        "created_at": FieldValue.serverTimestamp(),
-        "created_by": user.uid,
-      });
-
-      // Adiciona o inventário criado à lista listedItems do PanelController
-      InventoryModel newInventory = InventoryModel(
-        id: newInventoryRef.id,
-        title: titleController.text.trim(),
-        description: descriptionController.text.trim(),
-        revisionNumber: revisionController.text.trim(),
-        createdAt: DateTime.now(),
-        isActive: 1, 
-      );
-      _panelController.listedItems.add(newInventory);
-
-      // Salva o inventário no banco de dados local
-      await _dbHelper.insert('inventories', newInventory.toMap());*/
-     /* // Segurança firebase
-      User? user = FirebaseAuth.instance.currentUser;
-      if (user == null) {
-        Get.snackbar("Erro", "Usuário não autenticado.");
-        isLoading.value = false;
-        return;
-      }
-
-      String departmentId = (context.widget as InventoryForm).cod;
-
-      DocumentReference departmentRef = FirebaseFirestore.instance
-          .collection("departments")
-          .doc(departmentId);
-
-      DocumentReference newInventoryRef = await departmentRef.collection("inventories").add({
-        "title": titleController.text.trim(),
-        "description": descriptionController.text.trim(),
-        "revision_number": revisionController.text.trim(),
-        "created_at": FieldValue.serverTimestamp(),
-        "created_by": user.uid,
-      });
-
-      // Adiciona o inventário criado à lista listedItems do PanelController
-      InventoryModel newInventory = InventoryModel(
-        id: newInventoryRef.id,
-        title: titleController.text.trim(),
-        description: descriptionController.text.trim(),
-        revisionNumber: revisionController.text.trim(),
-        createdAt: DateTime.now(),
-        isActive: 1, 
-      );
-      _panelController.listedItems.add(newInventory);
-
-      // Salva o inventário no banco de dados local
-      await _dbHelper.insert('inventories', newInventory.toMap());*/
-
-      clearFields();
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Sucesso, inventário criado com sucesso!"),
-        ),
-      );
-      Navigator.pop(context);
     } catch (e) {
       print(e.toString());
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Erro ao salvar inventário: $e")),
       );
-    } finally {
-      isLoading.value = false;
     }
+  }
+
+  Future<void> saveInventory(BuildContext context) async {
+    isLoading.value = true;
+    var user = _authService.currentUser;
+    await saveInventoryToFirestore(user);
+    await saveInventoryToHive(user, context);
+    clearFields();
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text("Sucesso, inventário criado com sucesso!"),
+      ),
+    );
+    isLoading.value = false;
+    Navigator.pop(context);
   }
 
   void loadInventories() {

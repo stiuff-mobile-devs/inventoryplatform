@@ -10,14 +10,14 @@ import 'package:inventoryplatform/app/services/auth_service.dart';
 import 'package:inventoryplatform/app/services/error_service.dart';
 
 class ControllerInitializer {
-  static void initialize() {
+  static Future<void> initialize() async {
+    Get.put(AuthService());
     Get.put(DepartmentController());
     Get.put(ConnectionController());
     Get.put(CarouselSectionController());
     Get.put(InventoryController());
     Get.put(MaterialController());
     Get.put(PanelController());
-    Get.put(AuthService());
     Get.put(ErrorService());
     Get.put(LoginController());
   }

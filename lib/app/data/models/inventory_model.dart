@@ -29,11 +29,23 @@ class InventoryModel extends HiveObject {
   @HiveField(7)
   String departmentId;
 
+  @HiveField(8)
+  String createdBy;
+
+  @HiveField(9)
+  String? updatedBy;
+
+  @HiveField(10)
+  bool active = true;
+
+
   InventoryModel({
     required this.title,
     required this.description,
     required this.revisionNumber,
     required this.departmentId,
+    required this.createdBy,
+    this.updatedBy,
     this.updatedAt,
   }) : id = Uuid().v4(); // Generate a unique ID
 }

@@ -20,13 +20,16 @@ class DepartmentModelAdapter extends TypeAdapter<DepartmentModel> {
       title: fields[1] as String,
       description: fields[2] as String,
       imagePath: fields[3] as String?,
-    )..id = fields[0] as String;
+      createdBy: fields[5] as String?,
+    )
+      ..id = fields[0] as String
+      ..createdAt = fields[4] as DateTime;
   }
 
   @override
   void write(BinaryWriter writer, DepartmentModel obj) {
     writer
-      ..writeByte(4)
+      ..writeByte(6)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -34,7 +37,11 @@ class DepartmentModelAdapter extends TypeAdapter<DepartmentModel> {
       ..writeByte(2)
       ..write(obj.description)
       ..writeByte(3)
-      ..write(obj.imagePath);
+      ..write(obj.imagePath)
+      ..writeByte(4)
+      ..write(obj.createdAt)
+      ..writeByte(5)
+      ..write(obj.createdBy);
   }
 
   @override
