@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
@@ -7,20 +8,21 @@ import 'package:image_picker/image_picker.dart';
 import 'package:inventoryplatform/app/controllers/inventory_controller.dart';
 import 'package:inventoryplatform/app/data/models/inventory_model.dart';
 import 'package:inventoryplatform/app/data/models/material_model.dart';
+import 'package:inventoryplatform/app/services/auth_service.dart';
 import 'package:inventoryplatform/app/ui/device/forms/material_form.dart';
 import 'package:inventoryplatform/app/ui/device/pages/material_details_page.dart';
 
 class MaterialController extends GetxController {
-  
   //final _panelController = Get.find<PanelController>();
   final _inventoryController = Get.find<InventoryController>();
 
-  final TextEditingController barcodeController = TextEditingController();
+  final TextEditingController tagController = TextEditingController();
   final TextEditingController dateController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
   final TextEditingController locationController = TextEditingController();
   final TextEditingController nameController = TextEditingController();
   final TextEditingController observationsController = TextEditingController();
+  final AuthService _authService = Get.find<AuthService>();
 
   final ImagePicker picker = ImagePicker();
 
@@ -38,7 +40,7 @@ class MaterialController extends GetxController {
     nameController.clear();
     descriptionController.clear();
     dateController.clear();
-    barcodeController.clear();
+    tagController.clear();
     locationController.clear();
     observationsController.clear();
     image.value = null;
@@ -95,82 +97,79 @@ class MaterialController extends GetxController {
     }
   }
 
-  String convertToEPC(String barcode, BuildContext context) {
-    String prefix = "UFF"; // Prefixo fixo
-
-    // Converte cada caractere do código de barras para hexadecimal
-    String hexBarcode =
-        barcode.codeUnits.map((c) => c.toRadixString(16)).join();
-
-    // Concatena o prefixo com o código convertido
-    String epc = prefix + hexBarcode;
-
-    // Se o EPC for maior que 24 caracteres, corta e marca o último caractere como "X"
-    if (epc.length > 24) {
-      epc = epc.substring(0, 23) + "X"; // Último caractere vira "X"
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text(
-                "⚠️ Aviso: Código de barras muito longo. Último caractere foi marcado com 'X'.")),
-      );
-    } else {
-      // Preenche com zeros se for menor
-      epc = epc.padRight(24, '0');
-    }
-
-    return epc.toUpperCase();
-  }
-
-  Future<dynamic> checkMaterial(String barcode, String id) async {
+  Future<dynamic> checkMaterial(String tag) async {
     var box = await Hive.openBox<MaterialModel>('materials');
 
     // Cria um material vazio
     MaterialModel material = MaterialModel(
-        id: '',
         name: '',
-        barcode: '',
-        date: DateTime.now(),
+        tag: '',
+        createdAt: DateTime.now(),
+        createBy: "",
         description: '',
         geolocation: '',
         observations: '',
         inventoryId: '',
         imagePaths: []);
 
-    //Busca pelo RFID
-    if (barcode.isEmpty) {
-      material = box.values
-          .firstWhere((material) => material.id == id, orElse: () => material);
-    }
-    //Busca pelo código de barras
-    else if (barcode.isNotEmpty && id.isEmpty) {
-      material = box.values.firstWhere(
-        (material) => material.barcode == barcode,
-        orElse: () => material,
-      );
-    }
-    //Busca pelo RFID e código de barras
-    else {
-      material = box.values.firstWhere(
-        (material) => material.id == id && material.barcode == barcode,
-        orElse: () => material,
-      );
-    }
+    material = box.values
+        .firstWhere((material) => material.tag == tag, orElse: () => material);
+
     return material;
   }
 
-  // Função para salvar os dados
-  Future<void> saveMaterial(BuildContext context, String geolocationStr, String codDepartment) async {
+  Future<void> saveMaterialToFirestore(var user, String geolocationStr, String departmentId) async {
+     try {
+      CollectionReference materials =
+          FirebaseFirestore.instance.collection('materials');
+      DocumentReference departmentRef = FirebaseFirestore.instance.collection('departments').doc(departmentId);
+      Map<String, dynamic> data = {
+        "tag": tagController.text.trim(),
+        "description": descriptionController.text.trim(),
+        "name": nameController.text.trim(),
+        "geolocation": geolocationStr,
+        "observations": observationsController.text.trim(),
+        "inventory": {
+          "inventory Id": null, 
+          "inventory name": null, 
+          "inventory description ": null,
+        },
+        "reports": {
+          "created_at": FieldValue.serverTimestamp(),
+          "created_by": user.email ?? "",
+          "updated_at": "",
+          "updated_by": "",
+        },
+        "images": {
+          "image1": "",
+          "image2": "",
+          "image3": "",
+        },
+
+        "active": true,
+      };
+      await materials.add(data);
+      await departmentRef.collection('materials').add(data);
+
+      print("Inventário salvo no Firestore com sucesso!");
+    } catch (e) {
+      print("Erro ao salvar Inventário: $e");
+    }
+  }
+  Future<void> saveMaterialTempToFirestore(var user, String geolocationStr, String departmentId) async {
+    
+  }
+  Future<void> saveMaterialToHive(var user, String geolocationStr,
+      String codDepartment, BuildContext context) async {
     try {
-      String newId = convertToEPC(barcodeController.text.trim(), context);
-      MaterialModel retornado =
-          await checkMaterial(barcodeController.text.trim(), newId);
+      MaterialModel retornado = await checkMaterial(tagController.text.trim());
       if (retornado.id == "") {
         final box = Hive.box<MaterialModel>('materials');
         final material = MaterialModel(
-          id: newId,
           name: nameController.text.trim(),
-          barcode: barcodeController.text.trim(),
-          date: DateTime.parse(dateController.text.trim()),
+          tag: tagController.text.trim(),
+          createdAt: DateTime.parse(dateController.text.trim()),
+          createBy: user.email,
           description: descriptionController.text.trim(),
           geolocation: geolocationStr,
           observations: observationsController.text.trim(),
@@ -178,68 +177,25 @@ class MaterialController extends GetxController {
           imagePaths: images.isNotEmpty ? images : null,
         );
         await box.add(material);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("material adicionado com sucesso!")),
-        );
       } else {
         navigateToMaterialDetails(context, retornado);
       }
-      // Verifique se o usuário está autenticado
-      /* User? user = FirebaseAuth.instance.currentUser;
-      if (user == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Usuário não autenticado.")),
-        );
 
-        return;
-      }
-
-      // Criando um nome único para a imagem
-     /* String fileName = "departments/${DateTime.now().millisecondsSinceEpoch}.jpg";
-      Reference storageRef = FirebaseStorage.instance.ref().child(fileName);
-      await storageRef.putFile(_image!);
-      String imageUrl = await storageRef.getDownloadURL();*/
-
-
-      // Obtém a referência da coleção existente "inventories"
-     String departmentId = _panelController.getCurrentOrganization()!.id; 
-
-    // Obtendo a referência do documento do departamento específico
-      DocumentReference departmentRef = FirebaseFirestore.instance
-        .collection("departments")
-        .doc(departmentId);
-
-      CollectionReference inventoriesRef = departmentRef.collection("inventories");
-      String inventoryId = (context.widget as MaterialForm).cod; 
-
-      DocumentReference inventoryRef = inventoriesRef.doc(inventoryId);
-      CollectionReference itemsRef = inventoryRef.collection("items");
-
-      // Salvando no Firestore
-      await itemsRef.add({
-        "barcode": barcodeController.text.trim(),
-        "date": dateController.text.trim(),
-        "description": descriptionController.text.trim(),
-        "geolocation": geolocationController.text.trim(),
-        "location": locationController.text.trim(),
-        "name": nameController.text.trim(),
-        "observations": observations.text.trim(),
-        //"image": imageUrl,
-        "created_at": FieldValue.serverTimestamp(),
-        "created_by": user.uid, // Adiciona o ID do usuário
-      });
-*/
-      // Feedback de sucesso
-
-      // Voltar para a tela anterior
       clearData();
       //Navigator.pop(context);
     } catch (e) {
       print(e.toString());
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Erro ao salvar material: $e")),
-      );
     }
+  }
+
+  // Função para salvar os dados
+  Future<void> saveMaterial( BuildContext context, String geolocationStr, String codDepartment) async {
+   var user = _authService.currentUser;
+    await saveMaterialToFirestore(user, geolocationStr, "abyTlSLCo2r0Od3AiUQ1");
+    await saveMaterialToHive(user, geolocationStr, codDepartment, context);
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("material adicionado com sucesso!")),
+    );
   }
 
   List<MaterialModel> getMaterials() {
@@ -249,8 +205,11 @@ class MaterialController extends GetxController {
 
   List<MaterialModel> getMaterialsByDepartment(String deptId) {
     final materials = getMaterials();
-    final inventoryIds = getInventoriesByDept(deptId).map((inv) => inv.id).toList();
-    return materials.where((mat) => inventoryIds.contains(mat.inventoryId)).toList();
+    final inventoryIds =
+        getInventoriesByDept(deptId).map((inv) => inv.id).toList();
+    return materials
+        .where((mat) => inventoryIds.contains(mat.inventoryId))
+        .toList();
   }
 
   List<MaterialModel> getMaterialsByInventory(String inventoryId) {
@@ -259,14 +218,15 @@ class MaterialController extends GetxController {
   }
 
   List<InventoryModel> getInventoriesByDept(String deptId) {
-     return _inventoryController.getInventoriesByDepartment(deptId);
+    return _inventoryController.getInventoriesByDepartment(deptId);
   }
 
   List<InventoryModel> getInventories() {
     return _inventoryController.getInventories();
   }
 
-  Future<void> navigateToMaterialDetails(BuildContext context, MaterialModel material) async {
+  Future<void> navigateToMaterialDetails(
+      BuildContext context, MaterialModel material) async {
     await Navigator.push(
       context,
       MaterialPageRoute(

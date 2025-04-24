@@ -178,11 +178,11 @@ class _MaterialPageState extends State<MaterialPage> {
                 },
                 child: Row(children: [
                   const SizedBox(height: 30),
-                  Expanded(flex: 2, child: Text(_allMaterials[index].barcode!)),
+                  Expanded(flex: 2, child: Text(_allMaterials[index].tag!)),
                   Expanded(child: Text(_allMaterials[index].name)),
                   Expanded(
                       child:
-                      Text(formatDatePortuguese(_allMaterials[index].date))),
+                      Text(formatDatePortuguese(_allMaterials[index].createdAt))),
                 ])
               );
             },
@@ -263,9 +263,9 @@ class _MaterialPageState extends State<MaterialPage> {
                       itemBuilder: (context, index) {
                         return pw.Row (
                             children: [
-                              pw.Expanded(flex: 2, child: pw.Text(_allMaterials[index].barcode!)),
+                              pw.Expanded(flex: 2, child: pw.Text(_allMaterials[index].tag!)),
                               pw.Expanded(child: pw.Text(_allMaterials[index].name)),
-                              pw.Expanded(child: pw.Text(formatDatePortuguese(_allMaterials[index].date))),
+                              pw.Expanded(child: pw.Text(formatDatePortuguese(_allMaterials[index].createdAt))),
                             ]
                         );
                       },

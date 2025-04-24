@@ -17,32 +17,36 @@ class MaterialModelAdapter extends TypeAdapter<MaterialModel> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return MaterialModel(
-      id: fields[0] as String,
-      barcode: fields[1] as String?,
+      tag: fields[1] as String?,
       name: fields[2] as String,
       observations: fields[3] as String,
-      date: fields[4] as DateTime,
+      createdAt: fields[4] as DateTime,
       geolocation: fields[5] as String,
       description: fields[6] as String,
-      inventoryId: fields[7] as String,
+      inventoryId: fields[7] as String?,
+      createBy: fields[9] as String,
       imagePaths: (fields[8] as List?)?.cast<String>(),
-    );
+    )
+      ..id = fields[0] as String
+      ..updatedAt = fields[10] as DateTime?
+      ..updatedBy = fields[11] as String?
+      ..active = fields[12] as bool;
   }
 
   @override
   void write(BinaryWriter writer, MaterialModel obj) {
     writer
-      ..writeByte(9)
+      ..writeByte(13)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
-      ..write(obj.barcode)
+      ..write(obj.tag)
       ..writeByte(2)
       ..write(obj.name)
       ..writeByte(3)
       ..write(obj.observations)
       ..writeByte(4)
-      ..write(obj.date)
+      ..write(obj.createdAt)
       ..writeByte(5)
       ..write(obj.geolocation)
       ..writeByte(6)
@@ -50,7 +54,15 @@ class MaterialModelAdapter extends TypeAdapter<MaterialModel> {
       ..writeByte(7)
       ..write(obj.inventoryId)
       ..writeByte(8)
-      ..write(obj.imagePaths);
+      ..write(obj.imagePaths)
+      ..writeByte(9)
+      ..write(obj.createBy)
+      ..writeByte(10)
+      ..write(obj.updatedAt)
+      ..writeByte(11)
+      ..write(obj.updatedBy)
+      ..writeByte(12)
+      ..write(obj.active);
   }
 
   @override

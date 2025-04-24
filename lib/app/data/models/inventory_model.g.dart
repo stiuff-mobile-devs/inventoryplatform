@@ -22,17 +22,19 @@ class InventoryModelAdapter extends TypeAdapter<InventoryModel> {
       revisionNumber: fields[3] as String,
       departmentId: fields[7] as String,
       createdBy: fields[8] as String,
+      updatedBy: fields[9] as String?,
       updatedAt: fields[5] as DateTime?,
     )
       ..id = fields[0] as String
       ..createdAt = fields[4] as DateTime
-      ..isDeleted = fields[6] as bool;
+      ..isDeleted = fields[6] as bool
+      ..active = fields[10] as bool;
   }
 
   @override
   void write(BinaryWriter writer, InventoryModel obj) {
     writer
-      ..writeByte(9)
+      ..writeByte(11)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -50,7 +52,11 @@ class InventoryModelAdapter extends TypeAdapter<InventoryModel> {
       ..writeByte(7)
       ..write(obj.departmentId)
       ..writeByte(8)
-      ..write(obj.createdBy);
+      ..write(obj.createdBy)
+      ..writeByte(9)
+      ..write(obj.updatedBy)
+      ..writeByte(10)
+      ..write(obj.active);
   }
 
   @override

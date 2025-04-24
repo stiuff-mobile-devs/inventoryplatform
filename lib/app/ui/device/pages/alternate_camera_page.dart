@@ -118,14 +118,14 @@ class _AlternateCameraPageState extends State<AlternateCameraPage> {
                     setState(() {
                       _isInFormPage = true;
                     });
-                    MaterialModel checkMaterial =  await _materialController.checkMaterial(_scannedCode!, '');
-                    if (checkMaterial.id.isEmpty && checkMaterial.barcode!.isEmpty){
+                    MaterialModel checkMaterial =  await _materialController.checkMaterial(_scannedCode!);
+                    if (checkMaterial.id.isEmpty && checkMaterial.tag!.isEmpty){
                         Get.offNamed(Routes.MATERIAL,
                           //arguments: inventory, ///aqui
                           parameters: {'codDepartment': widget.codDepartment!, 'barcode': _scannedCode!});
                       }
                     else{
-                      MaterialModel checkMaterial =  await _materialController.checkMaterial(_scannedCode!, '');
+                      MaterialModel checkMaterial =  await _materialController.checkMaterial(_scannedCode!);
                       await _materialController.navigateToMaterialDetails(context, checkMaterial);
                       Navigator.of(context).pop(); // Fecha a página atual
                     }

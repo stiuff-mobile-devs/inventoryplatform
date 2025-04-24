@@ -69,7 +69,7 @@ class _MaterialFormState extends State<MaterialForm> {
     super.initState();
     _captureGeolocation();
     if (widget.barcode != null) {
-      controller.barcodeController.text = widget.barcode!;
+      controller.tagController.text = widget.barcode!;
     }
     controller.dateController.text = DateFormat('yyyy-MM-dd').format(DateTime.now());
   }
@@ -122,7 +122,7 @@ class _MaterialFormState extends State<MaterialForm> {
               ),
               const SizedBox(height: 10),
               TextFormField(
-                controller: controller.barcodeController,
+                controller: controller.tagController,
                 readOnly: true, // Impede edição
                 decoration: InputDecoration(
                   labelText: "Código de Barras",

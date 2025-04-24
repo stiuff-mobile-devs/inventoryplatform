@@ -1,5 +1,7 @@
 import 'package:hive/hive.dart';
+import 'package:uuid/uuid.dart';
 part 'material_model.g.dart';
+
 
 @HiveType(typeId: 2)
 class MaterialModel extends HiveObject {
@@ -7,7 +9,7 @@ class MaterialModel extends HiveObject {
   String id;
 
   @HiveField(1)
-  String? barcode;
+  String? tag;
 
   @HiveField(2)
   String name;
@@ -16,7 +18,7 @@ class MaterialModel extends HiveObject {
   String observations;
 
   @HiveField(4)
-  DateTime date;
+  DateTime createdAt;
 
   @HiveField(5)
   String geolocation;
@@ -25,21 +27,33 @@ class MaterialModel extends HiveObject {
   String description;
 
   @HiveField(7)
-  String inventoryId;
+  String? inventoryId;
 
   @HiveField(8)
   List<String>? imagePaths;
 
+  @HiveField(9)
+  String createBy;
+
+  @HiveField(10)
+  DateTime? updatedAt;
+
+  @HiveField(11)
+  String? updatedBy;
+
+  @HiveField(12)
+  bool active = true;
+
   MaterialModel({
-    required this.id,
-    this.barcode,
+    this.tag,
     required this.name,
     required this.observations,
-    required this.date,
+    required this.createdAt,
     required this.geolocation,
     required this.description,
     required this.inventoryId,
+    required this.createBy,
     this.imagePaths,
 
-  }) ;
+  }) : id = Uuid().v4(); // Generate a unique ID
 }

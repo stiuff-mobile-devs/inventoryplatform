@@ -53,7 +53,7 @@ class MaterialDetailsPage extends StatelessWidget {
           margin: const EdgeInsets.all(8.0),
           child: Padding(
             padding: const EdgeInsets.all(16.0),
-            child: material.id.isEmpty && material.barcode!.isEmpty
+            child: material.id.isEmpty && material.tag!.isEmpty
                 ? Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -80,9 +80,9 @@ class MaterialDetailsPage extends StatelessWidget {
                       const SizedBox(height: 8.0),
                       Text('Nome: ${material.name}'),
                       const SizedBox(height: 8.0),
-                      Text('Código de Barras: ${material.barcode}'),
+                      Text('Código de Barras: ${material.tag}'),
                       const SizedBox(height: 8.0),
-                      Text('Data: ${material.date.toLocal()}'),
+                      Text('Data: ${material.createdAt.toLocal()}'),
                       const SizedBox(height: 8.0),
                       Text('Descrição: ${material.description}'),
                       const SizedBox(height: 8.0),
@@ -90,7 +90,7 @@ class MaterialDetailsPage extends StatelessWidget {
                       const SizedBox(height: 8.0),
                       Text('Observações: ${material.observations}'),
                       const SizedBox(height: 8.0),
-                      Text('Inventário: ${_inventoryController.getInventoryTitleById(material.inventoryId)}'),
+                      Text('Inventário: ${_inventoryController.getInventoryTitleById(material.inventoryId!)}'),
                       const SizedBox(height: 16.0),
                       if (material.imagePaths != null && material.imagePaths!.isNotEmpty)
                         Column(
