@@ -18,22 +18,24 @@ class InventoryModel extends HiveObject {
   String revisionNumber;
 
   @HiveField(4)
-  DateTime createdAt = DateTime.now();
+  bool active;
 
   @HiveField(5)
-  DateTime? updatedAt;
+  String departmentId;
 
   @HiveField(6)
-  bool isDeleted = false;
+  DateTime created;
 
   @HiveField(7)
-  String departmentId;
+  DateTime? modified;
 
   InventoryModel({
     required this.title,
     required this.description,
     required this.revisionNumber,
     required this.departmentId,
-    this.updatedAt,
-  }) : id = Uuid().v4(); // Generate a unique ID
+  }) : id = Uuid().v4(),
+        created = DateTime.now(),
+        modified = DateTime.now(),
+        active = true;
 }

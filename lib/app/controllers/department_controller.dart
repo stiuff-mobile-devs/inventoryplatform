@@ -1,12 +1,20 @@
 import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:get/get.dart';
+import 'package:inventoryplatform/app/controllers/sync_controller.dart';
 import 'package:inventoryplatform/app/data/models/department_model.dart';
 import 'package:inventoryplatform/app/routes/app_routes.dart';
+import 'package:inventoryplatform/app/services/connection_service.dart';
 
 class DepartmentController extends GetxController {
+  final box = Hive.box<DepartmentModel>('departments');
+
+  final SyncController syncController = SyncController();
+  final ConnectionService connectionService = ConnectionService();
+
   final TextEditingController titleController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
   final ImagePicker picker = ImagePicker();
@@ -25,7 +33,7 @@ class DepartmentController extends GetxController {
     descriptionController.clear();
     image.value = null;
   }
-  
+
   Future<void> pickImage(ImageSource source) async {
     final pickedFile = await picker.pickImage(source: source);
     if (pickedFile != null) {
@@ -38,9 +46,8 @@ class DepartmentController extends GetxController {
     isLoading.value = true;
 
     try {
-      /*
       //Segurança firebase
-      User? user = FirebaseAuth.instance.currentUser;
+      /*User? user = FirebaseAuth.instance.currentUser;
       if (user == null) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Usuário não autenticado.")),
@@ -48,24 +55,21 @@ class DepartmentController extends GetxController {
         isLoading.value = false;
         return;
       }
-
-      await FirebaseFirestore.instance.collection("departments").add({
-        "title": titleController.text.trim(),
-        "description": descriptionController.text.trim(),
-        "created_at": FieldValue.serverTimestamp(),
-        "created_by": user.uid,
-      });
-
-      mockService.addSampleOrganizations();
       */
-      //SALVANDO NO BD LOCAL 
-      final box = Hive.box<DepartmentModel>('departments');
+
+      //SALVANDO NO BD LOCAL
       final department = DepartmentModel(
         title: titleController.text.trim(),
         description: descriptionController.text.trim(),
         imagePath: image.value?.path,
       );
-      await box.add(department);
+      _saveDepartmentToLocal(department);
+
+      if (await connectionService.checkInternetConnection()) {
+        saveDepartmentToRemote(department);
+      } else {
+        syncController.saveToSyncTable("departments", department.id);
+      }
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Departamento criado com sucesso!")),
@@ -77,24 +81,65 @@ class DepartmentController extends GetxController {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Erro ao salvar departamento: $e")),
       );
+    } finally {
+      isLoading.value = false;
     }
-    isLoading.value = false;
+  }
+
+  Future<void> _saveDepartmentToLocal(DepartmentModel department) async {
+    try {
+      await box.put(department.id, department);
+    } catch (e) {
+      throw Exception(e.toString());
+    }
+  }
+
+  Future<void> saveDepartmentToRemote(DepartmentModel department) async {
+    try {
+      await FirebaseFirestore.instance
+        .collection("departments")
+        .doc(department.id)
+        .set({
+          "title": department.title,
+          "description": department.description,
+          "active": department.active,
+          "created": department.created,
+          "modified": department.modified
+        });
+    } catch (e) {
+      throw Exception(e.toString());
+    }
+  }
+
+  Future<bool> syncDepartment(String deptId) async {
+    final department = getDepartmentById(deptId);
+    if (department != null) {
+      await saveDepartmentToRemote(department);
+      return true;
+    } else {
+      return false;
+    }
   }
 
   List<DepartmentModel> getDepartments() {
-    final box = Hive.box<DepartmentModel>('departments');
     return box.values.toList();
   }
 
   String? getDepartmentTitleById(String id) {
-    final box = Hive.box<DepartmentModel>('departments');
+    final dept = getDepartmentById(id);
+    if (dept != null) {
+      return dept.title;
+    }
+    return null;
+  }
+
+  DepartmentModel? getDepartmentById(String id) {
     try {
       final department = box.values.firstWhere(
-        (dept) => dept.id == id,
+            (dept) => dept.id == id,
       );
-      return department.title;
+      return department;
     } catch (e) {
-      // Retorna null se nenhum departamento for encontrado
       return null;
     }
   }

@@ -17,9 +17,21 @@ class DepartmentModel extends HiveObject {
   @HiveField(3)
   String? imagePath;
 
+  @HiveField(4)
+  bool active;
+
+  @HiveField(5)
+  DateTime created;
+
+  @HiveField(6)
+  DateTime? modified;
+
   DepartmentModel({
     required this.title,
     required this.description,
     this.imagePath,
-  }) : id = Uuid().v4(); // Generate a unique ID
+  }) : id = Uuid().v4(),
+        active = true,
+        created = DateTime.now(),
+        modified = DateTime.now();
 }

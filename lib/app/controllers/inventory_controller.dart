@@ -1,10 +1,18 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
+import 'package:inventoryplatform/app/controllers/sync_controller.dart';
 import 'package:inventoryplatform/app/data/models/inventory_model.dart';
+import 'package:inventoryplatform/app/services/connection_service.dart';
 import 'package:inventoryplatform/app/ui/device/forms/inventory_form.dart';
 
 class InventoryController extends GetxController {
+  final box = Hive.box<InventoryModel>('inventories');
+
+  final SyncController syncController = SyncController();
+  final ConnectionService connectionService = ConnectionService();
+
   final TextEditingController titleController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
   final TextEditingController revisionController = TextEditingController();
@@ -27,16 +35,7 @@ class InventoryController extends GetxController {
     }
 
     isLoading.value = true;
-
     try {
-      final box = Hive.box<InventoryModel>('inventories');
-      final department = InventoryModel(
-        title: titleController.text.trim(),
-        description: descriptionController.text.trim(),
-        revisionNumber: revisionController.text.trim(),
-        departmentId: (context.widget as InventoryForm).cod,
-      );
-      await box.add(department);
 /* // Segurança firebase
       User? user = FirebaseAuth.instance.currentUser;
       if (user == null) {
@@ -66,7 +65,7 @@ class InventoryController extends GetxController {
         description: descriptionController.text.trim(),
         revisionNumber: revisionController.text.trim(),
         createdAt: DateTime.now(),
-        isActive: 1, 
+        isActive: 1,
       );
       _panelController.listedItems.add(newInventory);
 
@@ -101,12 +100,19 @@ class InventoryController extends GetxController {
         description: descriptionController.text.trim(),
         revisionNumber: revisionController.text.trim(),
         createdAt: DateTime.now(),
-        isActive: 1, 
+        isActive: 1,
       );
       _panelController.listedItems.add(newInventory);
 
       // Salva o inventário no banco de dados local
       await _dbHelper.insert('inventories', newInventory.toMap());*/
+      InventoryModel inventory = await _saveInventoryToLocal((context.widget as InventoryForm).cod);
+
+      if (await connectionService.checkInternetConnection()) {
+        saveInventoryToRemote(inventory);
+      } else {
+        syncController.saveToSyncTable("inventories", inventory.id);
+      }
 
       clearFields();
       ScaffoldMessenger.of(context).showSnackBar(
@@ -125,12 +131,56 @@ class InventoryController extends GetxController {
     }
   }
 
+  Future<InventoryModel> _saveInventoryToLocal(String deptId) async {
+    try {
+      final inventory = InventoryModel(
+        title: titleController.text.trim(),
+        description: descriptionController.text.trim(),
+        revisionNumber: revisionController.text.trim(),
+        departmentId: deptId,
+      );
+
+      await box.put(inventory.id, inventory);
+      return inventory;
+    }  catch (e) {
+      throw Exception(e.toString());
+    }
+  }
+
+  Future<void> saveInventoryToRemote(InventoryModel inventory) async {
+    try {
+      await FirebaseFirestore.instance
+        .collection("inventories")
+        .doc(inventory.id)
+        .set({
+          "title": inventory.title,
+          "description": inventory.description,
+          "revisionNumber": inventory.revisionNumber,
+          "departmentId": inventory.departmentId,
+          "active": inventory.active,
+          "created": inventory.created,
+          "modified": inventory.modified
+        });
+    } catch (e) {
+      throw Exception(e.toString());
+    }
+  }
+
+  Future<bool> syncInventory(String invId) async {
+    final inventory = getInventoryById(invId);
+    if (inventory != null) {
+      await saveInventoryToRemote(inventory);
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   void loadInventories() {
     inventories.assignAll(getInventories());
   }
 
   List<InventoryModel> getInventories() {
-    final box = Hive.box<InventoryModel>('inventories');
     return box.values.toList();
   }
 
@@ -140,14 +190,20 @@ class InventoryController extends GetxController {
   }
 
   String? getInventoryTitleById(String id) {
-    final box = Hive.box<InventoryModel>('inventories');
+    final inv = getInventoryById(id);
+    if (inv != null) {
+      return inv.title;
+    }
+    return null;
+  }
+
+  InventoryModel? getInventoryById(String id) {
     try {
       final inventory = box.values.firstWhere(
         (inv) => inv.id == id,
       );
-      return inventory.title;
+      return inventory;
     } catch (e) {
-      // Retorna null se nenhum departamento for encontrado
       return null;
     }
   }

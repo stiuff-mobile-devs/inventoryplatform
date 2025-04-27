@@ -1,50 +1,41 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'department_model.dart';
+part of 'sync_table_model.dart';
 
 // **************************************************************************
 // TypeAdapterGenerator
 // **************************************************************************
 
-class DepartmentModelAdapter extends TypeAdapter<DepartmentModel> {
+class SyncTableModelAdapter extends TypeAdapter<SyncTableModel> {
   @override
   final int typeId = 0;
 
   @override
-  DepartmentModel read(BinaryReader reader) {
+  SyncTableModel read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return DepartmentModel(
-      title: fields[1] as String,
-      description: fields[2] as String,
-      imagePath: fields[3] as String?,
+    return SyncTableModel(
+      originTable: fields[1] as String,
+      objectId: fields[2] as String,
     )
       ..id = fields[0] as String
-      ..active = fields[4] as bool
-      ..created = fields[5] as DateTime
-      ..modified = fields[6] as DateTime?;
+      ..created = fields[3] as DateTime;
   }
 
   @override
-  void write(BinaryWriter writer, DepartmentModel obj) {
+  void write(BinaryWriter writer, SyncTableModel obj) {
     writer
-      ..writeByte(7)
+      ..writeByte(4)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
-      ..write(obj.title)
+      ..write(obj.originTable)
       ..writeByte(2)
-      ..write(obj.description)
+      ..write(obj.objectId)
       ..writeByte(3)
-      ..write(obj.imagePath)
-      ..writeByte(4)
-      ..write(obj.active)
-      ..writeByte(5)
-      ..write(obj.created)
-      ..writeByte(6)
-      ..write(obj.modified);
+      ..write(obj.created);
   }
 
   @override
@@ -53,7 +44,7 @@ class DepartmentModelAdapter extends TypeAdapter<DepartmentModel> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is DepartmentModelAdapter &&
+      other is SyncTableModelAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

@@ -142,7 +142,7 @@ class UpdateChartState extends State<UpdateChart> {
     final updates = <DateTime, int>{};
 
     for (var inventory in widget.inventories) {
-      final date = inventory.updatedAt?.toIso8601String().substring(0, 10);
+      final date = inventory.modified?.toIso8601String().substring(0, 10);
       if (date != null) {
         updates[DateTime.parse(date)] =
             (updates[DateTime.parse(date)] ?? 0) + 1;
