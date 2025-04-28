@@ -169,7 +169,9 @@ class _InventoryPageState extends State<InventoryPage> {
                     'Título': item.title,
                     'Descrição': item.description,
                     'Criado em': DateFormat('dd/MM/yyyy HH:mm').format(item.createdAt.toLocal()),
-                    'Atualizado em': item.updatedAt ?? "Nunca modificado",
+                    'Atualizado em': item.updatedAt != null
+                        ? DateFormat('dd/MM/yyyy HH:mm').format(item.updatedAt!.toLocal())
+                        : "Nunca modificado",
                   },
                   isActive: 1,
                   icon: Icons.donut_large_rounded,
@@ -219,7 +221,10 @@ class _InventoryPageState extends State<InventoryPage> {
                                           child: ElevatedButton(
                                             onPressed: () {
                                               Navigator.of(context).pop();
-                                              // Adicione a lógica para editar
+                                              Get.find<InventoryController>().loadInventoryForEdit(item,item.id);
+                                              Get.toNamed(Routes.EDITINVENTORY, parameters:{
+                                                'id': item.id
+                                              });
                                             },
                                             style: ElevatedButton.styleFrom(
                                               padding: const EdgeInsets.all(12.0),
