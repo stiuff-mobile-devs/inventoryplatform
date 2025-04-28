@@ -3,7 +3,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hive/hive.dart';
 import 'package:inventoryplatform/app/controllers/department_controller.dart';
 import 'package:inventoryplatform/app/controllers/inventory_controller.dart';
-import 'package:inventoryplatform/app/data/models/department_model.dart';
 import 'package:inventoryplatform/app/data/models/sync_table_model.dart';
 
 class SyncController extends GetxController {
@@ -13,7 +12,7 @@ class SyncController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    _syncRemoteToLocal();
+    syncRemoteToLocal();
     _syncLocalToRemote();
   }
 
@@ -25,11 +24,11 @@ class SyncController extends GetxController {
         bool success = false;
         switch (item.originTable) {
           case "departments":
-            success = await departmentController.syncDepartment(item.objectId);
+            success = await syncDepartment(item.objectId);
             break;
 
           case "inventories":
-            success = await inventoryController.syncInventory(item.objectId);
+            success = await syncInventory(item.objectId);
             break;
         }
 
@@ -38,21 +37,49 @@ class SyncController extends GetxController {
         }
       }
     }
-
   }
 
-  void _syncRemoteToLocal() async {
-    final box = Hive.box<SyncTableModel>('unsynchronized');
+  void syncRemoteToLocal() async {
+    try {
+      await _syncRemoteDepartments();
+      await _syncRemoteInventories();
+    } catch (e) {
+      print("erro ao buscar dados do firebase");
+    }
+  }
+
+  Future<void> _syncRemoteDepartments() async {
     FirebaseFirestore.instance
-        .collection('Departamento')
+        .collection('departments')
         .snapshots()
         .listen((snapshot) {
       for (var doc in snapshot.docs) {
-        var data = doc.data();
-        final department = DepartmentModel(
-          title: data['title'],
-          description: data['description'],
-        );
+        if (doc.exists) {
+          final dept = departmentController.getDepartmentById(doc.id);
+          if (dept != null && (dept.modified)!.isAfter(doc.data()['modified'])) {
+            continue;
+          } else {
+            departmentController.saveExistingDepartmentToLocal(doc.id,doc.data());
+          }
+        }
+      }
+    });
+  }
+
+  Future<void> _syncRemoteInventories() async {
+    FirebaseFirestore.instance
+        .collection('inventories')
+        .snapshots()
+        .listen((snapshot) {
+      for (var doc in snapshot.docs) {
+        if (doc.exists) {
+          final inv = inventoryController.getInventoryById(doc.id);
+          if (inv != null && (inv.modified)!.isAfter(doc.data()['modified'])) {
+            continue;
+          } else {
+            inventoryController.saveExistingInventoryToLocal(doc.id,doc.data());
+          }
+        }
       }
     });
   }
@@ -68,6 +95,26 @@ class SyncController extends GetxController {
       await box.put(toSync.id, toSync);
     } catch (e) {
       throw Exception(e.toString());
+    }
+  }
+
+  Future<bool> syncDepartment(String deptId) async {
+    final department = departmentController.getDepartmentById(deptId);
+    if (department != null) {
+      await departmentController.saveDepartmentToRemote(department);
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  Future<bool> syncInventory(String invId) async {
+    final inventory = inventoryController.getInventoryById(invId);
+    if (inventory != null) {
+      await inventoryController.saveInventoryToRemote(inventory);
+      return true;
+    } else {
+      return false;
     }
   }
 }

@@ -38,4 +38,15 @@ class InventoryModel extends HiveObject {
         created = DateTime.now(),
         modified = DateTime.now(),
         active = true;
+
+  InventoryModel.existing({
+    required this.id,
+    required this.title,
+    required this.description,
+    required this.revisionNumber,
+    required this.departmentId,
+    required this.active,
+    required this.created,
+    required this.modified
+  });
 }

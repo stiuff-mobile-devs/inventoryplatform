@@ -63,7 +63,7 @@ class DepartmentController extends GetxController {
         description: descriptionController.text.trim(),
         imagePath: image.value?.path,
       );
-      _saveDepartmentToLocal(department);
+      saveDepartmentToLocal(department);
 
       if (await connectionService.checkInternetConnection()) {
         saveDepartmentToRemote(department);
@@ -86,7 +86,7 @@ class DepartmentController extends GetxController {
     }
   }
 
-  Future<void> _saveDepartmentToLocal(DepartmentModel department) async {
+  Future<void> saveDepartmentToLocal(DepartmentModel department) async {
     try {
       await box.put(department.id, department);
     } catch (e) {
@@ -111,13 +111,20 @@ class DepartmentController extends GetxController {
     }
   }
 
-  Future<bool> syncDepartment(String deptId) async {
-    final department = getDepartmentById(deptId);
-    if (department != null) {
-      await saveDepartmentToRemote(department);
-      return true;
-    } else {
-      return false;
+  Future<void> saveExistingDepartmentToLocal(String id, Map<String,dynamic> dept) async {
+    DepartmentModel department = DepartmentModel.existing(
+      id: id,
+      title: dept['title'],
+      description: dept['description'],
+      active: dept['active'],
+      created: dept['created'],
+      modified: dept['modified']
+    );
+
+    try {
+      await box.put(department.id, department);
+    } catch (e) {
+      throw Exception(e.toString());
     }
   }
 

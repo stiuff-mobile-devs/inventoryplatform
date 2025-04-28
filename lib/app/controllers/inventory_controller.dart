@@ -166,13 +166,22 @@ class InventoryController extends GetxController {
     }
   }
 
-  Future<bool> syncInventory(String invId) async {
-    final inventory = getInventoryById(invId);
-    if (inventory != null) {
-      await saveInventoryToRemote(inventory);
-      return true;
-    } else {
-      return false;
+  Future<void> saveExistingInventoryToLocal(String id, Map<String,dynamic> inv) async {
+    InventoryModel inventory = InventoryModel.existing(
+      id: id,
+      title: inv['title'],
+      description: inv['description'],
+      revisionNumber: inv['revisionNumber'],
+      departmentId: inv['departmentId'],
+      active: inv['active'],
+      created: inv['created'],
+      modified: inv['modified']
+    );
+
+    try {
+      await box.put(inventory.id, inventory);
+    } catch (e) {
+      throw Exception(e.toString());
     }
   }
 

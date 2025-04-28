@@ -34,4 +34,14 @@ class DepartmentModel extends HiveObject {
         active = true,
         created = DateTime.now(),
         modified = DateTime.now();
+
+  DepartmentModel.existing({
+    required this.id,
+    required this.title,
+    required this.description,
+    required this.active,
+    required this.created,
+    required this.modified,
+    this.imagePath,
+  });
 }

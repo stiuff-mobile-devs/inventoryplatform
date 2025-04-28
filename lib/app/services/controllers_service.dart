@@ -21,6 +21,6 @@ class ControllerInitializer {
     Get.put(AuthService());
     Get.put(ErrorService());
     Get.put(LoginController());
-    //Get.put(SyncController());
+    Get.put(SyncController());
   }
 }
