@@ -34,7 +34,8 @@ class _MaterialFormState extends State<MaterialForm> {
     if (status.isGranted) {
       try {
         Position position = await Geolocator.getCurrentPosition(
-          locationSettings: const LocationSettings(accuracy: LocationAccuracy.high),
+          locationSettings:
+              const LocationSettings(accuracy: LocationAccuracy.high),
         );
         setState(() {
           _currentPosition = {
@@ -60,7 +61,8 @@ class _MaterialFormState extends State<MaterialForm> {
   }
 
   String geolocationToStr() {
-    String? geolocationStr = _currentPosition?.entries.map((e) => "${e.key}: ${e.value}").join(", ");
+    String? geolocationStr =
+        _currentPosition?.entries.map((e) => "${e.key}: ${e.value}").join(", ");
     return geolocationStr!;
   }
 
@@ -69,9 +71,10 @@ class _MaterialFormState extends State<MaterialForm> {
     super.initState();
     _captureGeolocation();
     if (widget.barcode != null) {
-      controller.barcodeController.text = widget.barcode!;
+      controller.tagController.text = widget.barcode!;
     }
-    controller.dateController.text = DateFormat('yyyy-MM-dd').format(DateTime.now());
+    controller.dateController.text =
+        DateFormat('yyyy-MM-dd').format(DateTime.now());
   }
 
   @override
@@ -91,7 +94,8 @@ class _MaterialFormState extends State<MaterialForm> {
                 context: context,
                 builder: (context) => AlertDialog(
                   title: const Text("Em Desenvolvimento"),
-                  content: const Text("Esta funcionalidade está em desenvolvimento."),
+                  content: const Text(
+                      "Esta funcionalidade está em desenvolvimento."),
                   actions: [
                     TextButton(
                       onPressed: () => Navigator.of(context).pop(),
@@ -122,15 +126,20 @@ class _MaterialFormState extends State<MaterialForm> {
               ),
               const SizedBox(height: 10),
               TextFormField(
-                controller: controller.barcodeController,
-                readOnly: true, // Impede edição
-                decoration: InputDecoration(
-                  labelText: "Código de Barras",
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8.0),
+                  controller: controller.tagController,
+                  readOnly: false, // Impede edição
+                  decoration: InputDecoration(
+                    labelText: "Tag *",
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
                   ),
-                ),
-              ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Tag é obrigatória';
+                    }
+                    return null;
+                  }),
               const SizedBox(height: 10),
               TextFormField(
                 controller: controller.nameController,
@@ -210,7 +219,7 @@ class _MaterialFormState extends State<MaterialForm> {
               _isLoading
                   ? const Row(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children:  [
+                      children: [
                         CircularProgressIndicator(),
                         SizedBox(width: 10),
                         Text(
@@ -282,12 +291,14 @@ class _MaterialFormState extends State<MaterialForm> {
                     : ElevatedButton(
                         onPressed: () async {
                           if (_formKey.currentState!.validate()) {
-                            await controller.saveMaterial(context, geolocationToStr(), widget.codDepartment);
-                            Get.offNamed(Routes.ALT_CAMERA);
+                            await controller.saveMaterial(context,
+                                geolocationToStr(), widget.codDepartment);
+                            Navigator.of(context).pop();
                           }
                         },
                         style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 32, vertical: 12),
                           backgroundColor: Colors.purple,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8.0),
