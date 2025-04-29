@@ -17,6 +17,12 @@ class InventoryController extends GetxController {
   // Variável reativa para armazenar os inventários
   final RxList<InventoryModel> inventories = <InventoryModel>[].obs;
 
+    @override
+  void onInit() {
+    super.onInit();
+    fetchAndSaveAllInventories(); // Chama a função ao inicializar o controlador
+  }
+
   void clearFields() {
     titleController.clear();
     descriptionController.clear();
@@ -109,6 +115,41 @@ class InventoryController extends GetxController {
     } catch (e) {
       // Retorna null se nenhum departamento for encontrado
       return null;
+    }
+  }
+
+  Future<void> fetchAndSaveAllInventories() async {
+    try {
+      // Referência à coleção de inventários no Firestore
+      CollectionReference inventories =
+          FirebaseFirestore.instance.collection('inventories');
+
+      // Busca todos os documentos da coleção
+      QuerySnapshot querySnapshot = await inventories.get();
+
+      // Referência ao box do Hive
+      final box = Hive.box<InventoryModel>('inventories');
+
+      // Itera sobre os documentos e salva no Hive
+      for (var doc in querySnapshot.docs) {
+        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+
+        final inventory = InventoryModel(
+          //id: doc.id,
+          title: data['title'] ?? '',
+          description: data['description'] ?? '',
+          revisionNumber: data['revisionNumber'] ?? '',
+          departmentId: data['departament']?['departmentId'] ?? '',
+          createdBy: data['reports']?['created_by'] ?? '',
+        );
+
+        // Salva no Hive usando o ID como chave
+        await box.put(doc.id, inventory);
+      }
+
+      print("Todos os inventários foram buscados do Firestore e salvos no Hive com sucesso!");
+    } catch (e) {
+      print("Erro ao buscar e salvar inventários: $e");
     }
   }
 }

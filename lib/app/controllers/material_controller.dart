@@ -31,6 +31,12 @@ class MaterialController extends GetxController {
 
   var isLoading = false.obs;
 
+    @override
+  void onInit() {
+    super.onInit();
+    fetchAndSaveAllMaterials(); // Chama a função ao inicializar o controlador
+  }
+
   void onClose() {
     clearData();
     super.onClose();
@@ -231,4 +237,46 @@ class MaterialController extends GetxController {
       ),
     );
   }
+
+  Future<void> fetchAndSaveAllMaterials() async {
+  try {
+    // Referência à coleção de materiais no Firestore
+    CollectionReference materials =
+        FirebaseFirestore.instance.collection('materials');
+
+    // Busca todos os documentos da coleção
+    QuerySnapshot querySnapshot = await materials.get();
+
+    // Referência ao box do Hive
+    final box = Hive.box<MaterialModel>('materials');
+
+    // Itera sobre os documentos e salva no Hive
+    for (var doc in querySnapshot.docs) {
+      Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+
+      final material = MaterialModel(
+       // id: doc.id,
+        name: data['name'] ?? '',
+        tag: data['tag'] ?? '',
+        createdBy: data['reports']?['created_by'] ?? '',
+        description: data['description'] ?? '',
+        geolocation: data['geolocation'] ?? '',
+        observations: data['observations'] ?? '',
+        inventoryId: data['inventory']?['inventory Id'] ?? '',
+        /*imagePaths: [
+          data['images']?['image1'] ?? '',
+          data['images']?['image2'] ?? '',
+          data['images']?['image3'] ?? '',
+        ].where((path) => path.isNotEmpty).toList(),*/
+      );
+
+      // Salva no Hive usando o ID como chave
+      await box.put(doc.id, material);
+    }
+
+    print("Todos os materiais foram buscados do Firestore e salvos no Hive com sucesso!");
+  } catch (e) {
+    print("Erro ao buscar e salvar materiais: $e");
+  }
+}
 }

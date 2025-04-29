@@ -18,6 +18,12 @@ class DepartmentController extends GetxController {
   var isLoading = false.obs;
 
   @override
+  void onInit() {
+    super.onInit();
+    fetchAndSaveAllDepartments(); // Chama a função ao inicializar o controlador
+  }
+
+  @override
   void onClose() {
     clearData();
     super.onClose();
@@ -89,6 +95,39 @@ class DepartmentController extends GetxController {
     Get.offAllNamed(Routes.HOME);
     isLoading.value = false;
   }
+
+Future<void> fetchAndSaveAllDepartments() async {
+  try {
+    // Referência à coleção de departamentos no Firestore
+    CollectionReference departments =
+        FirebaseFirestore.instance.collection('departments');
+
+    // Busca todos os documentos da coleção
+    QuerySnapshot querySnapshot = await departments.get();
+
+    // Referência ao box do Hive
+    final box = Hive.box<DepartmentModel>('departments');
+
+    // Itera sobre os documentos e salva no Hive
+    for (var doc in querySnapshot.docs) {
+      Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+
+      final department = DepartmentModel(
+       // id: doc.id,
+        title: data['title'] ?? '',
+        description: data['description'] ?? '',
+        //imagePath: data['image'], 
+        createdBy: data['reports']['created_by'] ?? '',
+      );
+
+      // Salva no Hive usando o ID como chave
+      await box.put(doc.id, department);
+    }
+    print("Todos os departamentos foram buscados do Firestore e salvos no Hive com sucesso!");
+  } catch (e) {
+    print("Erro ao buscar e salvar departamentos: $e");
+  }
+}
 
   List<DepartmentModel> getDepartments() {
     final box = Hive.box<DepartmentModel>('departments');

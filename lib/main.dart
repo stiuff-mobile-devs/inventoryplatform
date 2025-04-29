@@ -1,6 +1,8 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
+import 'package:hive/hive.dart';
+import 'package:inventoryplatform/app/data/models/department_model.dart';
 import 'package:inventoryplatform/app/routes/app_pages.dart';
 import 'package:inventoryplatform/app/routes/app_routes.dart';
 import 'package:inventoryplatform/app/services/controllers_service.dart';
@@ -13,9 +15,25 @@ Future<void> main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
 );
+ 
 
-  await ControllerInitializer.initialize(); // Inicializa os controladores
-  await HiveInitializer.initialize(); // Inicializa o Hive e registra os adapters
+
+
+    await HiveInitializer.initialize(); // Inicializa o Hive e registra os adapters
+
+       //Função temporaria
+    // Abre as boxes do Hive
+    await Hive.openBox<DepartmentModel>('departments');
+    await Hive.openBox('inventory');
+    await Hive.openBox('material');
+
+    // Limpa os dados do Hive
+    Hive.box<DepartmentModel>('departments').clear();
+    Hive.box('inventory').clear();
+    Hive.box('material').clear();
+
+    await ControllerInitializer.initialize(); // Inicializa os controladores
+
 
   runApp(
     GetMaterialApp(
