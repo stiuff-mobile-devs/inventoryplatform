@@ -6,6 +6,8 @@ import 'package:inventoryplatform/app/routes/app_routes.dart';
 import 'package:inventoryplatform/app/services/utils_service.dart';
 import 'package:sidebarx/sidebarx.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:inventoryplatform/app/ui/device/components/usuarios_dialog.dart';
+import 'package:inventoryplatform/app/routes/app_routes.dart';
 
 class CustomSidebar extends StatelessWidget {
   CustomSidebar({super.key});
@@ -92,6 +94,14 @@ class CustomSidebar extends StatelessWidget {
           },
         ),
         SidebarXItem(
+          icon: Icons.people_outline, // Ícone relacionado a usuários
+          label: 'Usuários',
+          onTap: () {
+            mostrarUsuariosDialog(
+                context); // Chame a função para exibir o diálogo
+          },
+        ),
+        SidebarXItem(
           icon: Icons.menu_book_outlined,
           label: 'Manual do Usuário',
           onTap: () async {
@@ -102,11 +112,11 @@ class CustomSidebar extends StatelessWidget {
             }
           },
         ),
-        /*SidebarXItem(
+        SidebarXItem(
           icon: Icons.settings_applications,
           label: 'Configurações',
           onTap: () {
-            Get.offAllNamed(AppRoutes.settings);
+            Get.offAllNamed(Routes.SETTINGS);
             sidebarController.selectIndex(1);
           },
         ),
@@ -114,10 +124,10 @@ class CustomSidebar extends StatelessWidget {
           icon: Icons.help,
           label: 'Ajuda',
           onTap: () {
-            Get.offAllNamed(AppRoutes.help);
+            Get.offAllNamed(Routes.SETTINGS);
             sidebarController.selectIndex(2);
           },
-        ),*/
+        ),
         SidebarXItem(
           icon: Icons.logout,
           label: 'Logout',
@@ -149,7 +159,7 @@ class CustomSidebar extends StatelessWidget {
     );
   }
 
-   Widget _buildUserAvatar(SidebarController controller, bool extended) {
+  Widget _buildUserAvatar(SidebarController controller, bool extended) {
     final double radius = extended ? 30 : 16;
     final double size = extended ? 60 : 32;
     final double iconSize = extended ? 48 : 24;
