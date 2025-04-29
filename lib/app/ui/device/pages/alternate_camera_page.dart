@@ -119,7 +119,7 @@ class _AlternateCameraPageState extends State<AlternateCameraPage> {
                       _isInFormPage = true;
                     });
                     MaterialModel checkMaterial =  await _materialController.checkMaterial(_scannedCode!);
-                    if (checkMaterial.id.isEmpty && checkMaterial.tag!.isEmpty){
+                    if (checkMaterial.tag!.isEmpty){
                         Get.offNamed(Routes.MATERIAL,
                           //arguments: inventory, ///aqui
                           parameters: {'codDepartment': widget.codDepartment!, 'barcode': _scannedCode!});

@@ -162,7 +162,7 @@ class MaterialController extends GetxController {
       String codDepartment, BuildContext context) async {
     try {
       MaterialModel retornado = await checkMaterial(tagController.text.trim());
-      if (retornado.id == "") {
+      if (retornado.tag == "") {
         final box = Hive.box<MaterialModel>('materials');
         final material = MaterialModel(
           name: nameController.text.trim(),
@@ -180,7 +180,6 @@ class MaterialController extends GetxController {
       }
 
       clearData();
-      //Navigator.pop(context);
     } catch (e) {
       print(e.toString());
     }
