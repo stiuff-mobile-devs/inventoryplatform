@@ -267,7 +267,7 @@ class _InventoryPageState extends State<InventoryPage> {
                                                     title: const Text(
                                                         'Adicionar Barcode'),
                                                     content: const Text(
-                                                        'Deseja adicionar um barcode?'),
+                                                        'Deseja escanear um barcode?'),
                                                     actions: [
                                                       TextButton(
                                                         onPressed: () {

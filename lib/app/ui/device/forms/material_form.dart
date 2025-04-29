@@ -123,7 +123,7 @@ class _MaterialFormState extends State<MaterialForm> {
               const SizedBox(height: 10),
               TextFormField(
                 controller: controller.tagController,
-                readOnly: true, // Impede edição
+                readOnly: false, // Impede edição
                 decoration: InputDecoration(
                   labelText: "Código de Barras",
                   border: OutlineInputBorder(
