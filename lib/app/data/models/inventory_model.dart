@@ -24,19 +24,27 @@ class InventoryModel extends HiveObject {
   String departmentId;
 
   @HiveField(6)
-  DateTime created;
+  DateTime created_at;
 
   @HiveField(7)
-  DateTime? modified;
+  DateTime updated_at;
+
+  @HiveField(8)
+  String created_by;
+
+  @HiveField(9)
+  String updated_by;
 
   InventoryModel({
     required this.title,
     required this.description,
     required this.revisionNumber,
     required this.departmentId,
+    required this.created_by,
   }) : id = Uuid().v4(),
-        created = DateTime.now(),
-        modified = DateTime.now(),
+        created_at = DateTime.now(),
+        updated_at = DateTime.now(),
+        updated_by = created_by,
         active = true;
 
   InventoryModel.existing({
@@ -46,7 +54,9 @@ class InventoryModel extends HiveObject {
     required this.revisionNumber,
     required this.departmentId,
     required this.active,
-    required this.created,
-    required this.modified
+    required this.created_at,
+    required this.updated_at,
+    required this.created_by,
+    required this.updated_by
   });
 }

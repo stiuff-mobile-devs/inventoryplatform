@@ -3,7 +3,7 @@ import 'package:uuid/uuid.dart';
 
 part 'sync_table_model.g.dart';
 
-@HiveType(typeId: 0)
+@HiveType(typeId: 3)
 class SyncTableModel extends HiveObject {
   @HiveField(0)
   String id;

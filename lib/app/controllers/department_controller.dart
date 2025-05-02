@@ -7,13 +7,13 @@ import 'package:get/get.dart';
 import 'package:inventoryplatform/app/controllers/sync_controller.dart';
 import 'package:inventoryplatform/app/data/models/department_model.dart';
 import 'package:inventoryplatform/app/routes/app_routes.dart';
+import 'package:inventoryplatform/app/services/auth_service.dart';
 import 'package:inventoryplatform/app/services/connection_service.dart';
 
 class DepartmentController extends GetxController {
-  final box = Hive.box<DepartmentModel>('departments');
-
-  final SyncController syncController = SyncController();
   final ConnectionService connectionService = ConnectionService();
+  final AuthService authService = AuthService();
+  late SyncController syncController;
 
   final TextEditingController titleController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
@@ -62,12 +62,14 @@ class DepartmentController extends GetxController {
         title: titleController.text.trim(),
         description: descriptionController.text.trim(),
         imagePath: image.value?.path,
+        created_by: authService.currentUser!.uid
       );
       saveDepartmentToLocal(department);
 
       if (await connectionService.checkInternetConnection()) {
         saveDepartmentToRemote(department);
       } else {
+        syncController = Get.find<SyncController>();
         syncController.saveToSyncTable("departments", department.id);
       }
 
@@ -87,6 +89,7 @@ class DepartmentController extends GetxController {
   }
 
   Future<void> saveDepartmentToLocal(DepartmentModel department) async {
+    final box = Hive.box<DepartmentModel>('departments');
     try {
       await box.put(department.id, department);
     } catch (e) {
@@ -103,8 +106,12 @@ class DepartmentController extends GetxController {
           "title": department.title,
           "description": department.description,
           "active": department.active,
-          "created": department.created,
-          "modified": department.modified
+          "reports": {
+            "created_at": department.created_at,
+            "updated_at": department.updated_at,
+            "created_by": department.created_by,
+            "updated_by": department.updated_by
+          }
         });
     } catch (e) {
       throw Exception(e.toString());
@@ -112,23 +119,24 @@ class DepartmentController extends GetxController {
   }
 
   Future<void> saveExistingDepartmentToLocal(String id, Map<String,dynamic> dept) async {
+    final reports = dept['reports'];
+
     DepartmentModel department = DepartmentModel.existing(
       id: id,
       title: dept['title'],
       description: dept['description'],
       active: dept['active'],
-      created: dept['created'],
-      modified: dept['modified']
+      created_at: reports['created_at'].toDate(),
+      updated_at: reports['updated_at'].toDate(),
+      created_by: reports['created_by'],
+      updated_by: reports['updated_by']
     );
 
-    try {
-      await box.put(department.id, department);
-    } catch (e) {
-      throw Exception(e.toString());
-    }
+    saveDepartmentToLocal(department);
   }
 
   List<DepartmentModel> getDepartments() {
+    final box = Hive.box<DepartmentModel>('departments');
     return box.values.toList();
   }
 
@@ -141,6 +149,7 @@ class DepartmentController extends GetxController {
   }
 
   DepartmentModel? getDepartmentById(String id) {
+    final box = Hive.box<DepartmentModel>('departments');
     try {
       final department = box.values.firstWhere(
             (dept) => dept.id == id,

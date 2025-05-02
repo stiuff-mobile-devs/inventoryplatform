@@ -8,7 +8,7 @@ part of 'sync_table_model.dart';
 
 class SyncTableModelAdapter extends TypeAdapter<SyncTableModel> {
   @override
-  final int typeId = 0;
+  final int typeId = 3;
 
   @override
   SyncTableModel read(BinaryReader reader) {

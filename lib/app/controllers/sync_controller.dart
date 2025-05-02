@@ -13,7 +13,7 @@ class SyncController extends GetxController {
   void onInit() {
     super.onInit();
     syncRemoteToLocal();
-    _syncLocalToRemote();
+    //_syncLocalToRemote();
   }
 
   void _syncLocalToRemote() async {
@@ -44,7 +44,7 @@ class SyncController extends GetxController {
       await _syncRemoteDepartments();
       await _syncRemoteInventories();
     } catch (e) {
-      print("erro ao buscar dados do firebase");
+      print("erro ao buscar dados do firebase: $e");
     }
   }
 
@@ -56,7 +56,8 @@ class SyncController extends GetxController {
       for (var doc in snapshot.docs) {
         if (doc.exists) {
           final dept = departmentController.getDepartmentById(doc.id);
-          if (dept != null && (dept.modified)!.isAfter(doc.data()['modified'])) {
+          final lastModifiedOnRemote = doc.data()['reports']['updated_at'].toDate();
+          if (dept != null && (dept.updated_at).isAfter(lastModifiedOnRemote)) {
             continue;
           } else {
             departmentController.saveExistingDepartmentToLocal(doc.id,doc.data());
@@ -74,7 +75,8 @@ class SyncController extends GetxController {
       for (var doc in snapshot.docs) {
         if (doc.exists) {
           final inv = inventoryController.getInventoryById(doc.id);
-          if (inv != null && (inv.modified)!.isAfter(doc.data()['modified'])) {
+          final lastModifiedOnRemote = doc.data()['reports']['updated_at'].toDate();
+          if (inv != null && (inv.updated_at).isAfter(lastModifiedOnRemote)) {
             continue;
           } else {
             inventoryController.saveExistingInventoryToLocal(doc.id,doc.data());

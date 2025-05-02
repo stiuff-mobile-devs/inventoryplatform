@@ -4,14 +4,14 @@ import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:inventoryplatform/app/controllers/sync_controller.dart';
 import 'package:inventoryplatform/app/data/models/inventory_model.dart';
+import 'package:inventoryplatform/app/services/auth_service.dart';
 import 'package:inventoryplatform/app/services/connection_service.dart';
 import 'package:inventoryplatform/app/ui/device/forms/inventory_form.dart';
 
 class InventoryController extends GetxController {
-  final box = Hive.box<InventoryModel>('inventories');
-
-  final SyncController syncController = SyncController();
   final ConnectionService connectionService = ConnectionService();
+  final AuthService authService = AuthService();
+  late SyncController syncController;
 
   final TextEditingController titleController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
@@ -106,11 +106,20 @@ class InventoryController extends GetxController {
 
       // Salva o inventário no banco de dados local
       await _dbHelper.insert('inventories', newInventory.toMap());*/
-      InventoryModel inventory = await _saveInventoryToLocal((context.widget as InventoryForm).cod);
+
+      final inventory = InventoryModel(
+          title: titleController.text.trim(),
+          description: descriptionController.text.trim(),
+          revisionNumber: revisionController.text.trim(),
+          departmentId: (context.widget as InventoryForm).cod,
+          created_by: authService.currentUser!.uid
+      );
+      _saveInventoryToLocal(inventory);
 
       if (await connectionService.checkInternetConnection()) {
         saveInventoryToRemote(inventory);
       } else {
+        syncController = Get.find<SyncController>();
         syncController.saveToSyncTable("inventories", inventory.id);
       }
 
@@ -131,17 +140,10 @@ class InventoryController extends GetxController {
     }
   }
 
-  Future<InventoryModel> _saveInventoryToLocal(String deptId) async {
+  Future<void> _saveInventoryToLocal(InventoryModel inventory) async {
+    final box = Hive.box<InventoryModel>('inventories');
     try {
-      final inventory = InventoryModel(
-        title: titleController.text.trim(),
-        description: descriptionController.text.trim(),
-        revisionNumber: revisionController.text.trim(),
-        departmentId: deptId,
-      );
-
       await box.put(inventory.id, inventory);
-      return inventory;
     }  catch (e) {
       throw Exception(e.toString());
     }
@@ -158,8 +160,12 @@ class InventoryController extends GetxController {
           "revisionNumber": inventory.revisionNumber,
           "departmentId": inventory.departmentId,
           "active": inventory.active,
-          "created": inventory.created,
-          "modified": inventory.modified
+          "reports": {
+            "created_at": inventory.created_at,
+            "updated_at": inventory.updated_at,
+            "created_by": inventory.created_by,
+            "updated_by": inventory.updated_by
+          }
         });
     } catch (e) {
       throw Exception(e.toString());
@@ -167,6 +173,9 @@ class InventoryController extends GetxController {
   }
 
   Future<void> saveExistingInventoryToLocal(String id, Map<String,dynamic> inv) async {
+    final box = Hive.box<InventoryModel>('inventories');
+    final reports = inv['reports'];
+
     InventoryModel inventory = InventoryModel.existing(
       id: id,
       title: inv['title'],
@@ -174,15 +183,13 @@ class InventoryController extends GetxController {
       revisionNumber: inv['revisionNumber'],
       departmentId: inv['departmentId'],
       active: inv['active'],
-      created: inv['created'],
-      modified: inv['modified']
+      created_at: reports['created_at'].toDate(),
+      updated_at: reports['updated_at'].toDate(),
+      created_by: reports['created_by'],
+      updated_by: reports['updated_by']
     );
 
-    try {
-      await box.put(inventory.id, inventory);
-    } catch (e) {
-      throw Exception(e.toString());
-    }
+    _saveInventoryToLocal(inventory);
   }
 
   void loadInventories() {
@@ -190,6 +197,7 @@ class InventoryController extends GetxController {
   }
 
   List<InventoryModel> getInventories() {
+    final box = Hive.box<InventoryModel>('inventories');
     return box.values.toList();
   }
 
@@ -207,6 +215,7 @@ class InventoryController extends GetxController {
   }
 
   InventoryModel? getInventoryById(String id) {
+    final box = Hive.box<InventoryModel>('inventories');
     try {
       final inventory = box.values.firstWhere(
         (inv) => inv.id == id,

@@ -16,8 +16,8 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
 );
 
-  ControllerInitializer.initialize(); // Inicializa os controladores
   await HiveInitializer.initialize(); // Inicializa o Hive e registra os adapters
+  ControllerInitializer.initialize(); // Inicializa os controladores
 
   runApp(
     GetMaterialApp(

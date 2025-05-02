@@ -186,8 +186,8 @@ class _InventoryPageState extends State<InventoryPage> {
                   attributes: {
                     'Título': item.title,
                     'Descrição': item.description,
-                    'Criado em': DateFormat('dd/MM/yyyy HH:mm').format(item.created.toLocal()),
-                    'Atualizado em': item.modified ?? "Nunca modificado",
+                    'Criado em': DateFormat('dd/MM/yyyy HH:mm').format(item.created_at.toLocal()),
+                    'Atualizado em': item.updated_at ?? "Nunca modificado",
                   },
                   isActive: 1,
                   icon: Icons.donut_large_rounded,
@@ -222,9 +222,9 @@ class _InventoryPageState extends State<InventoryPage> {
                                     Text(
                                         "Número de Revisão: ${item.revisionNumber}"),
                                     const SizedBox(height: 8.0),
-                                    Text("Data de Criação: ${DateFormat('dd/MM/yyyy HH:mm').format(item.created.toLocal())}"), // Formata a data e hora
+                                    Text("Data de Criação: ${DateFormat('dd/MM/yyyy HH:mm').format(item.created_at.toLocal())}"), // Formata a data e hora
                                     const SizedBox(height: 8.0),
-                                    Text("Última Atualização: ${item.modified ?? "Nunca modificado"}"),
+                                    Text("Última Atualização: ${item.updated_at ?? "Nunca modificado"}"),
                                     const SizedBox(height: 8.0),
                                     Text("Departamento de origem: ${_departmentController.getDepartmentTitleById(item.departmentId) ?? "Desconhecido"}"), 
 
