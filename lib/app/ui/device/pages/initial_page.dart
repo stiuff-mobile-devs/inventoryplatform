@@ -26,7 +26,7 @@ class InitialPage extends StatelessWidget {
           splash: SvgPicture.asset(
             'assets/icons/JustLogoColetor.svg',
           ),
-          nextScreen:  const LoginPage(),
+          nextScreen: const LoginPage(),
           splashTransition: SplashTransition.fadeTransition,
           backgroundColor: Colors.transparent,
         ),
