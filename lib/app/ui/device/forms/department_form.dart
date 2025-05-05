@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
@@ -102,7 +104,7 @@ class DepartmentForm extends StatelessWidget {
                           : ClipRRect(
                               borderRadius: BorderRadius.circular(8.0),
                               child: Image.file(
-                                controller.image.value!,
+                                controller.image.value! as File,
                                 height: 200,
                                 width: 200,
                                 fit: BoxFit.cover,
