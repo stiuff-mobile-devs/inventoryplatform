@@ -4,7 +4,9 @@ import 'package:get/get.dart';
 import 'package:inventoryplatform/app/controllers/home_controller.dart';
 import 'package:inventoryplatform/app/routes/app_routes.dart';
 import 'package:inventoryplatform/app/ui/device/theme/base_scaffold.dart';
-import 'package:inventoryplatform/app/ui/device/theme/carousel_section.dart' as w;
+import 'package:inventoryplatform/app/ui/device/theme/carousel_section.dart'
+    as w;
+import 'package:inventoryplatform/app/ui/device/components/usuarios_dialog.dart';
 
 class HomePage extends StatelessWidget {
   final HomeController controller = Get.put(HomeController());
@@ -22,6 +24,7 @@ class HomePage extends StatelessWidget {
             _buildHeader(context),
             const SizedBox(height: 20),
             _buildQuickActions(context),
+            const SizedBox(height: 20),
             const SizedBox(height: 20),
             _buildSectionTitle('Meus Departamentos', context),
             const SizedBox(height: 16),
@@ -54,7 +57,7 @@ class HomePage extends StatelessWidget {
           const CircleAvatar(
             radius: 36,
             backgroundColor: Colors.purple,
-            child:  Icon(Icons.dashboard, size: 36, color: Colors.white),
+            child: Icon(Icons.dashboard, size: 36, color: Colors.white),
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -109,14 +112,14 @@ class HomePage extends StatelessWidget {
         const SizedBox(height: 12),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
+          children: [
             _buildQuickActionButton(
               icon: Icons.add_circle_rounded,
               label: 'Criar um novo Departamento',
               color: Colors.purple,
               onPressed: () => controller.createDepartment(context),
             ),
-           /* _buildQuickActionButton(
+            /* _buildQuickActionButton(
               icon: Icons.supervised_user_circle,
               label: 'Participar de um Departamento',
               color: Colors.green,
