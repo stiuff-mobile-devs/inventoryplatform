@@ -1,3 +1,5 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:inventoryplatform/app/routes/app_routes.dart';
 import 'package:inventoryplatform/app/services/auth_service.dart';
@@ -23,11 +25,8 @@ class LoginController extends GetxController {
 
   Future<bool> handleSignIn(UserCredentialsModel credentials) async {
     try {
-
       final success = await _authService.signInWithEmailPassword(
-          credentials.email,
-          credentials.password!
-      );
+          credentials.email, credentials.password!);
       if (success) {
         Get.offAllNamed(Routes.HOME);
       }
@@ -35,6 +34,16 @@ class LoginController extends GetxController {
     } catch (e) {
       _errorService.handleError(e as Exception);
       return false;
+    }
+  }
+
+  Future<void> checkLoginStatus(BuildContext context) async {
+    debugPrint('Checking login status...');
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Get.offAllNamed(Routes.HOME);
+      });
     }
   }
 }

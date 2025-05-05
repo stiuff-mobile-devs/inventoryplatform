@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
@@ -39,6 +40,7 @@ class LoginPageState extends State<LoginPage> {
     super.initState();
     _scrollController.addListener(updateScrollHint);
     WidgetsBinding.instance.addPostFrameCallback((_) => updateScrollHint());
+    controller.checkLoginStatus(context);
   }
 
   @override
