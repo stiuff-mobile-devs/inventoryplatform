@@ -91,6 +91,7 @@ class DepartmentController extends GetxController {
   Future<void> saveDepartment(BuildContext context) async {
     isLoading.value = true;
     var user = _authService.currentUser;
+
     if (image.value == null) {
       final byteData =
           await rootBundle.load('assets/images/DepartamentoGenerico.jpg');
@@ -99,11 +100,358 @@ class DepartmentController extends GetxController {
       await tempFile.writeAsBytes(byteData.buffer.asUint8List());
       image.value = tempFile;
     }
-    await saveDepartmentToFirestore(user);
-    await saveDepartmentToHive(user);
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Departamento criado com sucesso!")),
+
+    // Exibe o pop-up inicial com barra de progresso
+    Get.dialog(
+      Center(
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black26,
+                blurRadius: 8,
+                offset: Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              LinearProgressIndicator(
+                minHeight: 8,
+                backgroundColor: Colors.grey[300],
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.amber),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                "Carregando informações para o Firebase...",
+                style: TextStyle(
+                  color: Colors.amber,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
+      ),
+      barrierDismissible: false,
     );
+
+    bool firestoreSuccess = false;
+    bool hiveSuccess = false;
+
+    try {
+      await Future.delayed(const Duration(seconds: 2)); // Garante 2 segundos de exibição
+      await saveDepartmentToFirestore(user);
+      firestoreSuccess = true;
+      Get.back(); // Fecha o pop-up anterior
+      Get.dialog(
+        Center(
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black26,
+                  blurRadius: 8,
+                  offset: Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                LinearProgressIndicator(
+                  minHeight: 8,
+                  backgroundColor: Colors.grey[300],
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  "Dados salvos no Firebase com sucesso!",
+                  style: TextStyle(
+                    color: Colors.green,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          ),
+        ),
+        barrierDismissible: false,
+      );
+      await Future.delayed(const Duration(seconds: 2));
+    } catch (e) {
+      Get.back(); // Fecha o pop-up anterior
+      Get.dialog(
+        Center(
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black26,
+                  blurRadius: 8,
+                  offset: Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                LinearProgressIndicator(
+                  minHeight: 8,
+                  backgroundColor: Colors.grey[300],
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  "Erro ao enviar para o Firebase!",
+                  style: TextStyle(
+                    color: Colors.red,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          ),
+        ),
+        barrierDismissible: false,
+      );
+      await Future.delayed(const Duration(seconds: 2));
+    }
+
+    try {
+      await Future.delayed(const Duration(seconds: 2)); // Garante 2 segundos de exibição
+      await saveDepartmentToHive(user);
+      hiveSuccess = true;
+      Get.back(); // Fecha o pop-up anterior
+      Get.dialog(
+        Center(
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black26,
+                  blurRadius: 8,
+                  offset: Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                LinearProgressIndicator(
+                  minHeight: 8,
+                  backgroundColor: Colors.grey[300],
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  "Dados salvos no Hive com sucesso!",
+                  style: TextStyle(
+                    color: Colors.green,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          ),
+        ),
+        barrierDismissible: false,
+      );
+      await Future.delayed(const Duration(seconds: 2));
+    } catch (e) {
+      Get.back(); // Fecha o pop-up anterior
+      Get.dialog(
+        Center(
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black26,
+                  blurRadius: 8,
+                  offset: Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                LinearProgressIndicator(
+                  minHeight: 8,
+                  backgroundColor: Colors.grey[300],
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  "Erro ao enviar para o Hive!",
+                  style: TextStyle(
+                    color: Colors.red,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          ),
+        ),
+        barrierDismissible: false,
+      );
+      await Future.delayed(const Duration(seconds: 2));
+    }
+
+    // Exibe o resultado final
+    Get.back(); // Fecha o pop-up anterior
+    if (firestoreSuccess && hiveSuccess) {
+      Get.dialog(
+        Center(
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black26,
+                  blurRadius: 8,
+                  offset: Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                LinearProgressIndicator(
+                  minHeight: 8,
+                  backgroundColor: Colors.grey[300],
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  "Dados enviados com sucesso!",
+                  style: TextStyle(
+                    color: Colors.green,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          ),
+        ),
+        barrierDismissible: false,
+      );
+    } else if (firestoreSuccess || hiveSuccess) {
+      Get.dialog(
+        Center(
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black26,
+                  blurRadius: 8,
+                  offset: Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                LinearProgressIndicator(
+                  minHeight: 8,
+                  backgroundColor: Colors.grey[300],
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.amber),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  firestoreSuccess
+                      ? "Apenas os dados do Firebase foram enviados!"
+                      : "Apenas os dados do Hive foram enviados!",
+                  style: TextStyle(
+                    color: Colors.amber,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          ),
+        ),
+        barrierDismissible: false,
+      );
+    } else {
+      Get.dialog(
+        Center(
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black26,
+                  blurRadius: 8,
+                  offset: Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                LinearProgressIndicator(
+                  minHeight: 8,
+                  backgroundColor: Colors.grey[300],
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  "Erro ao enviar os dados!",
+                  style: TextStyle(
+                    color: Colors.red,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          ),
+        ),
+        barrierDismissible: false,
+      );
+    }
+
+    await Future.delayed(const Duration(seconds: 2));
+    Get.back(); // Fecha o pop-up final
+
     clearData();
     Get.offAllNamed(Routes.HOME);
     isLoading.value = false;
