@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:inventoryplatform/app/controllers/image_controller.dart';
 import 'package:inventoryplatform/app/controllers/inventory_controller.dart';
 import 'package:inventoryplatform/app/data/models/inventory_model.dart';
 import 'package:inventoryplatform/app/data/models/material_model.dart';
@@ -23,10 +24,13 @@ class MaterialController extends GetxController {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController observationsController = TextEditingController();
   final AuthService _authService = Get.find<AuthService>();
+  final ImageController _imageController = Get.find<ImageController>();
+
 
   final ImagePicker picker = ImagePicker();
 
   final List<String> images = [];
+  RxList<File?> imagesList = RxList<File?>([]);
   Rx<File?> image = Rx<File?>(null);
 
   var isLoading = false.obs;
@@ -93,6 +97,8 @@ class MaterialController extends GetxController {
         final XFile? image = await picker.pickImage(source: source);
         if (image != null) {
           images.add(image.path);
+          imagesList.add(image as File?);
+
           update();
         }
       }
@@ -125,6 +131,10 @@ class MaterialController extends GetxController {
 
   Future<void> saveMaterialToFirestore(var user, String geolocationStr, String departmentId) async {
      try {
+
+
+
+
       CollectionReference materials =
           FirebaseFirestore.instance.collection('materials');
       DocumentReference departmentRef = FirebaseFirestore.instance.collection('departments').doc(departmentId);
