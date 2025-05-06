@@ -67,47 +67,47 @@ class MaterialController extends GetxController {
   }
 
   Future<void> addImage(BuildContext context) async {
-    if (images.length < 3) {
-      final ImageSource? source = await showDialog<ImageSource>(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: const Text('Escolha a origem da imagem'),
-            actions: <Widget>[
-              IconButton(
-                icon: const Icon(Icons.camera_alt),
-                onPressed: () {
-                  Navigator.pop(context, ImageSource.camera);
-                },
-                tooltip: 'Câmera',
-              ),
-              IconButton(
-                icon: const Icon(Icons.photo_library),
-                onPressed: () {
-                  Navigator.pop(context, ImageSource.gallery);
-                },
-                tooltip: 'Galeria',
-              ),
-            ],
-          );
-        },
-      );
+  if (images.length < 3) {
+    final ImageSource? source = await showDialog<ImageSource>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Escolha a origem da imagem'),
+          actions: <Widget>[
+            IconButton(
+              icon: const Icon(Icons.camera_alt),
+              onPressed: () {
+                Navigator.pop(context, ImageSource.camera);
+              },
+              tooltip: 'Câmera',
+            ),
+            IconButton(
+              icon: const Icon(Icons.photo_library),
+              onPressed: () {
+                Navigator.pop(context, ImageSource.gallery);
+              },
+              tooltip: 'Galeria',
+            ),
+          ],
+        );
+      },
+    );
 
-      if (source != null) {
-        final XFile? image = await picker.pickImage(source: source);
-        if (image != null) {
-          images.add(image.path);
-          imagesList.add(image as File?);
-
-          update();
-        }
+    if (source != null) {
+      final XFile? pickedFile = await picker.pickImage(source: source);
+      if (pickedFile != null) {
+        final File image = File(pickedFile.path);
+        images.add(image.path);
+        imagesList.add(image);
+        update();
       }
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Máximo de 3 imagens atingido.')),
-      );
     }
+  } else {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Máximo de 3 imagens atingido.')),
+    );
   }
+}
 
   Future<dynamic> checkMaterial(String tag) async {
     var box = await Hive.openBox<MaterialModel>('materials');
@@ -131,10 +131,8 @@ class MaterialController extends GetxController {
 
   Future<void> saveMaterialToFirestore(var user, String geolocationStr, String departmentId) async {
      try {
-
-
-
-
+       List<String> imagens =
+          await _imageController.convertImagesToBase64(imagesList);
       CollectionReference materials =
           FirebaseFirestore.instance.collection('materials');
       DocumentReference departmentRef = FirebaseFirestore.instance.collection('departments').doc(departmentId);
@@ -156,9 +154,9 @@ class MaterialController extends GetxController {
           "updated_by": "",
         },
         "images": {
-          "image1": "",
-          "image2": "",
-          "image3": "",
+          "image1": imagens[0],
+          "image2": imagens[1],
+          "image3": imagens[2],
         },
 
         "active": true,
@@ -263,7 +261,13 @@ class MaterialController extends GetxController {
     // Itera sobre os documentos e salva no Hive
     for (var doc in querySnapshot.docs) {
       Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+      List<String> allimages = [];
+      allimages.add(data['images']['image1']);
+      allimages.add(data['images']['image2']);
+      allimages.add(data['images']['image3']);
 
+       List<String> imagens =
+            (await _imageController.convertBase64ToImages(allimages));
       final material = MaterialModel(
        // id: doc.id,
         name: data['name'] ?? '',
@@ -273,11 +277,11 @@ class MaterialController extends GetxController {
         geolocation: data['geolocation'] ?? '',
         observations: data['observations'] ?? '',
         inventoryId: data['inventory']?['inventory Id'] ?? '',
-        /*imagePaths: [
-          data['images']?['image1'] ?? '',
-          data['images']?['image2'] ?? '',
-          data['images']?['image3'] ?? '',
-        ].where((path) => path.isNotEmpty).toList(),*/
+        imagePaths: [
+          imagens[0],
+          imagens[1],
+          imagens[2],
+        ],
       );
 
       // Salva no Hive usando o ID como chave
