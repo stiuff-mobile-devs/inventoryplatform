@@ -36,6 +36,7 @@ class InventoryModel extends HiveObject {
   String? updatedBy;
 
   InventoryModel({
+    String? id, // Torna o ID opcional
     required this.title,
     required this.description,
     required this.revisionNumber,
@@ -43,5 +44,5 @@ class InventoryModel extends HiveObject {
     required this.createdBy,
     this.updatedBy,
     this.updatedAt,
-  }) : id = Uuid().v4(); // Generate a unique ID
+  }) : id = id ?? Uuid().v4(); // Gera um ID automaticamente se não for fornecido
 }

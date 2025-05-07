@@ -45,6 +45,7 @@ class MaterialModel extends HiveObject {
   bool active = true;
 
   MaterialModel({
+    String? id, // Torna o ID opcional
     this.tag,
     required this.name,
     required this.observations,
@@ -56,5 +57,5 @@ class MaterialModel extends HiveObject {
     this.updatedAt,
     this.updatedBy,
 
-  }) : id = Uuid().v4(); // Generate a unique ID
+  }) : id = id ?? Uuid().v4(); // Gera um ID automaticamente se não for fornecido
 }

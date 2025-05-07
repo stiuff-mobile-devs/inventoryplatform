@@ -32,6 +32,8 @@ class MaterialController extends GetxController {
   final List<String> images = [];
   RxList<File?> imagesList = RxList<File?>([]);
   Rx<File?> image = Rx<File?>(null);
+  late String hiveMaterialId;
+
 
   var isLoading = false.obs;
 
@@ -129,51 +131,53 @@ class MaterialController extends GetxController {
     return material;
   }
 
-  Future<void> saveMaterialToFirestore(var user, String geolocationStr, String departmentId) async {
-     try {
-       List<String> imagens =
-          await _imageController.convertImagesToBase64(imagesList);
-      CollectionReference materials =
-          FirebaseFirestore.instance.collection('materials');
-      DocumentReference departmentRef = FirebaseFirestore.instance.collection('departments').doc(departmentId);
-      Map<String, dynamic> data = {
-        "tag": tagController.text.trim(),
-        "description": descriptionController.text.trim(),
-        "name": nameController.text.trim(),
-        "geolocation": geolocationStr,
-        "observations": observationsController.text.trim(),
-        "inventory": {
-          "inventory Id": null, 
-          "inventory name": null, 
-          "inventory description ": null,
-        },
-        "reports": {
-          "created_at": FieldValue.serverTimestamp(),
-          "created_by": user.email ?? "",
-          "updated_at": "",
-          "updated_by": "",
-        },
-        "images": {
-          "image1": imagens[0],
-          "image2": imagens[1],
-          "image3": imagens[2],
-        },
+  Future<void> saveMaterialToFirestore(var user, String geolocationStr, String inventoryId) async {
+  try {
+    List<String> imagens = await _imageController.convertImagesToBase64(imagesList);
 
-        "active": true,
-      };
-      await materials.add(data);
-      await departmentRef.collection('materials').add(data);
-
-      print("Inventário salvo no Firestore com sucesso!");
-    } catch (e) {
-      print("Erro ao salvar Inventário: $e");
+    // Garantir que a lista tenha pelo menos 3 imagens
+    while (imagens.length < 3) {
+      imagens.add(""); // Adiciona strings vazias para evitar erros
     }
+
+    CollectionReference materials =
+        FirebaseFirestore.instance.collection('materials');
+    DocumentReference inventoryReference = FirebaseFirestore.instance.collection('inventories').doc(inventoryId);
+
+    Map<String, dynamic> data = {
+      "tag": tagController.text.trim(),
+      "description": descriptionController.text.trim(),
+      "name": nameController.text.trim(),
+      "geolocation": geolocationStr,
+      "observations": observationsController.text.trim(),
+      "inventory Id": inventoryId,
+      "reports": {
+        "created_at": FieldValue.serverTimestamp(),
+        "created_by": user.email ?? "",
+        "updated_at": "",
+        "updated_by": "",
+      },
+      "images": {
+        "image1": imagens[0],
+        "image2": imagens[1],
+        "image3": imagens[2],
+      },
+      "active": true,
+    };
+
+    await materials.doc(hiveMaterialId).set(data);
+    await inventoryReference.collection('materials').doc(hiveMaterialId).set(data);
+
+    print("Material salvo no Firestore com sucesso!");
+  } catch (e) {
+    print("Erro ao salvar material: $e");
   }
-  Future<void> saveMaterialTempToFirestore(var user, String geolocationStr, String departmentId) async {
+}
+  Future<void> saveMaterialTempToFirestore(var user, String geolocationStr, String inventoryId) async {
     
   }
   Future<void> saveMaterialToHive(var user, String geolocationStr,
-      String codDepartment, BuildContext context) async {
+      String inventorieId, BuildContext context) async {
     try {
       MaterialModel retornado = await checkMaterial(tagController.text.trim());
       if (retornado.tag == "") {
@@ -185,10 +189,11 @@ class MaterialController extends GetxController {
           description: descriptionController.text.trim(),
           geolocation: geolocationStr,
           observations: observationsController.text.trim(),
-          inventoryId: codDepartment,
+          inventoryId: inventorieId,
           imagePaths: images.isNotEmpty ? images : null,
         );
         await box.add(material);
+        hiveMaterialId = material.id;
       } else {
         navigateToMaterialDetails(context, retornado);
       }
@@ -200,10 +205,11 @@ class MaterialController extends GetxController {
   }
 
   // Função para salvar os dados
-  Future<void> saveMaterial( BuildContext context, String geolocationStr, String codDepartment) async {
+  Future<void> saveMaterial( BuildContext context, String geolocationStr, String inventoryId) async {
    var user = _authService.currentUser;
-    await saveMaterialToFirestore(user, geolocationStr, "abyTlSLCo2r0Od3AiUQ1");
-    await saveMaterialToHive(user, geolocationStr, codDepartment, context);
+   await saveMaterialToHive(user, geolocationStr, inventoryId, context);
+    await saveMaterialToFirestore(user, geolocationStr, inventoryId);
+    
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text("material adicionado com sucesso!")),
     );
@@ -269,7 +275,7 @@ class MaterialController extends GetxController {
        List<String> imagens =
             (await _imageController.convertBase64ToImages(allimages));
       final material = MaterialModel(
-       // id: doc.id,
+       id: doc.id,
         name: data['name'] ?? '',
         tag: data['tag'] ?? '',
         createdBy: data['reports']?['created_by'] ?? '',

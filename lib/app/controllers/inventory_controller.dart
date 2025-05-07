@@ -39,11 +39,7 @@ class InventoryController extends GetxController {
         "title": titleController.text.trim(),
         "description": descriptionController.text.trim(),
         "revisionNumber": revisionController.text.trim(),
-        "departament": {
-          "departmentId": null, // Adicione o ID do departamento aqui
-          "name": null, 
-          "description departament": null,
-        },
+        "departmentId": null,
         "reports": {
           "created_at": FieldValue.serverTimestamp(),
           "created_by": user.email ?? "",
@@ -138,7 +134,7 @@ class InventoryController extends GetxController {
         Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
 
         final inventory = InventoryModel(
-          //id: doc.id,
+          id: doc.id,
           title: data['title'] ?? '',
           description: data['description'] ?? '',
           revisionNumber: data['revisionNumber'] ?? '',
