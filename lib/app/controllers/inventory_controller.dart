@@ -5,6 +5,7 @@ import 'package:hive/hive.dart';
 import 'package:inventoryplatform/app/data/models/inventory_model.dart';
 import 'package:inventoryplatform/app/services/auth_service.dart';
 import 'package:inventoryplatform/app/ui/device/forms/inventory_form.dart';
+import 'package:inventoryplatform/app/ui/device/theme/custom_bd_dialogs.dart';
 
 class InventoryController extends GetxController {
   final TextEditingController titleController = TextEditingController();
@@ -15,11 +16,10 @@ class InventoryController extends GetxController {
   final isLoading = false.obs;
   late String hiveInventoryId;
 
-
   // Variável reativa para armazenar os inventários
   final RxList<InventoryModel> inventories = <InventoryModel>[].obs;
 
-    @override
+  @override
   void onInit() {
     super.onInit();
     fetchAndSaveAllInventories(); // Chama a função ao inicializar o controlador
@@ -78,8 +78,56 @@ class InventoryController extends GetxController {
   Future<void> saveInventory(BuildContext context) async {
     isLoading.value = true;
     var user = _authService.currentUser;
-    await saveInventoryToHive(user, context);
-    await saveInventoryToFirestore(user);
+    bool firestoreSuccess = false;
+    bool hiveSuccess = false;
+    CustomDialogs.showLoadingDialog(
+        "Carregando informações para o banco local...");
+
+    try {
+      await Future.delayed(
+          const Duration(seconds: 2)); // Garante 2 segundos de exibição
+      await saveInventoryToHive(user, context);
+      hiveSuccess = true;
+      CustomDialogs.closeDialog(); // Fecha o pop-up anterior
+      CustomDialogs.showSuccessDialog("Dados salvos localmente com sucesso!");
+      await Future.delayed(const Duration(seconds: 2));
+    } catch (e) {
+      CustomDialogs.closeDialog(); // Fecha o pop-up anterior
+      CustomDialogs.showErrorDialog("Erro ao enviar para o banco local!");
+      await Future.delayed(const Duration(seconds: 2));
+    }
+    // Exibe o pop-up inicial com barra de progresso
+    CustomDialogs.showLoadingDialog(
+        "Carregando informações para o banco online...");
+    try {
+      await Future.delayed(
+          const Duration(seconds: 2)); // Garante 2 segundos de exibição
+      await saveInventoryToFirestore(user);
+      firestoreSuccess = true;
+      CustomDialogs.closeDialog(); // Fecha o pop-up anterior
+      CustomDialogs.showSuccessDialog("Dados salvos online com sucesso!");
+      await Future.delayed(const Duration(seconds: 2));
+    } catch (e) {
+      CustomDialogs.closeDialog(); // Fecha o pop-up anterior
+      CustomDialogs.showErrorDialog("Erro ao enviar para o banco online!");
+      await Future.delayed(const Duration(seconds: 2));
+    }
+    // Exibe o resultado final
+    CustomDialogs.closeDialog(); // Fecha o pop-up anterior
+    if (firestoreSuccess && hiveSuccess) {
+      CustomDialogs.showSuccessDialog("Dados enviados com sucesso!");
+    } else if (firestoreSuccess || hiveSuccess) {
+      CustomDialogs.showInfoDialog(
+        firestoreSuccess
+            ? "Apenas os dados do banco online foram enviados!"
+            : "Apenas os dados do banco local foram enviados!",
+      );
+    } else {
+      CustomDialogs.showErrorDialog("Erro ao enviar os dados!");
+    }
+
+    await Future.delayed(const Duration(seconds: 2));
+    CustomDialogs.closeDialog();
     clearFields();
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
@@ -146,7 +194,8 @@ class InventoryController extends GetxController {
         await box.put(doc.id, inventory);
       }
 
-      print("Todos os inventários foram buscados do Firestore e salvos no Hive com sucesso!");
+      print(
+          "Todos os inventários foram buscados do Firestore e salvos no Hive com sucesso!");
     } catch (e) {
       print("Erro ao buscar e salvar inventários: $e");
     }

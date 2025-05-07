@@ -12,6 +12,7 @@ import 'package:inventoryplatform/app/data/models/material_model.dart';
 import 'package:inventoryplatform/app/services/auth_service.dart';
 import 'package:inventoryplatform/app/ui/device/forms/material_form.dart';
 import 'package:inventoryplatform/app/ui/device/pages/material_details_page.dart';
+import 'package:inventoryplatform/app/ui/device/theme/custom_bd_dialogs.dart';
 
 class MaterialController extends GetxController {
   //final _panelController = Get.find<PanelController>();
@@ -26,7 +27,6 @@ class MaterialController extends GetxController {
   final AuthService _authService = Get.find<AuthService>();
   final ImageController _imageController = Get.find<ImageController>();
 
-
   final ImagePicker picker = ImagePicker();
 
   final List<String> images = [];
@@ -34,10 +34,9 @@ class MaterialController extends GetxController {
   Rx<File?> image = Rx<File?>(null);
   late String hiveMaterialId;
 
-
   var isLoading = false.obs;
 
-    @override
+  @override
   void onInit() {
     super.onInit();
     fetchAndSaveAllMaterials(); // Chama a função ao inicializar o controlador
@@ -69,47 +68,47 @@ class MaterialController extends GetxController {
   }
 
   Future<void> addImage(BuildContext context) async {
-  if (images.length < 3) {
-    final ImageSource? source = await showDialog<ImageSource>(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Escolha a origem da imagem'),
-          actions: <Widget>[
-            IconButton(
-              icon: const Icon(Icons.camera_alt),
-              onPressed: () {
-                Navigator.pop(context, ImageSource.camera);
-              },
-              tooltip: 'Câmera',
-            ),
-            IconButton(
-              icon: const Icon(Icons.photo_library),
-              onPressed: () {
-                Navigator.pop(context, ImageSource.gallery);
-              },
-              tooltip: 'Galeria',
-            ),
-          ],
-        );
-      },
-    );
+    if (images.length < 3) {
+      final ImageSource? source = await showDialog<ImageSource>(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text('Escolha a origem da imagem'),
+            actions: <Widget>[
+              IconButton(
+                icon: const Icon(Icons.camera_alt),
+                onPressed: () {
+                  Navigator.pop(context, ImageSource.camera);
+                },
+                tooltip: 'Câmera',
+              ),
+              IconButton(
+                icon: const Icon(Icons.photo_library),
+                onPressed: () {
+                  Navigator.pop(context, ImageSource.gallery);
+                },
+                tooltip: 'Galeria',
+              ),
+            ],
+          );
+        },
+      );
 
-    if (source != null) {
-      final XFile? pickedFile = await picker.pickImage(source: source);
-      if (pickedFile != null) {
-        final File image = File(pickedFile.path);
-        images.add(image.path);
-        imagesList.add(image);
-        update();
+      if (source != null) {
+        final XFile? pickedFile = await picker.pickImage(source: source);
+        if (pickedFile != null) {
+          final File image = File(pickedFile.path);
+          images.add(image.path);
+          imagesList.add(image);
+          update();
+        }
       }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Máximo de 3 imagens atingido.')),
+      );
     }
-  } else {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Máximo de 3 imagens atingido.')),
-    );
   }
-}
 
   Future<dynamic> checkMaterial(String tag) async {
     var box = await Hive.openBox<MaterialModel>('materials');
@@ -131,51 +130,55 @@ class MaterialController extends GetxController {
     return material;
   }
 
-  Future<void> saveMaterialToFirestore(var user, String geolocationStr, String inventoryId) async {
-  try {
-    List<String> imagens = await _imageController.convertImagesToBase64(imagesList);
+  Future<void> saveMaterialToFirestore(
+      var user, String geolocationStr, String inventoryId) async {
+    try {
+      List<String> imagens =
+          await _imageController.convertImagesToBase64(imagesList);
 
-    // Garantir que a lista tenha pelo menos 3 imagens
-    while (imagens.length < 3) {
-      imagens.add(""); // Adiciona strings vazias para evitar erros
+      // Garantir que a lista tenha pelo menos 3 imagens
+      while (imagens.length < 3) {
+        imagens.add(""); // Adiciona strings vazias para evitar erros
+      }
+
+      CollectionReference materials =
+          FirebaseFirestore.instance.collection('materials');
+      DocumentReference inventoryReference =
+          FirebaseFirestore.instance.collection('inventories').doc(inventoryId);
+
+      Map<String, dynamic> data = {
+        "tag": tagController.text.trim(),
+        "description": descriptionController.text.trim(),
+        "name": nameController.text.trim(),
+        "geolocation": geolocationStr,
+        "observations": observationsController.text.trim(),
+        "inventory Id": inventoryId,
+        "reports": {
+          "created_at": FieldValue.serverTimestamp(),
+          "created_by": user.email ?? "",
+          "updated_at": "",
+          "updated_by": "",
+        },
+        "images": {
+          "image1": imagens[0],
+          "image2": imagens[1],
+          "image3": imagens[2],
+        },
+        "active": true,
+      };
+
+      await materials.doc(hiveMaterialId).set(data);
+      await inventoryReference
+          .collection('materials')
+          .doc(hiveMaterialId)
+          .set(data);
+
+      print("Material salvo no Firestore com sucesso!");
+    } catch (e) {
+      print("Erro ao salvar material: $e");
     }
-
-    CollectionReference materials =
-        FirebaseFirestore.instance.collection('materials');
-    DocumentReference inventoryReference = FirebaseFirestore.instance.collection('inventories').doc(inventoryId);
-
-    Map<String, dynamic> data = {
-      "tag": tagController.text.trim(),
-      "description": descriptionController.text.trim(),
-      "name": nameController.text.trim(),
-      "geolocation": geolocationStr,
-      "observations": observationsController.text.trim(),
-      "inventory Id": inventoryId,
-      "reports": {
-        "created_at": FieldValue.serverTimestamp(),
-        "created_by": user.email ?? "",
-        "updated_at": "",
-        "updated_by": "",
-      },
-      "images": {
-        "image1": imagens[0],
-        "image2": imagens[1],
-        "image3": imagens[2],
-      },
-      "active": true,
-    };
-
-    await materials.doc(hiveMaterialId).set(data);
-    await inventoryReference.collection('materials').doc(hiveMaterialId).set(data);
-
-    print("Material salvo no Firestore com sucesso!");
-  } catch (e) {
-    print("Erro ao salvar material: $e");
   }
-}
-  Future<void> saveMaterialTempToFirestore(var user, String geolocationStr, String inventoryId) async {
-    
-  }
+
   Future<void> saveMaterialToHive(var user, String geolocationStr,
       String inventorieId, BuildContext context) async {
     try {
@@ -205,14 +208,56 @@ class MaterialController extends GetxController {
   }
 
   // Função para salvar os dados
-  Future<void> saveMaterial( BuildContext context, String geolocationStr, String inventoryId) async {
-   var user = _authService.currentUser;
-   await saveMaterialToHive(user, geolocationStr, inventoryId, context);
+  Future<void> saveMaterial(
+      BuildContext context, String geolocationStr, String inventoryId) async {
+    var user = _authService.currentUser;
+    bool firestoreSuccess = false;
+    bool hiveSuccess = false;
+    CustomDialogs.showLoadingDialog(
+        "Carregando informações para o banco local...");
+
+try {
+      await Future.delayed(const Duration(seconds: 2)); // Garante 2 segundos de exibição
+    await saveMaterialToHive(user, geolocationStr, inventoryId, context);
+      hiveSuccess = true;
+      CustomDialogs.closeDialog(); // Fecha o pop-up anterior
+      CustomDialogs.showSuccessDialog("Dados salvos localmente com sucesso!");
+      await Future.delayed(const Duration(seconds: 2));
+    } catch (e) {
+      CustomDialogs.closeDialog(); // Fecha o pop-up anterior
+      CustomDialogs.showErrorDialog("Erro ao enviar para o banco local!");
+      await Future.delayed(const Duration(seconds: 2));
+    }
+    // Exibe o pop-up inicial com barra de progresso
+    CustomDialogs.showLoadingDialog("Carregando informações para o banco online...");
+    try {
+      await Future.delayed(const Duration(seconds: 2)); // Garante 2 segundos de exibição
     await saveMaterialToFirestore(user, geolocationStr, inventoryId);
-    
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("material adicionado com sucesso!")),
-    );
+      firestoreSuccess = true;
+      CustomDialogs.closeDialog(); // Fecha o pop-up anterior
+      CustomDialogs.showSuccessDialog("Dados salvos online com sucesso!");
+      await Future.delayed(const Duration(seconds: 2));
+    } catch (e) {
+      CustomDialogs.closeDialog(); // Fecha o pop-up anterior
+      CustomDialogs.showErrorDialog("Erro ao enviar para o banco online!");
+      await Future.delayed(const Duration(seconds: 2));
+    }
+    // Exibe o resultado final
+    CustomDialogs.closeDialog(); // Fecha o pop-up anterior
+    if (firestoreSuccess && hiveSuccess) {
+      CustomDialogs.showSuccessDialog("Dados enviados com sucesso!");
+    } else if (firestoreSuccess || hiveSuccess) {
+      CustomDialogs.showInfoDialog(
+        firestoreSuccess
+            ? "Apenas os dados do banco online foram enviados!"
+            : "Apenas os dados do banco local foram enviados!",
+      );
+    } else {
+      CustomDialogs.showErrorDialog("Erro ao enviar os dados!");
+    }
+
+    await Future.delayed(const Duration(seconds: 2));
+    CustomDialogs.closeDialog(); // Fecha o pop-up final
   }
 
   List<MaterialModel> getMaterials() {
@@ -253,50 +298,51 @@ class MaterialController extends GetxController {
   }
 
   Future<void> fetchAndSaveAllMaterials() async {
-  try {
-    // Referência à coleção de materiais no Firestore
-    CollectionReference materials =
-        FirebaseFirestore.instance.collection('materials');
+    try {
+      // Referência à coleção de materiais no Firestore
+      CollectionReference materials =
+          FirebaseFirestore.instance.collection('materials');
 
-    // Busca todos os documentos da coleção
-    QuerySnapshot querySnapshot = await materials.get();
+      // Busca todos os documentos da coleção
+      QuerySnapshot querySnapshot = await materials.get();
 
-    // Referência ao box do Hive
-    final box = Hive.box<MaterialModel>('materials');
+      // Referência ao box do Hive
+      final box = Hive.box<MaterialModel>('materials');
 
-    // Itera sobre os documentos e salva no Hive
-    for (var doc in querySnapshot.docs) {
-      Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-      List<String> allimages = [];
-      allimages.add(data['images']['image1']);
-      allimages.add(data['images']['image2']);
-      allimages.add(data['images']['image3']);
+      // Itera sobre os documentos e salva no Hive
+      for (var doc in querySnapshot.docs) {
+        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+        List<String> allimages = [];
+        allimages.add(data['images']['image1']);
+        allimages.add(data['images']['image2']);
+        allimages.add(data['images']['image3']);
 
-       List<String> imagens =
+        List<String> imagens =
             (await _imageController.convertBase64ToImages(allimages));
-      final material = MaterialModel(
-       id: doc.id,
-        name: data['name'] ?? '',
-        tag: data['tag'] ?? '',
-        createdBy: data['reports']?['created_by'] ?? '',
-        description: data['description'] ?? '',
-        geolocation: data['geolocation'] ?? '',
-        observations: data['observations'] ?? '',
-        inventoryId: data['inventory']?['inventory Id'] ?? '',
-        imagePaths: [
-          imagens[0],
-          imagens[1],
-          imagens[2],
-        ],
-      );
+        final material = MaterialModel(
+          id: doc.id,
+          name: data['name'] ?? '',
+          tag: data['tag'] ?? '',
+          createdBy: data['reports']?['created_by'] ?? '',
+          description: data['description'] ?? '',
+          geolocation: data['geolocation'] ?? '',
+          observations: data['observations'] ?? '',
+          inventoryId: data['inventory']?['inventory Id'] ?? '',
+          imagePaths: [
+            imagens[0],
+            imagens[1],
+            imagens[2],
+          ],
+        );
 
-      // Salva no Hive usando o ID como chave
-      await box.put(doc.id, material);
+        // Salva no Hive usando o ID como chave
+        await box.put(doc.id, material);
+      }
+
+      print(
+          "Todos os materiais foram buscados do Firestore e salvos no Hive com sucesso!");
+    } catch (e) {
+      print("Erro ao buscar e salvar materiais: $e");
     }
-
-    print("Todos os materiais foram buscados do Firestore e salvos no Hive com sucesso!");
-  } catch (e) {
-    print("Erro ao buscar e salvar materiais: $e");
   }
-}
 }
