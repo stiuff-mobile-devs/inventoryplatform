@@ -3,43 +3,31 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hive/hive.dart';
 import 'package:inventoryplatform/app/controllers/department_controller.dart';
 import 'package:inventoryplatform/app/controllers/inventory_controller.dart';
-import 'package:inventoryplatform/app/data/models/sync_table_model.dart';
+import 'package:inventoryplatform/app/controllers/material_controller.dart';
+import 'package:inventoryplatform/app/data/models/department_model.dart';
+import 'package:inventoryplatform/app/data/models/inventory_model.dart';
+import 'package:inventoryplatform/app/services/connection_service.dart';
 
 class SyncController extends GetxController {
-  final DepartmentController departmentController = DepartmentController();
-  final InventoryController inventoryController = InventoryController();
+  final departmentController = Get.find<DepartmentController>();
+  final inventoryController = Get.find<InventoryController>();
+  final materialController = Get.find<MaterialController>();
+
+  final ConnectionService connectionService = ConnectionService();
 
   @override
   void onInit() {
     super.onInit();
-    syncRemoteToLocal();
-    //_syncLocalToRemote();
+    _syncRemoteToLocal();
+    _syncLocalToRemote();
   }
 
-  void _syncLocalToRemote() async {
-    final box = Hive.box<SyncTableModel>('unsynchronized');
-
-    if (box.length > 0) {
-      for (var item in box.values) {
-        bool success = false;
-        switch (item.originTable) {
-          case "departments":
-            success = await syncDepartment(item.objectId);
-            break;
-
-          case "inventories":
-            success = await syncInventory(item.objectId);
-            break;
-        }
-
-        if (success) {
-          await box.delete(item.id);
-        }
-      }
+  // *********** FIREBASE PARA HIVE **************************
+  void _syncRemoteToLocal() async {
+    if (!(await connectionService.checkInternetConnection())) {
+      return;
     }
-  }
 
-  void syncRemoteToLocal() async {
     try {
       await _syncRemoteDepartments();
       await _syncRemoteInventories();
@@ -56,7 +44,7 @@ class SyncController extends GetxController {
       for (var doc in snapshot.docs) {
         if (doc.exists) {
           final dept = departmentController.getDepartmentById(doc.id);
-          final lastModifiedOnRemote = doc.data()['reports']['updated_at'].toDate();
+          final lastModifiedOnRemote = (doc.data()['reports']['updated_at']).toDate();
           if (dept != null && (dept.updated_at).isAfter(lastModifiedOnRemote)) {
             continue;
           } else {
@@ -75,7 +63,7 @@ class SyncController extends GetxController {
       for (var doc in snapshot.docs) {
         if (doc.exists) {
           final inv = inventoryController.getInventoryById(doc.id);
-          final lastModifiedOnRemote = doc.data()['reports']['updated_at'].toDate();
+          final lastModifiedOnRemote = (doc.data()['reports']['updated_at']).toDate();
           if (inv != null && (inv.updated_at).isAfter(lastModifiedOnRemote)) {
             continue;
           } else {
@@ -86,37 +74,45 @@ class SyncController extends GetxController {
     });
   }
 
-  Future<void> saveToSyncTable(String origin, String id) async {
-    final box = Hive.box<SyncTableModel>('unsynchronized');
-    try {
-      final toSync = SyncTableModel(
-          originTable: origin,
-          objectId: id
-      );
+  // ***************** HIVE PARA FIREBASE ***********************
 
-      await box.put(toSync.id, toSync);
-    } catch (e) {
-      throw Exception(e.toString());
+  void _syncLocalToRemote() async {
+    if (!(await connectionService.checkInternetConnection())) {
+      return;
+    }
+
+    await _syncPendingDepartments();
+    await _syncPendingInventories();
+  }
+
+  Future<void> _syncPendingDepartments() async {
+    final box = Hive.box<DepartmentModel>('departments-pending');
+    if (box.length > 0) {
+      for (var item in box.values) {
+        try {
+          await departmentController.saveDepartmentToRemote(item);
+          await departmentController.saveDepartmentToLocal(item);
+          await box.delete(item.id);
+        } catch (e) {
+          throw Exception("Não foi possível sincronizar departamentos: $e");
+        }
+      }
     }
   }
 
-  Future<bool> syncDepartment(String deptId) async {
-    final department = departmentController.getDepartmentById(deptId);
-    if (department != null) {
-      await departmentController.saveDepartmentToRemote(department);
-      return true;
-    } else {
-      return false;
+  Future<void> _syncPendingInventories() async {
+    final box = Hive.box<InventoryModel>('inventories-pending');
+    if (box.length > 0) {
+      for (var item in box.values) {
+        try {
+          await inventoryController.saveInventoryToRemote(item);
+          await inventoryController.saveInventoryToLocal(item);
+          await box.delete(item.id);
+        } catch (e) {
+          throw Exception("Não foi possível sincronizar inventários: $e");
+        }
+      }
     }
   }
 
-  Future<bool> syncInventory(String invId) async {
-    final inventory = inventoryController.getInventoryById(invId);
-    if (inventory != null) {
-      await inventoryController.saveInventoryToRemote(inventory);
-      return true;
-    } else {
-      return false;
-    }
-  }
 }

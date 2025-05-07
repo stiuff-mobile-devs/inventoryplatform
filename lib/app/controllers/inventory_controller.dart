@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
-import 'package:inventoryplatform/app/controllers/sync_controller.dart';
 import 'package:inventoryplatform/app/data/models/inventory_model.dart';
 import 'package:inventoryplatform/app/services/auth_service.dart';
 import 'package:inventoryplatform/app/services/connection_service.dart';
@@ -11,7 +10,6 @@ import 'package:inventoryplatform/app/ui/device/forms/inventory_form.dart';
 class InventoryController extends GetxController {
   final ConnectionService connectionService = ConnectionService();
   final AuthService authService = AuthService();
-  late SyncController syncController;
 
   final TextEditingController titleController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
@@ -114,13 +112,12 @@ class InventoryController extends GetxController {
           departmentId: (context.widget as InventoryForm).cod,
           created_by: authService.currentUser!.uid
       );
-      _saveInventoryToLocal(inventory);
 
       if (await connectionService.checkInternetConnection()) {
         saveInventoryToRemote(inventory);
+        saveInventoryToLocal(inventory);
       } else {
-        syncController = Get.find<SyncController>();
-        syncController.saveToSyncTable("inventories", inventory.id);
+        _savePendingInventory(inventory);
       }
 
       clearFields();
@@ -140,8 +137,17 @@ class InventoryController extends GetxController {
     }
   }
 
-  Future<void> _saveInventoryToLocal(InventoryModel inventory) async {
+  Future<void> saveInventoryToLocal(InventoryModel inventory) async {
     final box = Hive.box<InventoryModel>('inventories');
+    try {
+      await box.put(inventory.id, inventory);
+    }  catch (e) {
+      throw Exception(e.toString());
+    }
+  }
+
+  Future<void> _savePendingInventory(InventoryModel inventory) async {
+    final box = Hive.box<InventoryModel>('inventories-pending');
     try {
       await box.put(inventory.id, inventory);
     }  catch (e) {
@@ -173,7 +179,6 @@ class InventoryController extends GetxController {
   }
 
   Future<void> saveExistingInventoryToLocal(String id, Map<String,dynamic> inv) async {
-    final box = Hive.box<InventoryModel>('inventories');
     final reports = inv['reports'];
 
     InventoryModel inventory = InventoryModel.existing(
@@ -189,7 +194,7 @@ class InventoryController extends GetxController {
       updated_by: reports['updated_by']
     );
 
-    _saveInventoryToLocal(inventory);
+    saveInventoryToLocal(inventory);
   }
 
   void loadInventories() {
