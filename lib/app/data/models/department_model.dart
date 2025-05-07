@@ -6,7 +6,7 @@ part 'department_model.g.dart';
 @HiveType(typeId: 0)
 class DepartmentModel extends HiveObject {
   @HiveField(0)
-  String id;
+  String? id;
 
   @HiveField(1)
   String title;
@@ -33,11 +33,12 @@ class DepartmentModel extends HiveObject {
   bool active = true;
 
   DepartmentModel({
+    String? id, // Torna o ID opcional
     required this.title,
     required this.description,
     this.imagePath,
     required this.createdBy,
     this.updateBy,
     this.updateAt,
-  }) : id = Uuid().v4(); // Generate a unique ID
+  }) : id = id ?? Uuid().v4(); // Gera um ID automaticamente se não for fornecido
 }

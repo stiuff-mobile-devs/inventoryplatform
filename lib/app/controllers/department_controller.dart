@@ -21,6 +21,7 @@ class DepartmentController extends GetxController {
 
   Rx<File?> image = Rx<File?>(null);
   var isLoading = false.obs;
+  late String hiveDepartmentId;
 
   @override
   void onInit() {
@@ -66,7 +67,7 @@ class DepartmentController extends GetxController {
         "active": true,
         "image_url": imagem[0],
       };
-      await departments.add(data);
+      await departments.doc(hiveDepartmentId).set(data);
       print("Departamento salvo no Firestore com sucesso!");
     } catch (e) {
       print("Erro ao salvar departamento: $e");
@@ -82,7 +83,8 @@ class DepartmentController extends GetxController {
         imagePath: image.value?.path,
         createdBy: user.email ?? "",
       );
-      await box.add(department);
+      await box.add(department); 
+      hiveDepartmentId = department.id!; // Armazena o ID do departamento
       print("Departamento salvo no Hive com sucesso!");
     } catch (e) {
       print(e.toString());
@@ -102,26 +104,10 @@ class DepartmentController extends GetxController {
       image.value = tempFile;
     }
 
-    // Exibe o pop-up inicial com barra de progresso
-    CustomDialogs.showLoadingDialog("Carregando informações para o banco online...");
-
     bool firestoreSuccess = false;
     bool hiveSuccess = false;
 
-    try {
-      await Future.delayed(const Duration(seconds: 2)); // Garante 2 segundos de exibição
-      await saveDepartmentToFirestore(user);
-      firestoreSuccess = true;
-      CustomDialogs.closeDialog(); // Fecha o pop-up anterior
-      CustomDialogs.showSuccessDialog("Dados salvos online com sucesso!");
-      await Future.delayed(const Duration(seconds: 2));
-    } catch (e) {
-      CustomDialogs.closeDialog(); // Fecha o pop-up anterior
-      CustomDialogs.showErrorDialog("Erro ao enviar para o banco online!");
-      await Future.delayed(const Duration(seconds: 2));
-    }
-      CustomDialogs.showLoadingDialog("Carregando informações para o banco local...");
-
+    CustomDialogs.showLoadingDialog("Carregando informações para o banco local...");
     try {
       await Future.delayed(const Duration(seconds: 2)); // Garante 2 segundos de exibição
       await saveDepartmentToHive(user);
@@ -134,7 +120,20 @@ class DepartmentController extends GetxController {
       CustomDialogs.showErrorDialog("Erro ao enviar para o banco local!");
       await Future.delayed(const Duration(seconds: 2));
     }
-
+    // Exibe o pop-up inicial com barra de progresso
+    CustomDialogs.showLoadingDialog("Carregando informações para o banco online...");
+    try {
+      await Future.delayed(const Duration(seconds: 2)); // Garante 2 segundos de exibição
+      await saveDepartmentToFirestore(user);
+      firestoreSuccess = true;
+      CustomDialogs.closeDialog(); // Fecha o pop-up anterior
+      CustomDialogs.showSuccessDialog("Dados salvos online com sucesso!");
+      await Future.delayed(const Duration(seconds: 2));
+    } catch (e) {
+      CustomDialogs.closeDialog(); // Fecha o pop-up anterior
+      CustomDialogs.showErrorDialog("Erro ao enviar para o banco online!");
+      await Future.delayed(const Duration(seconds: 2));
+    }
     // Exibe o resultado final
     CustomDialogs.closeDialog(); // Fecha o pop-up anterior
     if (firestoreSuccess && hiveSuccess) {
@@ -175,7 +174,7 @@ class DepartmentController extends GetxController {
         List<String> imagem =
             (await _imageController.convertBase64ToImages([data['image_url']]));
         final department = DepartmentModel(
-          // id: doc.id,
+          id: doc.id,
           title: data['title'] ?? '',
           description: data['description'] ?? '',
           imagePath: imagem[0],
@@ -183,7 +182,7 @@ class DepartmentController extends GetxController {
         );
 
         // Salva no Hive usando o ID como chave
-        await box.put(doc.id, department);
+        await box.put(doc.id, department); //Salva ou atualiza o departamento
       }
 
       // Fecha o diálogo após o carregamento

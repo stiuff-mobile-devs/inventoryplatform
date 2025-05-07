@@ -160,7 +160,7 @@ class _InventoryPageState extends State<InventoryPage> {
               onPressed: () async {
                 searchFocusNode.unfocus();
                 await Get.toNamed(Routes.INVENTORY,
-                    parameters: {'cod': organization!.id});
+                    parameters: {'cod': organization!.id!});
                 _inventoryController
                     .loadInventories(); // Atualiza a lista ao retornar
               },

@@ -83,7 +83,7 @@ class _DashboardPageState extends State<DashboardPage> {
                       ],
                     ),
                   ),
-                  _buildOrganizationContainer(department.title, department.id),
+                  _buildOrganizationContainer(department.title, department.id!),
                 ],
               ),
             ),

@@ -13,6 +13,8 @@ class InventoryController extends GetxController {
   final AuthService _authService = Get.find<AuthService>();
 
   final isLoading = false.obs;
+  late String hiveInventoryId;
+
 
   // Variável reativa para armazenar os inventários
   final RxList<InventoryModel> inventories = <InventoryModel>[].obs;
@@ -50,7 +52,7 @@ class InventoryController extends GetxController {
         },
         "active": true,
       };
-      await inventories.add(data);
+      await inventories.doc(hiveInventoryId).set(data);
       print("Inventário salvo no Firestore com sucesso!");
     } catch (e) {
       print("Erro ao salvar Inventário: $e");
@@ -68,6 +70,7 @@ class InventoryController extends GetxController {
         createdBy: user.email ?? "",
       );
       await box.add(department);
+      hiveInventoryId = department.id;
     } catch (e) {
       print(e.toString());
       ScaffoldMessenger.of(context).showSnackBar(
@@ -79,8 +82,8 @@ class InventoryController extends GetxController {
   Future<void> saveInventory(BuildContext context) async {
     isLoading.value = true;
     var user = _authService.currentUser;
-    await saveInventoryToFirestore(user);
     await saveInventoryToHive(user, context);
+    await saveInventoryToFirestore(user);
     clearFields();
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
