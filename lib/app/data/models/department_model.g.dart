@@ -19,14 +19,14 @@ class DepartmentModelAdapter extends TypeAdapter<DepartmentModel> {
     return DepartmentModel(
       title: fields[1] as String,
       description: fields[2] as String,
+      created_by: fields[7] as String,
       imagePath: fields[3] as String?,
-      createdBy: fields[5] as String,
-      updateBy: fields[6] as String?,
-      updateAt: fields[7] as String?,
     )
       ..id = fields[0] as String
-      ..createdAt = fields[4] as DateTime
-      ..active = fields[8] as bool;
+      ..active = fields[4] as bool
+      ..created_at = fields[5] as DateTime
+      ..updated_at = fields[6] as DateTime
+      ..updated_by = fields[8] as String;
   }
 
   @override
@@ -42,15 +42,15 @@ class DepartmentModelAdapter extends TypeAdapter<DepartmentModel> {
       ..writeByte(3)
       ..write(obj.imagePath)
       ..writeByte(4)
-      ..write(obj.createdAt)
+      ..write(obj.active)
       ..writeByte(5)
-      ..write(obj.createdBy)
+      ..write(obj.created_at)
       ..writeByte(6)
-      ..write(obj.updateBy)
+      ..write(obj.updated_at)
       ..writeByte(7)
-      ..write(obj.updateAt)
+      ..write(obj.created_by)
       ..writeByte(8)
-      ..write(obj.active);
+      ..write(obj.updated_by);
   }
 
   @override

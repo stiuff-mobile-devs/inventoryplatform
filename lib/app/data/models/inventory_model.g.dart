@@ -20,14 +20,14 @@ class InventoryModelAdapter extends TypeAdapter<InventoryModel> {
       title: fields[1] as String,
       description: fields[2] as String,
       revisionNumber: fields[3] as String,
-      departmentId: fields[7] as String,
-      createdBy: fields[8] as String,
-      updatedBy: fields[9] as String?,
-      updatedAt: fields[5] as DateTime?,
+      departmentId: fields[5] as String,
+      created_by: fields[8] as String,
     )
       ..id = fields[0] as String
-      ..createdAt = fields[4] as DateTime
-      ..active = fields[6] as bool;
+      ..active = fields[4] as bool
+      ..created_at = fields[6] as DateTime
+      ..updated_at = fields[7] as DateTime
+      ..updated_by = fields[9] as String;
   }
 
   @override
@@ -43,17 +43,17 @@ class InventoryModelAdapter extends TypeAdapter<InventoryModel> {
       ..writeByte(3)
       ..write(obj.revisionNumber)
       ..writeByte(4)
-      ..write(obj.createdAt)
-      ..writeByte(5)
-      ..write(obj.updatedAt)
-      ..writeByte(6)
       ..write(obj.active)
-      ..writeByte(7)
+      ..writeByte(5)
       ..write(obj.departmentId)
+      ..writeByte(6)
+      ..write(obj.created_at)
+      ..writeByte(7)
+      ..write(obj.updated_at)
       ..writeByte(8)
-      ..write(obj.createdBy)
+      ..write(obj.created_by)
       ..writeByte(9)
-      ..write(obj.updatedBy);
+      ..write(obj.updated_by);
   }
 
   @override

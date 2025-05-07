@@ -4,26 +4,21 @@ import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:inventoryplatform/app/data/models/inventory_model.dart';
 import 'package:inventoryplatform/app/services/auth_service.dart';
+import 'package:inventoryplatform/app/services/connection_service.dart';
 import 'package:inventoryplatform/app/ui/device/forms/inventory_form.dart';
-import 'package:inventoryplatform/app/ui/device/theme/custom_bd_dialogs.dart';
 
 class InventoryController extends GetxController {
+  final ConnectionService connectionService = ConnectionService();
+  final AuthService authService = AuthService();
+
   final TextEditingController titleController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
   final TextEditingController revisionController = TextEditingController();
-  final AuthService _authService = Get.find<AuthService>();
 
   final isLoading = false.obs;
-  late String hiveInventoryId;
 
   // Variável reativa para armazenar os inventários
-  final RxList<InventoryModel> inventories = <InventoryModel>[].obs;
-
-  @override
-  void onInit() {
-    super.onInit();
-    fetchAndSaveAllInventories(); // Chama a função ao inicializar o controlador
-  }
+  final RxList<InventoryModel> inventories= <InventoryModel>[].obs;
 
   void clearFields() {
     titleController.clear();
@@ -31,111 +26,175 @@ class InventoryController extends GetxController {
     revisionController.clear();
   }
 
-  Future<void> saveInventoryToFirestore(var user) async {
+  Future<void> saveInventory(BuildContext context) async {
+    if (titleController.text.isEmpty || revisionController.text.isEmpty) {
+      Get.snackbar("Erro", "Preencha o campo título e número de revisão.");
+      return;
+    }
+
+    isLoading.value = true;
     try {
-      CollectionReference inventories =
-          FirebaseFirestore.instance.collection('inventories');
-      Map<String, dynamic> data = {
+/* // Segurança firebase
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user == null) {
+        Get.snackbar("Erro", "Usuário não autenticado.");
+        isLoading.value = false;
+        return;
+      }
+
+      String departmentId = (context.widget as InventoryForm).cod;
+
+      DocumentReference departmentRef = FirebaseFirestore.instance
+          .collection("departments")
+          .doc(departmentId);
+
+      DocumentReference newInventoryRef = await departmentRef.collection("inventories").add({
         "title": titleController.text.trim(),
         "description": descriptionController.text.trim(),
-        "revisionNumber": revisionController.text.trim(),
-        "departmentId": null,
-        "reports": {
-          "created_at": FieldValue.serverTimestamp(),
-          "created_by": user.email ?? "",
-          "updated_at": "",
-          "updated_by": "",
-        },
-        "active": true,
-      };
-      await inventories.doc(hiveInventoryId).set(data);
-      print("Inventário salvo no Firestore com sucesso!");
-    } catch (e) {
-      print("Erro ao salvar Inventário: $e");
-    }
-  }
+        "revision_number": revisionController.text.trim(),
+        "created_at": FieldValue.serverTimestamp(),
+        "created_by": user.uid,
+      });
 
-  Future<void> saveInventoryToHive(var user, BuildContext context) async {
-    try {
-      final box = Hive.box<InventoryModel>('inventories');
-      final department = InventoryModel(
+      // Adiciona o inventário criado à lista listedItems do PanelController
+      InventoryModel newInventory = InventoryModel(
+        id: newInventoryRef.id,
         title: titleController.text.trim(),
         description: descriptionController.text.trim(),
         revisionNumber: revisionController.text.trim(),
-        departmentId: (context.widget as InventoryForm).cod,
-        createdBy: user.email ?? "",
+        createdAt: DateTime.now(),
+        isActive: 1,
       );
-      await box.add(department);
-      hiveInventoryId = department.id;
+      _panelController.listedItems.add(newInventory);
+
+      // Salva o inventário no banco de dados local
+      await _dbHelper.insert('inventories', newInventory.toMap());*/
+     /* // Segurança firebase
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user == null) {
+        Get.snackbar("Erro", "Usuário não autenticado.");
+        isLoading.value = false;
+        return;
+      }
+
+      String departmentId = (context.widget as InventoryForm).cod;
+
+      DocumentReference departmentRef = FirebaseFirestore.instance
+          .collection("departments")
+          .doc(departmentId);
+
+      DocumentReference newInventoryRef = await departmentRef.collection("inventories").add({
+        "title": titleController.text.trim(),
+        "description": descriptionController.text.trim(),
+        "revision_number": revisionController.text.trim(),
+        "created_at": FieldValue.serverTimestamp(),
+        "created_by": user.uid,
+      });
+
+      // Adiciona o inventário criado à lista listedItems do PanelController
+      InventoryModel newInventory = InventoryModel(
+        id: newInventoryRef.id,
+        title: titleController.text.trim(),
+        description: descriptionController.text.trim(),
+        revisionNumber: revisionController.text.trim(),
+        createdAt: DateTime.now(),
+        isActive: 1,
+      );
+      _panelController.listedItems.add(newInventory);
+
+      // Salva o inventário no banco de dados local
+      await _dbHelper.insert('inventories', newInventory.toMap());*/
+
+      final inventory = InventoryModel(
+          title: titleController.text.trim(),
+          description: descriptionController.text.trim(),
+          revisionNumber: revisionController.text.trim(),
+          departmentId: (context.widget as InventoryForm).cod,
+          created_by: authService.currentUser!.uid
+      );
+
+      if (await connectionService.checkInternetConnection()) {
+        saveInventoryToRemote(inventory);
+        saveInventoryToLocal(inventory);
+      } else {
+        _savePendingInventory(inventory);
+      }
+
+      clearFields();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Sucesso, inventário criado com sucesso!"),
+        ),
+      );
+      Navigator.pop(context);
     } catch (e) {
       print(e.toString());
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Erro ao salvar inventário: $e")),
       );
+    } finally {
+      isLoading.value = false;
     }
   }
 
-  Future<void> saveInventory(BuildContext context) async {
-    isLoading.value = true;
-    var user = _authService.currentUser;
-    bool firestoreSuccess = false;
-    bool hiveSuccess = false;
-    CustomDialogs.showLoadingDialog(
-        "Carregando informações para o banco local...");
-
+  Future<void> saveInventoryToLocal(InventoryModel inventory) async {
+    final box = Hive.box<InventoryModel>('inventories');
     try {
-      await Future.delayed(
-          const Duration(seconds: 2)); // Garante 2 segundos de exibição
-      await saveInventoryToHive(user, context);
-      hiveSuccess = true;
-      CustomDialogs.closeDialog(); // Fecha o pop-up anterior
-      CustomDialogs.showSuccessDialog("Dados salvos localmente com sucesso!");
-      await Future.delayed(const Duration(seconds: 2));
-    } catch (e) {
-      CustomDialogs.closeDialog(); // Fecha o pop-up anterior
-      CustomDialogs.showErrorDialog("Erro ao enviar para o banco local!");
-      await Future.delayed(const Duration(seconds: 2));
+      await box.put(inventory.id, inventory);
+    }  catch (e) {
+      throw Exception(e.toString());
     }
-    // Exibe o pop-up inicial com barra de progresso
-    CustomDialogs.showLoadingDialog(
-        "Carregando informações para o banco online...");
-    try {
-      await Future.delayed(
-          const Duration(seconds: 2)); // Garante 2 segundos de exibição
-      await saveInventoryToFirestore(user);
-      firestoreSuccess = true;
-      CustomDialogs.closeDialog(); // Fecha o pop-up anterior
-      CustomDialogs.showSuccessDialog("Dados salvos online com sucesso!");
-      await Future.delayed(const Duration(seconds: 2));
-    } catch (e) {
-      CustomDialogs.closeDialog(); // Fecha o pop-up anterior
-      CustomDialogs.showErrorDialog("Erro ao enviar para o banco online!");
-      await Future.delayed(const Duration(seconds: 2));
-    }
-    // Exibe o resultado final
-    CustomDialogs.closeDialog(); // Fecha o pop-up anterior
-    if (firestoreSuccess && hiveSuccess) {
-      CustomDialogs.showSuccessDialog("Dados enviados com sucesso!");
-    } else if (firestoreSuccess || hiveSuccess) {
-      CustomDialogs.showInfoDialog(
-        firestoreSuccess
-            ? "Apenas os dados do banco online foram enviados!"
-            : "Apenas os dados do banco local foram enviados!",
-      );
-    } else {
-      CustomDialogs.showErrorDialog("Erro ao enviar os dados!");
-    }
+  }
 
-    await Future.delayed(const Duration(seconds: 2));
-    CustomDialogs.closeDialog();
-    clearFields();
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text("Sucesso, inventário criado com sucesso!"),
-      ),
+  Future<void> _savePendingInventory(InventoryModel inventory) async {
+    final box = Hive.box<InventoryModel>('inventories-pending');
+    try {
+      await box.put(inventory.id, inventory);
+    }  catch (e) {
+      throw Exception(e.toString());
+    }
+  }
+
+  Future<void> saveInventoryToRemote(InventoryModel inventory) async {
+    try {
+      await FirebaseFirestore.instance
+        .collection("inventories")
+        .doc(inventory.id)
+        .set({
+          "title": inventory.title,
+          "description": inventory.description,
+          "revisionNumber": inventory.revisionNumber,
+          "departmentId": inventory.departmentId,
+          "active": inventory.active,
+          "reports": {
+            "created_at": inventory.created_at,
+            "updated_at": inventory.updated_at,
+            "created_by": inventory.created_by,
+            "updated_by": inventory.updated_by
+          }
+        });
+    } catch (e) {
+      throw Exception(e.toString());
+    }
+  }
+
+  Future<void> saveExistingInventoryToLocal(String id, Map<String,dynamic> inv) async {
+    final reports = inv['reports'];
+
+    InventoryModel inventory = InventoryModel.existing(
+      id: id,
+      title: inv['title'],
+      description: inv['description'],
+      revisionNumber: inv['revisionNumber'],
+      departmentId: inv['departmentId'],
+      active: inv['active'],
+      created_at: reports['created_at'].toDate(),
+      updated_at: reports['updated_at'].toDate(),
+      created_by: reports['created_by'],
+      updated_by: reports['updated_by']
     );
-    isLoading.value = false;
-    Navigator.pop(context);
+
+    saveInventoryToLocal(inventory);
   }
 
   void loadInventories() {
@@ -153,51 +212,22 @@ class InventoryController extends GetxController {
   }
 
   String? getInventoryTitleById(String id) {
+    final inv = getInventoryById(id);
+    if (inv != null) {
+      return inv.title;
+    }
+    return null;
+  }
+
+  InventoryModel? getInventoryById(String id) {
     final box = Hive.box<InventoryModel>('inventories');
     try {
       final inventory = box.values.firstWhere(
         (inv) => inv.id == id,
       );
-      return inventory.title;
+      return inventory;
     } catch (e) {
-      // Retorna null se nenhum departamento for encontrado
       return null;
-    }
-  }
-
-  Future<void> fetchAndSaveAllInventories() async {
-    try {
-      // Referência à coleção de inventários no Firestore
-      CollectionReference inventories =
-          FirebaseFirestore.instance.collection('inventories');
-
-      // Busca todos os documentos da coleção
-      QuerySnapshot querySnapshot = await inventories.get();
-
-      // Referência ao box do Hive
-      final box = Hive.box<InventoryModel>('inventories');
-
-      // Itera sobre os documentos e salva no Hive
-      for (var doc in querySnapshot.docs) {
-        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-
-        final inventory = InventoryModel(
-          id: doc.id,
-          title: data['title'] ?? '',
-          description: data['description'] ?? '',
-          revisionNumber: data['revisionNumber'] ?? '',
-          departmentId: data['departament']?['departmentId'] ?? '',
-          createdBy: data['reports']?['created_by'] ?? '',
-        );
-
-        // Salva no Hive usando o ID como chave
-        await box.put(doc.id, inventory);
-      }
-
-      print(
-          "Todos os inventários foram buscados do Firestore e salvos no Hive com sucesso!");
-    } catch (e) {
-      print("Erro ao buscar e salvar inventários: $e");
     }
   }
 }

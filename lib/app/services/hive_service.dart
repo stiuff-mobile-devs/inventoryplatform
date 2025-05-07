@@ -9,19 +9,17 @@ class HiveInitializer {
     print('Hive initialized');
 
     Hive.registerAdapter(DepartmentModelAdapter());
-    print('DepartmentsModelAdapter registered');
-
     Hive.registerAdapter(InventoryModelAdapter());
-    print('InventoriesModelAdapter registered');
-
     Hive.registerAdapter(MaterialModelAdapter());
 
+    // Tabelas
     await Hive.openBox<DepartmentModel>('departments');
-    print('Departments box opened');
-
     await Hive.openBox<InventoryModel>('inventories');
-    print('Inventories box opened');
-
     await Hive.openBox<MaterialModel>('materials');
+
+    // Tabelas temporárias
+    await Hive.openBox<DepartmentModel>('departments-pending');
+    await Hive.openBox<InventoryModel>('inventories-pending');
+    await Hive.openBox<MaterialModel>('materials-pending');
   }
 }

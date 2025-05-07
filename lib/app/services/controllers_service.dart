@@ -7,6 +7,7 @@ import 'package:inventoryplatform/app/controllers/inventory_controller.dart';
 import 'package:inventoryplatform/app/controllers/login_controller.dart';
 import 'package:inventoryplatform/app/controllers/material_controller.dart';
 import 'package:inventoryplatform/app/controllers/panel_controller.dart';
+import 'package:inventoryplatform/app/controllers/sync_controller.dart';
 import 'package:inventoryplatform/app/services/auth_service.dart';
 import 'package:inventoryplatform/app/services/error_service.dart';
 
@@ -22,5 +23,6 @@ class ControllerInitializer {
     Get.put(PanelController());
     Get.put(ErrorService());
     Get.put(LoginController());
+    Get.put(SyncController());
   }
 }
