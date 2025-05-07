@@ -55,7 +55,8 @@ class MaterialController extends GetxController {
     locationController.clear();
     observationsController.clear();
     image.value = null;
-    //images.clear();
+    images.clear();
+    imagesList.clear();
   }
 
   // Função para escolher ou capturar uma imagem
@@ -197,11 +198,12 @@ class MaterialController extends GetxController {
         );
         await box.add(material);
         hiveMaterialId = material.id;
+        print(material.imagePaths);
       } else {
         navigateToMaterialDetails(context, retornado);
       }
 
-      clearData();
+      
     } catch (e) {
       print(e.toString());
     }
@@ -258,6 +260,7 @@ try {
 
     await Future.delayed(const Duration(seconds: 2));
     CustomDialogs.closeDialog(); // Fecha o pop-up final
+    clearData();
   }
 
   List<MaterialModel> getMaterials() {
@@ -298,6 +301,7 @@ try {
   }
 
   Future<void> fetchAndSaveAllMaterials() async {
+    printMaterialImagePaths();
     try {
       // Referência à coleção de materiais no Firestore
       CollectionReference materials =
@@ -338,11 +342,21 @@ try {
         // Salva no Hive usando o ID como chave
         await box.put(doc.id, material);
       }
-
+  
       print(
           "Todos os materiais foram buscados do Firestore e salvos no Hive com sucesso!");
     } catch (e) {
       print("Erro ao buscar e salvar materiais: $e");
+    }
+  }
+
+  void printMaterialImagePaths() {
+    final box = Hive.box<MaterialModel>('materials');
+    final materials = box.values.toList();
+
+    for (var material in materials) {
+      print('Material: ${material.name}');
+      print('Image Paths: ${material.imagePaths}');
     }
   }
 }

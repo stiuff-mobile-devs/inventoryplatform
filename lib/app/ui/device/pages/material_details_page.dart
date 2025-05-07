@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:inventoryplatform/app/controllers/inventory_controller.dart';
+import 'package:inventoryplatform/app/controllers/material_controller.dart';
 import 'package:inventoryplatform/app/data/models/material_model.dart';
 
 class MaterialDetailsPage extends StatelessWidget {
@@ -11,6 +12,7 @@ class MaterialDetailsPage extends StatelessWidget {
 
   MaterialDetailsPage({Key? key, required this.material}) : super(key: key) {
     _inventoryController = Get.find<InventoryController>();
+  final MaterialController controller = Get.find<MaterialController>();
   }
 
   @override
@@ -72,6 +74,7 @@ class MaterialDetailsPage extends StatelessWidget {
                   )
                 : Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
+                    
                     children: [
                       Text(
                         'ID: ${material.id}',

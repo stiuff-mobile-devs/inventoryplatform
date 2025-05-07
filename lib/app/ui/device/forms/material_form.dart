@@ -125,11 +125,17 @@ class _MaterialFormState extends State<MaterialForm> {
                 controller: controller.tagController,
                 readOnly: false, // Impede edição
                 decoration: InputDecoration(
-                  labelText: "Código de Barras",
+                  labelText: "Código de Barras *",
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8.0),
                   ),
                 ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Código de Barras é obrigatório';
+                  }
+                  return null;
+                },
               ),
               const SizedBox(height: 10),
               TextFormField(
