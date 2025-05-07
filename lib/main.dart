@@ -24,13 +24,13 @@ Future<void> main() async {
        //Função temporaria
     // Abre as boxes do Hive
     await Hive.openBox<DepartmentModel>('departments');
-    await Hive.openBox('inventory');
-    await Hive.openBox('material');
+    await Hive.openBox('inventories');
+    await Hive.openBox('materials');
 
     // Limpa os dados do Hive
     Hive.box<DepartmentModel>('departments').clear();
-    Hive.box('inventory').clear();
-    Hive.box('material').clear();
+    Hive.box('inventories').clear();
+    Hive.box('materials').clear();
 
     await ControllerInitializer.initialize(); // Inicializa os controladores
 

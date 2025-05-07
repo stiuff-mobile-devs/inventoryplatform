@@ -9,6 +9,7 @@ import 'package:inventoryplatform/app/controllers/image_controller.dart';
 import 'package:inventoryplatform/app/data/models/department_model.dart';
 import 'package:inventoryplatform/app/routes/app_routes.dart';
 import 'package:inventoryplatform/app/services/auth_service.dart';
+import 'package:inventoryplatform/app/ui/device/theme/custom_bd_dialogs.dart';
 import 'package:path_provider/path_provider.dart';
 
 class DepartmentController extends GetxController {
@@ -102,45 +103,7 @@ class DepartmentController extends GetxController {
     }
 
     // Exibe o pop-up inicial com barra de progresso
-    Get.dialog(
-      Center(
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black26,
-                blurRadius: 8,
-                offset: Offset(0, 4),
-              ),
-            ],
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              LinearProgressIndicator(
-                minHeight: 8,
-                backgroundColor: Colors.grey[300],
-                valueColor: AlwaysStoppedAnimation<Color>(Colors.amber),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                "Carregando informações para o Firebase...",
-                style: TextStyle(
-                  color: Colors.amber,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ],
-          ),
-        ),
-      ),
-      barrierDismissible: false,
-    );
+    CustomDialogs.showLoadingDialog("Carregando informações para o banco online...");
 
     bool firestoreSuccess = false;
     bool hiveSuccess = false;
@@ -149,308 +112,45 @@ class DepartmentController extends GetxController {
       await Future.delayed(const Duration(seconds: 2)); // Garante 2 segundos de exibição
       await saveDepartmentToFirestore(user);
       firestoreSuccess = true;
-      Get.back(); // Fecha o pop-up anterior
-      Get.dialog(
-        Center(
-          child: Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black26,
-                  blurRadius: 8,
-                  offset: Offset(0, 4),
-                ),
-              ],
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                LinearProgressIndicator(
-                  minHeight: 8,
-                  backgroundColor: Colors.grey[300],
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  "Dados salvos no Firebase com sucesso!",
-                  style: TextStyle(
-                    color: Colors.green,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ],
-            ),
-          ),
-        ),
-        barrierDismissible: false,
-      );
+      CustomDialogs.closeDialog(); // Fecha o pop-up anterior
+      CustomDialogs.showSuccessDialog("Dados salvos online com sucesso!");
       await Future.delayed(const Duration(seconds: 2));
     } catch (e) {
-      Get.back(); // Fecha o pop-up anterior
-      Get.dialog(
-        Center(
-          child: Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black26,
-                  blurRadius: 8,
-                  offset: Offset(0, 4),
-                ),
-              ],
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                LinearProgressIndicator(
-                  minHeight: 8,
-                  backgroundColor: Colors.grey[300],
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  "Erro ao enviar para o Firebase!",
-                  style: TextStyle(
-                    color: Colors.red,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ],
-            ),
-          ),
-        ),
-        barrierDismissible: false,
-      );
+      CustomDialogs.closeDialog(); // Fecha o pop-up anterior
+      CustomDialogs.showErrorDialog("Erro ao enviar para o banco online!");
       await Future.delayed(const Duration(seconds: 2));
     }
+      CustomDialogs.showLoadingDialog("Carregando informações para o banco local...");
 
     try {
       await Future.delayed(const Duration(seconds: 2)); // Garante 2 segundos de exibição
       await saveDepartmentToHive(user);
       hiveSuccess = true;
-      Get.back(); // Fecha o pop-up anterior
-      Get.dialog(
-        Center(
-          child: Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black26,
-                  blurRadius: 8,
-                  offset: Offset(0, 4),
-                ),
-              ],
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                LinearProgressIndicator(
-                  minHeight: 8,
-                  backgroundColor: Colors.grey[300],
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  "Dados salvos no Hive com sucesso!",
-                  style: TextStyle(
-                    color: Colors.green,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ],
-            ),
-          ),
-        ),
-        barrierDismissible: false,
-      );
+      CustomDialogs.closeDialog(); // Fecha o pop-up anterior
+      CustomDialogs.showSuccessDialog("Dados salvos localmente com sucesso!");
       await Future.delayed(const Duration(seconds: 2));
     } catch (e) {
-      Get.back(); // Fecha o pop-up anterior
-      Get.dialog(
-        Center(
-          child: Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black26,
-                  blurRadius: 8,
-                  offset: Offset(0, 4),
-                ),
-              ],
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                LinearProgressIndicator(
-                  minHeight: 8,
-                  backgroundColor: Colors.grey[300],
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  "Erro ao enviar para o Hive!",
-                  style: TextStyle(
-                    color: Colors.red,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ],
-            ),
-          ),
-        ),
-        barrierDismissible: false,
-      );
+      CustomDialogs.closeDialog(); // Fecha o pop-up anterior
+      CustomDialogs.showErrorDialog("Erro ao enviar para o banco local!");
       await Future.delayed(const Duration(seconds: 2));
     }
 
     // Exibe o resultado final
-    Get.back(); // Fecha o pop-up anterior
+    CustomDialogs.closeDialog(); // Fecha o pop-up anterior
     if (firestoreSuccess && hiveSuccess) {
-      Get.dialog(
-        Center(
-          child: Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black26,
-                  blurRadius: 8,
-                  offset: Offset(0, 4),
-                ),
-              ],
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                LinearProgressIndicator(
-                  minHeight: 8,
-                  backgroundColor: Colors.grey[300],
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  "Dados enviados com sucesso!",
-                  style: TextStyle(
-                    color: Colors.green,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ],
-            ),
-          ),
-        ),
-        barrierDismissible: false,
-      );
+      CustomDialogs.showSuccessDialog("Dados enviados com sucesso!");
     } else if (firestoreSuccess || hiveSuccess) {
-      Get.dialog(
-        Center(
-          child: Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black26,
-                  blurRadius: 8,
-                  offset: Offset(0, 4),
-                ),
-              ],
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                LinearProgressIndicator(
-                  minHeight: 8,
-                  backgroundColor: Colors.grey[300],
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.amber),
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  firestoreSuccess
-                      ? "Apenas os dados do Firebase foram enviados!"
-                      : "Apenas os dados do Hive foram enviados!",
-                  style: TextStyle(
-                    color: Colors.amber,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ],
-            ),
-          ),
-        ),
-        barrierDismissible: false,
+      CustomDialogs.showInfoDialog(
+        firestoreSuccess
+            ? "Apenas os dados do banco online foram enviados!"
+            : "Apenas os dados do banco local foram enviados!",
       );
     } else {
-      Get.dialog(
-        Center(
-          child: Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black26,
-                  blurRadius: 8,
-                  offset: Offset(0, 4),
-                ),
-              ],
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                LinearProgressIndicator(
-                  minHeight: 8,
-                  backgroundColor: Colors.grey[300],
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  "Erro ao enviar os dados!",
-                  style: TextStyle(
-                    color: Colors.red,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ],
-            ),
-          ),
-        ),
-        barrierDismissible: false,
-      );
+      CustomDialogs.showErrorDialog("Erro ao enviar os dados!");
     }
 
     await Future.delayed(const Duration(seconds: 2));
-    Get.back(); // Fecha o pop-up final
+    CustomDialogs.closeDialog(); // Fecha o pop-up final
 
     clearData();
     Get.offAllNamed(Routes.HOME);
@@ -485,9 +185,15 @@ class DepartmentController extends GetxController {
         // Salva no Hive usando o ID como chave
         await box.put(doc.id, department);
       }
+
+      // Fecha o diálogo após o carregamento
+      CustomDialogs.closeDialog();
+
       print(
           "Todos os departamentos foram buscados do Firestore e salvos no Hive com sucesso!");
     } catch (e) {
+      // Fecha o diálogo em caso de erro
+      CustomDialogs.closeDialog();
       print("Erro ao buscar e salvar departamentos: $e");
     }
   }

@@ -12,8 +12,11 @@ class ImageController extends GetxController{
     List<String> base64Strings = [];
 
     for (File? imageFile in imageFiles) {
-   
-      Uint8List imageBytes = await imageFile!.readAsBytes();
+      if (imageFile == null) {
+        print("Arquivo de imagem nulo.");
+        continue;
+      }
+      Uint8List imageBytes = await imageFile.readAsBytes();
       if (imageBytes.lengthInBytes <= maxSizeBytes) {
         base64Strings.add(base64Encode(imageBytes));   
         continue;
