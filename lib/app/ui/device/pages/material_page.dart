@@ -155,7 +155,7 @@ class _MaterialPageState extends State<MaterialPage> {
             children: [
               Expanded(
                   flex: 2,
-                  child: Text("Código de Barras",
+                  child: Text("Tag",
                       style: TextStyle(fontWeight: FontWeight.bold))),
               Expanded(
                   child: Text("Título",

@@ -250,10 +250,49 @@ class _InventoryPageState extends State<InventoryPage> {
                                         Expanded(
                                           child: ElevatedButton(
                                             onPressed: () {
-                                              Navigator.of(context).pop();
-                                              Get.toNamed(
-                                                Routes.ALT_CAMERA,
-                                                parameters: {'codDepartment': item.id},
+                                                       showDialog(
+                                                context: context,
+                                                builder: (context) {
+                                                  return AlertDialog(
+                                                    title: const Text(
+                                                        'Adicionar Barcode'),
+                                                    content: const Text(
+                                                        'Deseja adicionar um barcode?'),
+                                                    actions: [
+                                                      TextButton(
+                                                        onPressed: () {
+                                                          Navigator.of(context)
+                                                              .pop();
+                                                          Get.toNamed(
+                                                            Routes.MATERIAL,
+                                                            parameters: {
+                                                              'codDepartment':
+                                                                  item.id,
+                                                              'barcode': '',
+                                                            },
+                                                          );
+                                                        },
+                                                        child:
+                                                            const Text('Não'),
+                                                      ),
+                                                      TextButton(
+                                                        onPressed: () {
+                                                          Navigator.of(context)
+                                                              .pop();
+                                                          Get.toNamed(
+                                                            Routes.ALT_CAMERA,
+                                                            parameters: {
+                                                              'codDepartment':
+                                                                  item.id
+                                                            },
+                                                          );
+                                                        },
+                                                        child:
+                                                            const Text('Sim'),
+                                                      ),
+                                                    ],
+                                                  );
+                                                },
                                               );
                                             },
                                             style: ElevatedButton.styleFrom(

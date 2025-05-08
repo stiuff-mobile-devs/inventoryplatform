@@ -83,7 +83,7 @@ class MaterialDetailsPage extends StatelessWidget {
                       const SizedBox(height: 8.0),
                       Text('Nome: ${material.name}'),
                       const SizedBox(height: 8.0),
-                      Text('Código de Barras: ${material.tag}'),
+                      Text('Tag: ${material.tag}'),
                       const SizedBox(height: 8.0),
                       Text('Data: ${material.createdAt.toLocal()}'),
                       const SizedBox(height: 8.0),
