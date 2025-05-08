@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:hive/hive.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:get/get.dart';
+import 'package:inventoryplatform/app/controllers/image_controller.dart';
 import 'package:inventoryplatform/app/data/models/department_model.dart';
 import 'package:inventoryplatform/app/routes/app_routes.dart';
 import 'package:inventoryplatform/app/services/auth_service.dart';
@@ -15,13 +16,15 @@ import 'package:path_provider/path_provider.dart';
 class DepartmentController extends GetxController {
   final ConnectionService connectionService = ConnectionService();
   final AuthService authService = AuthService();
-
+  final ImageController _imageController = ImageController();
   final TextEditingController titleController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
   final ImagePicker picker = ImagePicker();
 
+
   Rx<File?> image = Rx<File?>(null);
   var isLoading = false.obs;
+
 
   @override
   void onClose() {
@@ -157,6 +160,8 @@ class DepartmentController extends GetxController {
 
   Future<void> saveDepartmentToRemote(DepartmentModel department) async {
     try {
+      List<String> imagem =
+          await _imageController.convertImagesToBase64([image.value]);
       await FirebaseFirestore.instance
         .collection("departments")
         .doc(department.id)
@@ -164,6 +169,7 @@ class DepartmentController extends GetxController {
           "title": department.title,
           "description": department.description,
           "active": department.active,
+          "imageURL": imagem[0],
           "reports": {
             "created_at": department.created_at,
             "updated_at": department.updated_at,
