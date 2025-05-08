@@ -182,7 +182,7 @@ class DepartmentController extends GetxController {
     }
   }
 
-  Future<void> saveExistingDepartmentToLocal(String id, Map<String,dynamic> dept) async {
+  Future<void> saveExistingDepartmentToLocal(String id, Map<String,dynamic> dept, List<String> imagem) async {
     final reports = dept['reports'];
 
     DepartmentModel department = DepartmentModel.existing(
@@ -193,7 +193,8 @@ class DepartmentController extends GetxController {
       created_at: reports['created_at'].toDate(),
       updated_at: reports['updated_at'].toDate(),
       created_by: reports['created_by'],
-      updated_by: reports['updated_by']
+      updated_by: reports['updated_by'],
+      imagePath: imagem[0],
     );
 
     saveDepartmentToLocal(department);

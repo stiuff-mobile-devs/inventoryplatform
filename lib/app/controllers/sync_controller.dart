@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hive/hive.dart';
 import 'package:inventoryplatform/app/controllers/department_controller.dart';
+import 'package:inventoryplatform/app/controllers/image_controller.dart';
 import 'package:inventoryplatform/app/controllers/inventory_controller.dart';
 import 'package:inventoryplatform/app/controllers/material_controller.dart';
 import 'package:inventoryplatform/app/data/models/department_model.dart';
@@ -12,6 +13,8 @@ class SyncController extends GetxController {
   final departmentController = Get.find<DepartmentController>();
   final inventoryController = Get.find<InventoryController>();
   final materialController = Get.find<MaterialController>();
+  final ImageController _imageController = ImageController();
+
 
   final ConnectionService connectionService = ConnectionService();
 
@@ -40,15 +43,18 @@ class SyncController extends GetxController {
     FirebaseFirestore.instance
         .collection('departments')
         .snapshots()
-        .listen((snapshot) {
+        .listen((snapshot) async {
       for (var doc in snapshot.docs) {
+                Map<String, dynamic> data = doc.data();
+        List<String> imagem =
+            (await _imageController.convertBase64ToImages([data["imageURL"]]));
         if (doc.exists) {
           final dept = departmentController.getDepartmentById(doc.id);
           final lastModifiedOnRemote = (doc.data()['reports']['updated_at']).toDate();
           if (dept != null && (dept.updated_at).isAfter(lastModifiedOnRemote)) {
             continue;
           } else {
-            departmentController.saveExistingDepartmentToLocal(doc.id,doc.data());
+            departmentController.saveExistingDepartmentToLocal(doc.id,doc.data(), imagem);
           }
         }
       }
