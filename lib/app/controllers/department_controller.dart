@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:hive/hive.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:get/get.dart';
@@ -8,6 +9,8 @@ import 'package:inventoryplatform/app/data/models/department_model.dart';
 import 'package:inventoryplatform/app/routes/app_routes.dart';
 import 'package:inventoryplatform/app/services/auth_service.dart';
 import 'package:inventoryplatform/app/services/connection_service.dart';
+import 'package:inventoryplatform/app/ui/device/theme/custom_bd_dialogs.dart';
+import 'package:path_provider/path_provider.dart';
 
 class DepartmentController extends GetxController {
   final ConnectionService connectionService = ConnectionService();
@@ -44,29 +47,78 @@ class DepartmentController extends GetxController {
     isLoading.value = true;
 
     try {
-      //Segurança firebase
-      /*User? user = FirebaseAuth.instance.currentUser;
-      if (user == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Usuário não autenticado.")),
-        );
-        isLoading.value = false;
-        return;
-      }
-      */
 
-      //SALVANDO NO BD LOCAL
+      if (image.value == null) {
+        final byteData =
+          await rootBundle.load('assets/images/DepartamentoGenerico.jpg');
+          final tempDir = await getTemporaryDirectory();
+          final tempFile = File('${tempDir.path}/DepartamentoGenerico.jpg');
+          await tempFile.writeAsBytes(byteData.buffer.asUint8List());
+          image.value = tempFile;
+    }
+    
+      bool firestoreSuccess = false;
+      bool hiveSuccess = false;
+
       final department = DepartmentModel(
         title: titleController.text.trim(),
         description: descriptionController.text.trim(),
         imagePath: image.value?.path,
-        created_by: authService.currentUser!.uid
+        created_by: authService.currentUser!.email ?? "E-mail não encontrado",
       );
 
+      CustomDialogs.showLoadingDialog("Carregando informações para o banco remoto...");
       if (await connectionService.checkInternetConnection()) {
-        saveDepartmentToRemote(department);
-        saveDepartmentToLocal(department);
+
+         try {
+          await Future.delayed(const Duration(seconds: 2)); // Garante 2 segundos de exibição
+          await saveDepartmentToRemote(department);
+          firestoreSuccess = true;
+          CustomDialogs.closeDialog(); // Fecha o pop-up anterior
+          CustomDialogs.showSuccessDialog("Dados salvos remotamente com sucesso!");
+          await Future.delayed(const Duration(seconds: 2));
+        } catch (e) {
+          CustomDialogs.closeDialog(); // Fecha o pop-up anterior
+          CustomDialogs.showErrorDialog("Erro ao enviar para o banco remoto!");
+          await Future.delayed(const Duration(seconds: 2));
+        }
+
+        CustomDialogs.showLoadingDialog("Carregando informações para o banco local...");
+
+        try {
+          await Future.delayed(const Duration(seconds: 2)); // Garante 2 segundos de exibição
+          await saveDepartmentToLocal(department);
+          hiveSuccess = true;
+          CustomDialogs.closeDialog(); // Fecha o pop-up anterior
+          CustomDialogs.showSuccessDialog("Dados salvos localmente com sucesso!");
+          await Future.delayed(const Duration(seconds: 2));
+        } catch (e) {
+          CustomDialogs.closeDialog(); // Fecha o pop-up anterior
+          CustomDialogs.showErrorDialog("Erro ao enviar para o banco local!");
+          await Future.delayed(const Duration(seconds: 2));
+        }
+
+        CustomDialogs.closeDialog(); // Fecha o pop-up anterior
+
+        if (firestoreSuccess && hiveSuccess) {
+          CustomDialogs.showSuccessDialog("Dados enviados com sucesso!");
+        } else if (firestoreSuccess || hiveSuccess) {
+          CustomDialogs.showInfoDialog(
+            firestoreSuccess
+                ? "Apenas os dados do banco remoto foram enviados!"
+                : "Apenas os dados do banco local foram enviados!",
+          );
+        } else {
+          CustomDialogs.showErrorDialog("Erro ao enviar os dados!");
+        }
+
+        await Future.delayed(const Duration(seconds: 2));
+        CustomDialogs.closeDialog(); // Fecha o pop-up final
+
       } else {
+        CustomDialogs.closeDialog(); // Fecha o pop-up final
+        CustomDialogs.showErrorDialog("Não há conexão com a internet!");
+        CustomDialogs.closeDialog(); 
         savePendingDepartment(department);
       }
 
