@@ -130,45 +130,53 @@ class CarouselSection extends StatelessWidget {
                         ),
                       ),
               ),
-              AnimatedOpacity(
-                duration: const Duration(milliseconds: 300),
-                opacity:
-                    1.0, // Certifique-se de que a opacidade está definida corretamente
-                child: Positioned(
-                  bottom: 20.0, // Suba o texto ajustando este valor
-                  left: 16.0,
-                  right: 16.0,
-                  child: Container(
-                    color: Colors.black.withValues(alpha: 0.6),
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Center(
-                          child: Text(
-                            department.title,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                              fontSize: 16,
+              Stack(
+                children: [
+                  Positioned(
+                    child: AnimatedOpacity(
+                        duration: const Duration(milliseconds: 300),
+                        opacity:
+                            1.0, // Certifique-se de que a opacidade está definida corretamente
+                        child: ClipRRect(
+                          borderRadius: const BorderRadius.only(
+                            bottomLeft: Radius.circular(
+                                10.0), // Arredondar canto inferior esquerdo
+                            bottomRight: Radius.circular(
+                                10.0), // Arredondar canto inferior direito
+                          ),
+                          child: Container(
+                            color: Colors.black.withValues(alpha: 0.6),
+                            padding: const EdgeInsets.all(16.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Center(
+                                  child: Text(
+                                    department.title,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                ),
+                                Center(
+                                  child: Text(
+                                    department.description,
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                        ),
-                        Center(
-                          child: Text(
-                            department.description,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 12,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+                        )),
                   ),
-                ),
-              ),
+                ],
+              )
             ],
           ),
         ),
