@@ -18,7 +18,7 @@ class InventoryController extends GetxController {
   final isLoading = false.obs;
 
   // Variável reativa para armazenar os inventários
-  final RxList<InventoryModel> inventories= <InventoryModel>[].obs;
+  final RxList<InventoryModel> inventories = <InventoryModel>[].obs;
 
   void clearFields() {
     titleController.clear();
@@ -69,7 +69,7 @@ class InventoryController extends GetxController {
 
       // Salva o inventário no banco de dados local
       await _dbHelper.insert('inventories', newInventory.toMap());*/
-     /* // Segurança firebase
+      /* // Segurança firebase
       User? user = FirebaseAuth.instance.currentUser;
       if (user == null) {
         Get.snackbar("Erro", "Usuário não autenticado.");
@@ -110,8 +110,7 @@ class InventoryController extends GetxController {
           description: descriptionController.text.trim(),
           revisionNumber: revisionController.text.trim(),
           departmentId: (context.widget as InventoryForm).cod,
-          created_by: authService.currentUser!.uid
-      );
+          created_by: authService.currentUser!.uid);
 
       if (await connectionService.checkInternetConnection()) {
         saveInventoryToRemote(inventory);
@@ -128,7 +127,7 @@ class InventoryController extends GetxController {
       );
       Navigator.pop(context);
     } catch (e) {
-      print(e.toString());
+      debugPrint(e.toString());
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Erro ao salvar inventário: $e")),
       );
@@ -141,7 +140,7 @@ class InventoryController extends GetxController {
     final box = Hive.box<InventoryModel>('inventories');
     try {
       await box.put(inventory.id, inventory);
-    }  catch (e) {
+    } catch (e) {
       throw Exception(e.toString());
     }
   }
@@ -150,7 +149,7 @@ class InventoryController extends GetxController {
     final box = Hive.box<InventoryModel>('inventories-pending');
     try {
       await box.put(inventory.id, inventory);
-    }  catch (e) {
+    } catch (e) {
       throw Exception(e.toString());
     }
   }
@@ -158,41 +157,41 @@ class InventoryController extends GetxController {
   Future<void> saveInventoryToRemote(InventoryModel inventory) async {
     try {
       await FirebaseFirestore.instance
-        .collection("inventories")
-        .doc(inventory.id)
-        .set({
-          "title": inventory.title,
-          "description": inventory.description,
-          "revisionNumber": inventory.revisionNumber,
-          "departmentId": inventory.departmentId,
-          "active": inventory.active,
-          "reports": {
-            "created_at": inventory.created_at,
-            "updated_at": inventory.updated_at,
-            "created_by": inventory.created_by,
-            "updated_by": inventory.updated_by
-          }
-        });
+          .collection("inventories")
+          .doc(inventory.id)
+          .set({
+        "title": inventory.title,
+        "description": inventory.description,
+        "revisionNumber": inventory.revisionNumber,
+        "departmentId": inventory.departmentId,
+        "active": inventory.active,
+        "reports": {
+          "created_at": inventory.created_at,
+          "updated_at": inventory.updated_at,
+          "created_by": inventory.created_by,
+          "updated_by": inventory.updated_by
+        }
+      });
     } catch (e) {
       throw Exception(e.toString());
     }
   }
 
-  Future<void> saveExistingInventoryToLocal(String id, Map<String,dynamic> inv) async {
+  Future<void> saveExistingInventoryToLocal(
+      String id, Map<String, dynamic> inv) async {
     final reports = inv['reports'];
 
     InventoryModel inventory = InventoryModel.existing(
-      id: id,
-      title: inv['title'],
-      description: inv['description'],
-      revisionNumber: inv['revisionNumber'],
-      departmentId: inv['departmentId'],
-      active: inv['active'],
-      created_at: reports['created_at'].toDate(),
-      updated_at: reports['updated_at'].toDate(),
-      created_by: reports['created_by'],
-      updated_by: reports['updated_by']
-    );
+        id: id,
+        title: inv['title'],
+        description: inv['description'],
+        revisionNumber: inv['revisionNumber'],
+        departmentId: inv['departmentId'],
+        active: inv['active'],
+        created_at: reports['created_at'].toDate(),
+        updated_at: reports['updated_at'].toDate(),
+        created_by: reports['created_by'],
+        updated_by: reports['updated_by']);
 
     saveInventoryToLocal(inventory);
   }

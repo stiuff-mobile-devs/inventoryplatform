@@ -8,15 +8,14 @@ import 'package:inventoryplatform/app/services/hive_service.dart';
 import 'package:inventoryplatform/app/ui/device/theme/app_theme.dart';
 import 'package:inventoryplatform/firebase_options.dart';
 
-import 'app/controllers/sync_controller.dart';
-
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
-);
+  );
 
-  await HiveInitializer.initialize(); // Inicializa o Hive e registra os adapters
+  await HiveInitializer
+      .initialize(); // Inicializa o Hive e registra os adapters
   ControllerInitializer.initialize(); // Inicializa os controladores
 
   runApp(
@@ -28,5 +27,5 @@ Future<void> main() async {
       theme: globalTheme,
     ),
   );
-  print('App started');
+  debugPrint('App started');
 }

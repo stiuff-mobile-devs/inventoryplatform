@@ -38,6 +38,11 @@ dependencies:
   cloud_firestore: ^5.6.6
   awesome_snackbar_content: ^0.1.5
 
+  image: ^4.5.4
+  uuid: ^4.5.1
+  http: ^1.4.0
+  path: ^1.9.1
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

@@ -7,7 +7,7 @@ import 'package:inventoryplatform/app/routes/app_routes.dart';
 import 'package:inventoryplatform/app/ui/device/theme/list_item_widget.dart';
 import 'package:inventoryplatform/app/ui/device/theme/search_bar_widget.dart';
 import 'package:inventoryplatform/app/ui/device/theme/temporary_message_display.dart';
-import 'package:intl/intl.dart'; 
+import 'package:intl/intl.dart';
 
 class InventoryPage extends StatefulWidget {
   const InventoryPage({super.key});
@@ -18,8 +18,10 @@ class InventoryPage extends StatefulWidget {
 
 class _InventoryPageState extends State<InventoryPage> {
   final PanelController _panelController = Get.find<PanelController>();
-  final DepartmentController _departmentController = Get.find<DepartmentController>();
-  final InventoryController _inventoryController = Get.find<InventoryController>();
+  final DepartmentController _departmentController =
+      Get.find<DepartmentController>();
+  final InventoryController _inventoryController =
+      Get.find<InventoryController>();
 
   final FocusNode searchFocusNode = FocusNode();
 
@@ -60,26 +62,25 @@ class _InventoryPageState extends State<InventoryPage> {
     if (query.isEmpty) {
       _panelController
           .updateItemsBasedOnTab(_panelController.selectedTabIndex.value);
-    /* final filteredList = _panelController.inventories
+      /* final filteredList = _panelController.inventories
         .where((inventory) =>
             inventory?title.toLowerCase().contains(query.toLowerCase()))
         .toList();*/
 
-    //_panelController.listedItems.assignAll(filteredList);
-    /* final filteredList = _panelController.inventories
+      //_panelController.listedItems.assignAll(filteredList);
+      /* final filteredList = _panelController.inventories
         .where((inventory) =>
             inventory?title.toLowerCase().contains(query.toLowerCase()))
         .toList();*/
 
-    //_panelController.listedItems.assignAll(filteredList);
-;
+      //_panelController.listedItems.assignAll(filteredList);
 
-    /* final filteredList = _panelController.inventories
+      /* final filteredList = _panelController.inventories
         .where((inventory) =>
             inventory?title.toLowerCase().contains(query.toLowerCase()))
         .toList();*/
 
-    //_panelController.listedItems.assignAll(filteredList);
+      //_panelController.listedItems.assignAll(filteredList);
     }
 
     /* final filteredList = _panelController.inventories
@@ -159,7 +160,8 @@ class _InventoryPageState extends State<InventoryPage> {
                 searchFocusNode.unfocus();
                 await Get.toNamed(Routes.INVENTORY,
                     parameters: {'cod': organization!.id});
-                _inventoryController.loadInventories(); // Atualiza a lista ao retornar
+                _inventoryController
+                    .loadInventories(); // Atualiza a lista ao retornar
               },
               icon: const Icon(Icons.add),
               label: const Text('Adicionar Inventário'),
@@ -178,7 +180,8 @@ class _InventoryPageState extends State<InventoryPage> {
               message: "Não há itens para serem listados.",
             )
           : ListView.builder(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
               itemCount: _inventoryController.inventories.length,
               itemBuilder: (context, index) {
                 final item = _inventoryController.inventories[index];
@@ -186,8 +189,9 @@ class _InventoryPageState extends State<InventoryPage> {
                   attributes: {
                     'Título': item.title,
                     'Descrição': item.description,
-                    'Criado em': DateFormat('dd/MM/yyyy HH:mm').format(item.created_at.toLocal()),
-                    'Atualizado em': item.updated_at ?? "Nunca modificado",
+                    'Criado em': DateFormat('dd/MM/yyyy HH:mm')
+                        .format(item.created_at.toLocal()),
+                    'Atualizado em': item.updated_at,
                   },
                   isActive: 1,
                   icon: Icons.donut_large_rounded,
@@ -222,11 +226,14 @@ class _InventoryPageState extends State<InventoryPage> {
                                     Text(
                                         "Número de Revisão: ${item.revisionNumber}"),
                                     const SizedBox(height: 8.0),
-                                    Text("Data de Criação: ${DateFormat('dd/MM/yyyy HH:mm').format(item.created_at.toLocal())}"), // Formata a data e hora
+                                    Text(
+                                        "Data de Criação: ${DateFormat('dd/MM/yyyy HH:mm').format(item.created_at.toLocal())}"), // Formata a data e hora
                                     const SizedBox(height: 8.0),
-                                    Text("Última Atualização: ${item.updated_at ?? "Nunca modificado"}"),
+                                    Text(
+                                        "Última Atualização: ${item.updated_at}"),
                                     const SizedBox(height: 8.0),
-                                    Text("Departamento de origem: ${_departmentController.getDepartmentTitleById(item.departmentId) ?? "Desconhecido"}"), 
+                                    Text(
+                                        "Departamento de origem: ${_departmentController.getDepartmentTitleById(item.departmentId) ?? "Desconhecido"}"),
 
                                     const SizedBox(height: 24.0),
                                     Row(
@@ -240,30 +247,36 @@ class _InventoryPageState extends State<InventoryPage> {
                                               // Adicione a lógica para editar
                                             },
                                             style: ElevatedButton.styleFrom(
-                                              padding: const EdgeInsets.all(12.0),
+                                              padding:
+                                                  const EdgeInsets.all(12.0),
                                             ),
                                             child: const Icon(Icons.edit),
                                           ),
                                         ),
                                         const SizedBox(
-                                            width: 8.0), // Espaço entre os botões
+                                            width:
+                                                8.0), // Espaço entre os botões
                                         Expanded(
                                           child: ElevatedButton(
                                             onPressed: () {
                                               Navigator.of(context).pop();
                                               Get.toNamed(
                                                 Routes.ALT_CAMERA,
-                                                parameters: {'codDepartment': item.id},
+                                                parameters: {
+                                                  'codDepartment': item.id
+                                                },
                                               );
                                             },
                                             style: ElevatedButton.styleFrom(
-                                              padding: const EdgeInsets.all(12.0),
+                                              padding:
+                                                  const EdgeInsets.all(12.0),
                                             ),
                                             child: const Icon(Icons.add),
                                           ),
                                         ),
                                         const SizedBox(
-                                            width: 8.0), // Espaço entre os botões
+                                            width:
+                                                8.0), // Espaço entre os botões
                                         Expanded(
                                           child: ElevatedButton(
                                             onPressed: () {
@@ -271,7 +284,8 @@ class _InventoryPageState extends State<InventoryPage> {
                                               // Adicione a lógica para visualizar
                                             },
                                             style: ElevatedButton.styleFrom(
-                                              padding: const EdgeInsets.all(12.0),
+                                              padding:
+                                                  const EdgeInsets.all(12.0),
                                             ),
                                             child: const Icon(Icons.search),
                                           ),

@@ -141,8 +141,8 @@ class ScrollableBottomNavigationBarState
               ? Alignment.centerRight
               : Alignment.centerLeft,
           colors: [
-            Colors.deepPurple.withOpacity(0.9),
-            Colors.deepPurple.withOpacity(0.0),
+            Colors.deepPurple.withValues(alpha: 0.9),
+            Colors.deepPurple.withValues(alpha: 0.0),
           ],
         ),
       ),

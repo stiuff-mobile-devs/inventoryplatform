@@ -1,11 +1,8 @@
 import 'dart:async';
-
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:inventoryplatform/app/controllers/login_controller.dart';
-import 'package:inventoryplatform/app/ui/device/theme/credentials_model.dart';
 import 'package:inventoryplatform/app/ui/device/theme/google_login_button.dart';
 import 'package:inventoryplatform/app/ui/device/theme/loading_dialog.dart';
 import 'package:inventoryplatform/app/ui/device/theme/login_header.dart';
@@ -83,7 +80,7 @@ class LoginPageState extends State<LoginPage> {
       width: screenWidth * 0.8,
       height: screenHeight * 0.8125,
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.8),
+        color: Colors.white.withValues(alpha: 0.8),
         borderRadius: BorderRadius.circular(12),
       ),
       child: orientation == Orientation.portrait
@@ -173,7 +170,7 @@ class LoginPageState extends State<LoginPage> {
                 ),
                 fit: BoxFit.cover,
                 colorFilter: ColorFilter.mode(
-                  Colors.purple.withOpacity(0.6),
+                  Colors.purple.withValues(alpha: 0.6),
                   BlendMode.srcOver,
                 ),
               ),
@@ -277,15 +274,15 @@ class LoginPageState extends State<LoginPage> {
     }
   }
 
-  Future<void> _handleSignIn(UserCredentialsModel credentials) async {
-    _showLoadingDialog(context);
+  //Future<void> _handleSignIn(UserCredentialsModel credentials) async {
+  //  _showLoadingDialog(context);
 
-    final bool success = await controller.handleSignIn(credentials);
+  //  final bool success = await controller.handleSignIn(credentials);
 
-    if (mounted && !success) {
-      Navigator.of(context).pop();
-    }
-  }
+  //  if (mounted && !success) {
+  //    Navigator.of(context).pop();
+  //  }
+  //}
 
   Future<void> _showLoadingDialog(BuildContext context) async {
     await showDialog(

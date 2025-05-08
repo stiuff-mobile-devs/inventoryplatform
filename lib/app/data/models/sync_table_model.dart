@@ -20,5 +20,6 @@ class SyncTableModel extends HiveObject {
   SyncTableModel({
     required this.originTable,
     required this.objectId,
-  }) : id = Uuid().v4(), created = DateTime.now();
+  })  : id = const Uuid().v4(),
+        created = DateTime.now();
 }

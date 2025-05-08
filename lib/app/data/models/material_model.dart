@@ -2,7 +2,6 @@ import 'package:hive/hive.dart';
 import 'package:uuid/uuid.dart';
 part 'material_model.g.dart';
 
-
 @HiveType(typeId: 2)
 class MaterialModel extends HiveObject {
   @HiveField(0)
@@ -56,6 +55,7 @@ class MaterialModel extends HiveObject {
     this.imagePaths,
     this.updatedAt,
     this.updatedBy,
-
-  }) : id = id ?? Uuid().v4(); // Gera um ID automaticamente se não for fornecido
+  }) : id = id ??
+            const Uuid()
+                .v4(); // Gera um ID automaticamente se não for fornecido
 }

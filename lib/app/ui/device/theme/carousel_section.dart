@@ -7,7 +7,8 @@ import 'package:inventoryplatform/app/controllers/carousel_section_controller.da
 import 'package:inventoryplatform/app/data/models/department_model.dart';
 
 class CarouselSection extends StatelessWidget {
-  final CarouselSectionController controller = Get.find<CarouselSectionController>();
+  final CarouselSectionController controller =
+      Get.find<CarouselSectionController>();
   final bool? isExpanded;
   final String? route;
 
@@ -30,53 +31,52 @@ class CarouselSection extends StatelessWidget {
       );
     });
 
-    return  Stack(
-        alignment: Alignment.bottomCenter,
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(bottom: 20.0),
-            child: CarouselSlider(
-              options: CarouselOptions(
-                height: (isExpanded ?? false)
-                    ? MediaQuery.of(context).size.height * 0.75
-                    : MediaQuery.of(context).size.height * 0.25,
-                viewportFraction: 0.8,
-                initialPage: 1,
-                enableInfiniteScroll: true,
-                enlargeCenterPage: false,
-                autoPlay: false,
-                onPageChanged: (index, reason) {
-                  controller.updateCarouselIndex(index);
-                  controller.setHovered(index, true);
-                  Future.delayed(
-                    const Duration(seconds: 3),
-                    () => controller.setHovered(index, false),
-                  );
-                },
-              ),
-              items: departments
-                  .asMap()
-                  .entries
-                  .map(
-                    (entry) => _buildCarouselItem(
-                        entry.key, entry.value, 0.8, context,
-                        route: route),
-                  )
-                  .toList(),
+    return Stack(
+      alignment: Alignment.bottomCenter,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(bottom: 20.0),
+          child: CarouselSlider(
+            options: CarouselOptions(
+              height: (isExpanded ?? false)
+                  ? MediaQuery.of(context).size.height * 0.75
+                  : MediaQuery.of(context).size.height * 0.25,
+              viewportFraction: 0.8,
+              initialPage: 1,
+              enableInfiniteScroll: true,
+              enlargeCenterPage: false,
+              autoPlay: false,
+              onPageChanged: (index, reason) {
+                controller.updateCarouselIndex(index);
+                controller.setHovered(index, true);
+                Future.delayed(
+                  const Duration(seconds: 3),
+                  () => controller.setHovered(index, false),
+                );
+              },
+            ),
+            items: departments
+                .asMap()
+                .entries
+                .map(
+                  (entry) => _buildCarouselItem(
+                      entry.key, entry.value, 0.8, context,
+                      route: route),
+                )
+                .toList(),
+          ),
+        ),
+        Positioned(
+          bottom: 0,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: List.generate(
+              departments.length,
+              (index) => _buildIndicator(controller.carouselIndex.value, index),
             ),
           ),
-          Positioned(
-            bottom: 0,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(
-                departments.length,
-                (index) =>
-                    _buildIndicator(controller.carouselIndex.value, index),
-              ),
-            ),
-          ),
-        ],
+        ),
+      ],
     );
   }
 
@@ -132,13 +132,14 @@ class CarouselSection extends StatelessWidget {
               ),
               AnimatedOpacity(
                 duration: const Duration(milliseconds: 300),
-                opacity: 1.0, // Certifique-se de que a opacidade está definida corretamente
+                opacity:
+                    1.0, // Certifique-se de que a opacidade está definida corretamente
                 child: Positioned(
                   bottom: 20.0, // Suba o texto ajustando este valor
                   left: 16.0,
                   right: 16.0,
                   child: Container(
-                    color: Colors.black.withOpacity(0.6),
+                    color: Colors.black.withValues(alpha: 0.6),
                     padding: const EdgeInsets.all(16.0),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -154,16 +155,15 @@ class CarouselSection extends StatelessWidget {
                             ),
                           ),
                         ),
-                        if (department.description != null)
-                          Center(
-                            child: Text(
-                              department.description!,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 12,
-                              ),
+                        Center(
+                          child: Text(
+                            department.description,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
                             ),
                           ),
+                        ),
                       ],
                     ),
                   ),

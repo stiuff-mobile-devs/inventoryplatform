@@ -2,17 +2,15 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:inventoryplatform/app/controllers/inventory_controller.dart';
-import 'package:inventoryplatform/app/controllers/material_controller.dart';
 import 'package:inventoryplatform/app/data/models/material_model.dart';
 
 class MaterialDetailsPage extends StatelessWidget {
   final MaterialModel material;
   late final InventoryController _inventoryController;
 
-
-  MaterialDetailsPage({Key? key, required this.material}) : super(key: key) {
+  MaterialDetailsPage({super.key, required this.material}) {
     _inventoryController = Get.find<InventoryController>();
-  final MaterialController controller = Get.find<MaterialController>();
+    //final MaterialController controller = Get.find<MaterialController>();
   }
 
   @override
@@ -31,7 +29,8 @@ class MaterialDetailsPage extends StatelessWidget {
                 context: context,
                 builder: (context) => AlertDialog(
                   title: const Text("Em Desenvolvimento"),
-                  content: const Text("Esta funcionalidade está em desenvolvimento."),
+                  content: const Text(
+                      "Esta funcionalidade está em desenvolvimento."),
                   actions: [
                     TextButton(
                       onPressed: () => Navigator.of(context).pop(),
@@ -66,7 +65,7 @@ class MaterialDetailsPage extends StatelessWidget {
                       const SizedBox(height: 16.0),
                       ElevatedButton(
                         onPressed: () {
-                          print('Criar Material');
+                          debugPrint('Criar Material');
                         },
                         child: const Text('Criar Material'),
                       ),
@@ -74,7 +73,6 @@ class MaterialDetailsPage extends StatelessWidget {
                   )
                 : Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    
                     children: [
                       Text(
                         'ID: ${material.id}',
@@ -93,9 +91,11 @@ class MaterialDetailsPage extends StatelessWidget {
                       const SizedBox(height: 8.0),
                       Text('Observações: ${material.observations}'),
                       const SizedBox(height: 8.0),
-                      Text('Inventário: ${_inventoryController.getInventoryTitleById(material.inventoryId!)}'),
+                      Text(
+                          'Inventário: ${_inventoryController.getInventoryTitleById(material.inventoryId!)}'),
                       const SizedBox(height: 16.0),
-                      if (material.imagePaths != null && material.imagePaths!.isNotEmpty)
+                      if (material.imagePaths != null &&
+                          material.imagePaths!.isNotEmpty)
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -109,8 +109,8 @@ class MaterialDetailsPage extends StatelessWidget {
                                 padding: const EdgeInsets.only(bottom: 8.0),
                                 child: Image.file(
                                   File(path),
-                                  fit: BoxFit.contain, 
-                                  height: 200, 
+                                  fit: BoxFit.contain,
+                                  height: 200,
                                   width: double.infinity,
                                 ),
                               ),

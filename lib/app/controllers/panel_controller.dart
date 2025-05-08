@@ -4,12 +4,7 @@ import 'package:inventoryplatform/app/data/models/department_model.dart';
 import 'package:inventoryplatform/app/data/models/inventory_model.dart';
 import 'package:inventoryplatform/app/data/models/material_model.dart';
 
-enum TabType {
-  dashboard,
-  inventories,
-  materials,
-  unknown
-}
+enum TabType { dashboard, inventories, materials, unknown }
 
 class PanelController extends GetxController {
   //final _organizationRepository = Get.find<OrganizationRepository>();
@@ -48,8 +43,7 @@ class PanelController extends GetxController {
   DepartmentModel? getCurrentDepartment() => _currentDepartment.value;
 
   Future<void> refreshPage() async {
-    await refreshItemsForTab(
-        tabType: tabIndexToEnum(selectedTabIndex.value));
+    await refreshItemsForTab(tabType: tabIndexToEnum(selectedTabIndex.value));
   }
 
   Future<void> refreshItemsForTab({TabType? tabType}) async {
@@ -58,14 +52,14 @@ class PanelController extends GetxController {
     if (selectedTabIndex.value == 0) {
       await fetchAllData().then((data) => update());
     } else {
-      final deptId = _currentDepartment.value!.id;
+      //final deptId = _currentDepartment.value!.id;
       final dataFetchers = {
         TabType.inventories: () => {},
         TabType.materials: () => {},
       };
 
       if (dataFetchers.containsKey(tabType)) {
-        await dataFetchers[tabType]!();
+        dataFetchers[tabType]!();
       }
     }
     updateItemsBasedOnTab(selectedTabIndex.value);
@@ -103,15 +97,15 @@ class PanelController extends GetxController {
     listedItems.assignAll(tabDataMap[tabIndex] ?? []);
   }
 
-  Future<void> _fetchData<T>(
-      RxList<T> list, Future<List<T>> Function() fetcher) async {
-    try {
-      list.assignAll(await fetcher());
-    } catch (e) {
-      list.clear();
-      debugPrint("Erro ao buscar dados: $e");
-    }
-  }
+  // Future<void> _fetchData<T>(
+  //     RxList<T> list, Future<List<T>> Function() fetcher) async {
+  //   try {
+  //     list.assignAll(await fetcher());
+  //   } catch (e) {
+  //     list.clear();
+  //     debugPrint("Erro ao buscar dados: $e");
+  //   }
+  // }
 
   TabType tabIndexToEnum(int tabIndex) {
     switch (tabIndex) {

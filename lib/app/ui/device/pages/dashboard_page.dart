@@ -20,9 +20,8 @@ class _DashboardPageState extends State<DashboardPage> {
   late final PanelController _panelController;
   int _currentCarouselIndex = 0;
   late final String departmentId;
-  final InventoryController _inventoryController = Get.find<InventoryController>();
-  
-
+  final InventoryController _inventoryController =
+      Get.find<InventoryController>();
 
   Widget _buildHeader(DepartmentModel department) {
     return Container(
@@ -31,7 +30,7 @@ class _DashboardPageState extends State<DashboardPage> {
         borderRadius: BorderRadius.circular(12.0),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 8.0,
             offset: const Offset(0, 0),
           ),
@@ -83,7 +82,7 @@ class _DashboardPageState extends State<DashboardPage> {
                       ],
                     ),
                   ),
-                  _buildOrganizationContainer(department.title, department.id!),
+                  _buildOrganizationContainer(department.title, department.id),
                 ],
               ),
             ),
@@ -102,7 +101,7 @@ class _DashboardPageState extends State<DashboardPage> {
         borderRadius: BorderRadius.circular(5.0),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.2),
+            color: Colors.black.withValues(alpha: 0.2),
             blurRadius: 4.0,
             offset: const Offset(0, 2),
           ),
@@ -193,7 +192,7 @@ class _DashboardPageState extends State<DashboardPage> {
               borderRadius: BorderRadius.circular(12.0),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
+                  color: Colors.black.withValues(alpha: 0.1),
                   blurRadius: 8.0,
                   offset: const Offset(0, 4),
                 ),
@@ -203,8 +202,9 @@ class _DashboardPageState extends State<DashboardPage> {
               children: [
                 CarouselSlider(
                   items: [
-                    StatusChart(inventories: _inventoryController.inventories.value),
-                    UpdateChart(inventories: _inventoryController.inventories.value),
+                    StatusChart(
+                        inventories: _inventoryController.inventories.toList()),
+                    UpdateChart(inventories: _inventoryController.inventories),
                   ],
                   options: CarouselOptions(
                     height: 350.0,

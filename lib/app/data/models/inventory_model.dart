@@ -41,22 +41,21 @@ class InventoryModel extends HiveObject {
     required this.revisionNumber,
     required this.departmentId,
     required this.created_by,
-  }) : id = Uuid().v4(),
+  })  : id = const Uuid().v4(),
         created_at = DateTime.now(),
         updated_at = DateTime.now(),
         updated_by = created_by,
         active = true;
 
-  InventoryModel.existing({
-    required this.id,
-    required this.title,
-    required this.description,
-    required this.revisionNumber,
-    required this.departmentId,
-    required this.active,
-    required this.created_at,
-    required this.updated_at,
-    required this.created_by,
-    required this.updated_by
-  });
+  InventoryModel.existing(
+      {required this.id,
+      required this.title,
+      required this.description,
+      required this.revisionNumber,
+      required this.departmentId,
+      required this.active,
+      required this.created_at,
+      required this.updated_at,
+      required this.created_by,
+      required this.updated_by});
 }

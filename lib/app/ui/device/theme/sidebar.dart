@@ -7,7 +7,6 @@ import 'package:inventoryplatform/app/services/utils_service.dart';
 import 'package:sidebarx/sidebarx.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:inventoryplatform/app/ui/device/components/usuarios_dialog.dart';
-import 'package:inventoryplatform/app/routes/app_routes.dart';
 
 class CustomSidebar extends StatelessWidget {
   CustomSidebar({super.key});
@@ -105,10 +104,10 @@ class CustomSidebar extends StatelessWidget {
           icon: Icons.menu_book_outlined,
           label: 'Manual do Usuário',
           onTap: () async {
-            final Uri _url = Uri.parse(
+            final Uri url = Uri.parse(
                 'https://github.com/stiuff-mobile-devs/inventoryplatform/wiki/Manual');
-            if (!await launchUrl(_url)) {
-              throw Exception('Could not launch $_url');
+            if (!await launchUrl(url)) {
+              throw Exception('Could not launch $url');
             }
           },
         ),

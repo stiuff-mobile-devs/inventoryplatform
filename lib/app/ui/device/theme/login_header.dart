@@ -20,7 +20,7 @@ class LoginHeader extends StatelessWidget {
           child: Image.asset(
             'assets/images/StockBackground-1472x980.jpg',
             fit: BoxFit.cover,
-            color: Colors.purple.withOpacity(0.6),
+            color: Colors.purple.withValues(alpha: 0.6),
             colorBlendMode: BlendMode.srcOver,
           ),
         ),

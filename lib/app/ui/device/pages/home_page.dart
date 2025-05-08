@@ -6,7 +6,6 @@ import 'package:inventoryplatform/app/routes/app_routes.dart';
 import 'package:inventoryplatform/app/ui/device/theme/base_scaffold.dart';
 import 'package:inventoryplatform/app/ui/device/theme/carousel_section.dart'
     as w;
-import 'package:inventoryplatform/app/ui/device/components/usuarios_dialog.dart';
 
 class HomePage extends StatelessWidget {
   final HomeController controller = Get.put(HomeController());
@@ -46,7 +45,7 @@ class HomePage extends StatelessWidget {
         borderRadius: BorderRadius.circular(12.0),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: .1),
             blurRadius: 8.0,
             offset: const Offset(0, 4),
           ),
@@ -146,13 +145,14 @@ class HomePage extends StatelessWidget {
           child: InkWell(
             onTap: onPressed,
             borderRadius: BorderRadius.circular(16),
-            splashColor: color.withOpacity(0.2),
+            splashColor: color.withValues(alpha: 0.2),
             child: Container(
               padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
               decoration: BoxDecoration(
                 color: Colors.transparent,
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: color.withOpacity(0.5), width: 1),
+                border:
+                    Border.all(color: color.withValues(alpha: 0.5), width: 1),
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,

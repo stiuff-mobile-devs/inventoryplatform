@@ -7,7 +7,7 @@ class InventoryForm extends StatelessWidget {
   final String cod;
   final _formKey = GlobalKey<FormState>();
 
-  InventoryForm({required this.cod}) {
+  InventoryForm({super.key, required this.cod}) {
     // Define o valor inicial do campo de revisão
     controller.revisionController.text = "0.0.1";
   }
@@ -30,7 +30,8 @@ class InventoryForm extends StatelessWidget {
                 context: context,
                 builder: (context) => AlertDialog(
                   title: const Text("Em Desenvolvimento"),
-                  content: const Text("Esta funcionalidade está em desenvolvimento."),
+                  content: const Text(
+                      "Esta funcionalidade está em desenvolvimento."),
                   actions: [
                     TextButton(
                       onPressed: () => Navigator.of(context).pop(),
@@ -114,7 +115,8 @@ class InventoryForm extends StatelessWidget {
                           }
                         },
                         style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 32, vertical: 12),
                           backgroundColor: Colors.purple,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8.0),
@@ -133,4 +135,3 @@ class InventoryForm extends StatelessWidget {
     );
   }
 }
-

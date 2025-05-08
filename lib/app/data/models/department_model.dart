@@ -37,7 +37,7 @@ class DepartmentModel extends HiveObject {
     required this.description,
     required this.created_by,
     this.imagePath,
-  }) : id = Uuid().v4(),
+  })  : id = const Uuid().v4(),
         active = true,
         created_at = DateTime.now(),
         updated_at = DateTime.now(),

@@ -46,7 +46,7 @@ class TemporaryMessageDisplayState extends State<TemporaryMessageDisplay> {
             width: MediaQuery.of(context).size.width * 0.925,
             height: MediaQuery.of(context).size.height * 0.10,
             decoration: BoxDecoration(
-              color: Colors.blueAccent.withOpacity(0.1),
+              color: Colors.blueAccent.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8),
               border: Border.all(color: Colors.blueAccent),
             ),

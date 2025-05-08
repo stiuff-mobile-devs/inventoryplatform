@@ -10,7 +10,7 @@ import 'package:inventoryplatform/app/controllers/inventory_controller.dart';
 import 'package:inventoryplatform/app/data/models/inventory_model.dart';
 import 'package:inventoryplatform/app/data/models/material_model.dart';
 import 'package:inventoryplatform/app/services/auth_service.dart';
-import 'package:inventoryplatform/app/ui/device/forms/material_form.dart';
+
 import 'package:inventoryplatform/app/ui/device/pages/material_details_page.dart';
 import 'package:inventoryplatform/app/ui/device/theme/custom_bd_dialogs.dart';
 
@@ -42,6 +42,7 @@ class MaterialController extends GetxController {
     fetchAndSaveAllMaterials(); // Chama a função ao inicializar o controlador
   }
 
+  @override
   void onClose() {
     clearData();
     super.onClose();
@@ -174,9 +175,9 @@ class MaterialController extends GetxController {
           .doc(hiveMaterialId)
           .set(data);
 
-      print("Material salvo no Firestore com sucesso!");
+      debugPrint("Material salvo no Firestore com sucesso!");
     } catch (e) {
-      print("Erro ao salvar material: $e");
+      debugPrint("Erro ao salvar material: $e");
     }
   }
 
@@ -198,14 +199,12 @@ class MaterialController extends GetxController {
         );
         await box.add(material);
         hiveMaterialId = material.id;
-        print(material.imagePaths);
+        debugPrint(material.imagePaths?.toString());
       } else {
         navigateToMaterialDetails(context, retornado);
       }
-
-      
     } catch (e) {
-      print(e.toString());
+      debugPrint(e.toString());
     }
   }
 
@@ -218,9 +217,10 @@ class MaterialController extends GetxController {
     CustomDialogs.showLoadingDialog(
         "Carregando informações para o banco local...");
 
-try {
-      await Future.delayed(const Duration(seconds: 2)); // Garante 2 segundos de exibição
-    await saveMaterialToHive(user, geolocationStr, inventoryId, context);
+    try {
+      await Future.delayed(
+          const Duration(seconds: 2)); // Garante 2 segundos de exibição
+      await saveMaterialToHive(user, geolocationStr, inventoryId, context);
       hiveSuccess = true;
       CustomDialogs.closeDialog(); // Fecha o pop-up anterior
       CustomDialogs.showSuccessDialog("Dados salvos localmente com sucesso!");
@@ -231,10 +231,12 @@ try {
       await Future.delayed(const Duration(seconds: 2));
     }
     // Exibe o pop-up inicial com barra de progresso
-    CustomDialogs.showLoadingDialog("Carregando informações para o banco online...");
+    CustomDialogs.showLoadingDialog(
+        "Carregando informações para o banco online...");
     try {
-      await Future.delayed(const Duration(seconds: 2)); // Garante 2 segundos de exibição
-    await saveMaterialToFirestore(user, geolocationStr, inventoryId);
+      await Future.delayed(
+          const Duration(seconds: 2)); // Garante 2 segundos de exibição
+      await saveMaterialToFirestore(user, geolocationStr, inventoryId);
       firestoreSuccess = true;
       CustomDialogs.closeDialog(); // Fecha o pop-up anterior
       CustomDialogs.showSuccessDialog("Dados salvos online com sucesso!");
@@ -342,11 +344,11 @@ try {
         // Salva no Hive usando o ID como chave
         await box.put(doc.id, material);
       }
-  
-      print(
+
+      debugPrint(
           "Todos os materiais foram buscados do Firestore e salvos no Hive com sucesso!");
     } catch (e) {
-      print("Erro ao buscar e salvar materiais: $e");
+      debugPrint("Erro ao buscar e salvar materiais: $e");
     }
   }
 
@@ -355,8 +357,8 @@ try {
     final materials = box.values.toList();
 
     for (var material in materials) {
-      print('Material: ${material.name}');
-      print('Image Paths: ${material.imagePaths}');
+      debugPrint('Material: ${material.name}');
+      debugPrint('Image Paths: ${material.imagePaths}');
     }
   }
 }

@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hive/hive.dart';
@@ -32,7 +33,7 @@ class SyncController extends GetxController {
       await _syncRemoteDepartments();
       await _syncRemoteInventories();
     } catch (e) {
-      print("erro ao buscar dados do firebase: $e");
+      debugPrint("erro ao buscar dados do firebase: $e");
     }
   }
 
@@ -44,11 +45,13 @@ class SyncController extends GetxController {
       for (var doc in snapshot.docs) {
         if (doc.exists) {
           final dept = departmentController.getDepartmentById(doc.id);
-          final lastModifiedOnRemote = (doc.data()['reports']['updated_at']).toDate();
+          final lastModifiedOnRemote =
+              (doc.data()['reports']['updated_at']).toDate();
           if (dept != null && (dept.updated_at).isAfter(lastModifiedOnRemote)) {
             continue;
           } else {
-            departmentController.saveExistingDepartmentToLocal(doc.id,doc.data());
+            departmentController.saveExistingDepartmentToLocal(
+                doc.id, doc.data());
           }
         }
       }
@@ -63,11 +66,13 @@ class SyncController extends GetxController {
       for (var doc in snapshot.docs) {
         if (doc.exists) {
           final inv = inventoryController.getInventoryById(doc.id);
-          final lastModifiedOnRemote = (doc.data()['reports']['updated_at']).toDate();
+          final lastModifiedOnRemote =
+              (doc.data()['reports']['updated_at']).toDate();
           if (inv != null && (inv.updated_at).isAfter(lastModifiedOnRemote)) {
             continue;
           } else {
-            inventoryController.saveExistingInventoryToLocal(doc.id,doc.data());
+            inventoryController.saveExistingInventoryToLocal(
+                doc.id, doc.data());
           }
         }
       }
@@ -114,5 +119,4 @@ class SyncController extends GetxController {
       }
     }
   }
-
 }

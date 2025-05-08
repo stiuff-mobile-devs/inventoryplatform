@@ -2,8 +2,6 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_state_manager/get_state_manager.dart';
-import 'package:get/instance_manager.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:inventoryplatform/app/controllers/department_controller.dart';
 import 'package:inventoryplatform/app/controllers/department_edit_controller.dart';
@@ -219,6 +217,7 @@ class _DepartmentConfigPageState extends State<DepartmentConfigPage> {
     _panelController = Get.find<PanelController>();
   }
 
+  @override
   Widget build(BuildContext context) {
     editController.setInitialData(_panelController.getCurrentDepartment()!);
     final department = _panelController.getCurrentDepartment()!;

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get_utils/src/platform/platform.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+// import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:inventoryplatform/app/services/connection_service.dart';
 import 'package:inventoryplatform/app/services/error_service.dart';
 import 'package:inventoryplatform/app/services/warning_service.dart';
@@ -15,7 +15,7 @@ class AuthService {
   final ErrorService _errorService = ErrorService();
   final WarningService _warningService = WarningService();
   final ConnectionService _connectionService = ConnectionService();
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  // final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   String? _cachedProfileImageUrl;
 
@@ -80,10 +80,7 @@ class AuthService {
     }
 
     try {
-      final credential = await _auth.signInWithEmailAndPassword(
-          email: email,
-          password: password
-      );
+      await _auth.signInWithEmailAndPassword(email: email, password: password);
       success = true;
       return success;
     } on FirebaseAuthException catch (e) {
@@ -131,32 +128,32 @@ class AuthService {
       throw AuthError("Erro ao obter email do usuário.");
     }
 
-    bool isAllowed = true;
+    // bool isAllowed = true;
     //await _isEmailAllowed(user.email!);
 
     success = true;
 
-    if (!isAllowed) {
-      await _auth.signOut();
-      await _googleSignIn.signOut();
-      success = false;
-      _errorService.handleError(
-        AuthError("Seu email não está autorizado a acessar este sistema."),
-      );
-    }
+    //if (!isAllowed) {
+    //  await _auth.signOut();
+    //  await _googleSignIn.signOut();
+    //  success = false;
+    //  _errorService.handleError(
+    //    AuthError("Seu email não está autorizado a acessar este sistema."),
+    //  );
+    //}
 
     return success;
   }
 
-  Future<bool> _isEmailAllowed(String email) async {
-    final querySnapshot = await _firestore.collection("allowed_users").get();
-    for (var doc in querySnapshot.docs) {
-      if (doc.data()['email'] == email) {
-        return true;
-      }
-    }
-    return false;
-  }
+  // Future<bool> _isEmailAllowed(String email) async {
+  //   final querySnapshot = await _firestore.collection("allowed_users").get();
+  //   for (var doc in querySnapshot.docs) {
+  //     if (doc.data()['email'] == email) {
+  //       return true;
+  //     }
+  //   }
+  //   return false;
+  // }
 
   Future<void> signOut() async {
     await _auth.signOut();

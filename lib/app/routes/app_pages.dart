@@ -20,33 +20,29 @@ class AppPages {
       page: () => HomePage(),
       binding: HomeBinding(),
     ),
- 
     GetPage(
       name: Routes.INITIAL,
-      page: () => InitialPage(),
+      page: () => const InitialPage(),
     ),
-
     GetPage(
       name: Routes.DEPARTMENT,
       page: () => DepartmentForm(),
       binding: DepartmentBinding(),
     ),
-
     GetPage(
       name: Routes.INVENTORY,
-      page: () =>  InventoryForm(cod: Get.parameters['cod']!),
+      page: () => InventoryForm(cod: Get.parameters['cod']!),
       binding: InventoryBinding(),
     ),
-
     GetPage(
       name: Routes.PANEL,
       page: () => const PanelPage(),
       binding: PanelBinding(),
     ),
-
     GetPage(
       name: Routes.ALT_CAMERA,
-      page: () => AlternateCameraPage(codDepartment: Get.parameters['codDepartment'] ?? ''),
+      page: () => AlternateCameraPage(
+          codDepartment: Get.parameters['codDepartment'] ?? ''),
     ),
     GetPage(
       name: Routes.MATERIAL,
@@ -58,7 +54,6 @@ class AppPages {
     GetPage(
       name: Routes.LOGIN,
       page: () => const LoginPage(),
-      ),
-   
+    ),
   ];
 }

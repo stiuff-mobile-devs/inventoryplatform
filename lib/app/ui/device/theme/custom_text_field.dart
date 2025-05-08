@@ -46,7 +46,7 @@ class CustomTextFieldState extends State<CustomTextField> {
             style: TextStyle(
               color: (widget.isReadOnly!
                   ? Colors.grey
-                  : Colors.blue.withOpacity(0.8)),
+                  : Colors.blue.withValues(alpha: 0.8)),
               fontSize: 16.0,
               fontWeight: FontWeight.bold,
               height: 0,
@@ -86,7 +86,7 @@ class CustomTextFieldState extends State<CustomTextField> {
                     borderSide: BorderSide(color: Colors.red, width: 2.0),
                   ),
                   filled: widget.isReadOnly!,
-                  fillColor: Colors.grey.withOpacity(0.2),
+                  fillColor: Colors.grey.withValues(alpha: 0.2),
                 ),
                 style: const TextStyle(
                   fontSize: 16.0,
