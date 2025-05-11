@@ -309,6 +309,14 @@ class MaterialController extends GetxController {
     try {
       MaterialModel retornado = await checkMaterial(tagController.text.trim());
       if (retornado.tag == "") {
+        List<String> imagens =
+        await _imageController.convertImagesToBase64(imagesList);
+
+        // Garantir que a lista tenha pelo menos 3 imagens
+        while (imagens.length < 3) {
+          imagens.add(""); // Adiciona strings vazias para evitar erros
+        }
+
         final box = Hive.box<MaterialModel>('materials-pending');
         final material = MaterialModel(
           title: nameController.text.trim(),
@@ -318,7 +326,7 @@ class MaterialController extends GetxController {
           geolocation: geolocation,
           observations: observationsController.text.trim(),
           inventoryId: inventorieId,
-          imagePaths: images.isNotEmpty ? images : null,
+          imagePaths: imagens,
         );
         await box.put(material.id, material);
         hiveMaterialId = material.id;
@@ -352,9 +360,9 @@ class MaterialController extends GetxController {
         "updated_by": FieldValue.serverTimestamp(),
       },
       "images": {
-        "image1": "",
-        "image2": "",
-        "image3": "",
+        "image1": material.imagePaths![0],
+        "image2": material.imagePaths![1],
+        "image3": material.imagePaths![2],
       },
       "active": true,
     });

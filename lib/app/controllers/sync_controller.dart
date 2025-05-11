@@ -115,8 +115,6 @@ class SyncController extends GetxController {
     if (!(await connectionService.checkInternetConnection())) {
       return;
     }
-
-    print('AAAAAAAAAAAAAAAAAAAAAA');
     await _syncPendingDepartments();
     await _syncPendingInventories();
     await _syncPendingMaterials();
