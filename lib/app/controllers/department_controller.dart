@@ -67,7 +67,7 @@ class DepartmentController extends GetxController {
         title: titleController.text.trim(),
         description: descriptionController.text.trim(),
         imagePath: image.value?.path,
-        created_by: authService.currentUser!.email ?? "E-mail não encontrado",
+        createdBy: authService.currentUser!.email ?? "E-mail não encontrado",
       );
 
       CustomDialogs.showLoadingDialog("Carregando informações para o banco remoto...");
@@ -171,10 +171,10 @@ class DepartmentController extends GetxController {
           "active": department.active,
           "imageURL": imagem[0],
           "reports": {
-            "created_at": department.created_at,
-            "updated_at": department.updated_at,
-            "created_by": department.created_by,
-            "updated_by": department.updated_by
+            "created_at": department.createdAt,
+            "updated_at": department.updatedAt,
+            "created_by": department.createdBy,
+            "updated_by": department.updatedBy
           }
         });
     } catch (e) {
@@ -190,10 +190,10 @@ class DepartmentController extends GetxController {
       title: dept['title'],
       description: dept['description'],
       active: dept['active'],
-      created_at: reports['created_at'].toDate(),
-      updated_at: reports['updated_at'].toDate(),
-      created_by: reports['created_by'],
-      updated_by: reports['updated_by'],
+      createdAt: reports['created_at'].toDate(),
+      updatedAt: reports['updated_at'].toDate(),
+      createdBy: reports['created_by'],
+      updatedBy: reports['updated_by'],
       imagePath: imagem[0],
     );
 
@@ -201,8 +201,9 @@ class DepartmentController extends GetxController {
   }
 
   List<DepartmentModel> getDepartments() {
-    final box = Hive.box<DepartmentModel>('departments');
-    return box.values.toList();
+    final syncedDeps = (Hive.box<DepartmentModel>('departments')).values.toList();
+    final pendingDeps = (Hive.box<DepartmentModel>('departments-pending')).values.toList();
+    return [...syncedDeps,...pendingDeps];
   }
 
   String? getDepartmentTitleById(String id) {

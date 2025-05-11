@@ -38,7 +38,7 @@ class InventoryController extends GetxController {
           description: descriptionController.text.trim(),
           revisionNumber: revisionController.text.trim(),
           departmentId: (context.widget as InventoryForm).cod,
-          created_by: authService.currentUser!.uid);
+          createdBy: authService.currentUser!.uid);
       CustomDialogs.showLoadingDialog(
           "Carregando informações para o banco remoto...");
 
@@ -147,10 +147,10 @@ class InventoryController extends GetxController {
         "departmentId": inventory.departmentId,
         "active": inventory.active,
         "reports": {
-          "created_at": inventory.created_at,
-          "updated_at": inventory.updated_at,
-          "created_by": inventory.created_by,
-          "updated_by": inventory.updated_by
+          "created_at": inventory.createdAt,
+          "updated_at": inventory.updatedAt,
+          "created_by": inventory.createdBy,
+          "updated_by": inventory.updatedBy
         }
       });
     } catch (e) {
@@ -169,10 +169,10 @@ class InventoryController extends GetxController {
         revisionNumber: inv['revisionNumber'],
         departmentId: inv['departmentId'],
         active: inv['active'],
-        created_at: reports['created_at'].toDate(),
-        updated_at: reports['updated_at'].toDate(),
-        created_by: reports['created_by'],
-        updated_by: reports['updated_by']);
+        createdAt: reports['created_at'].toDate(),
+        updatedAt: reports['updated_at'].toDate(),
+        createdBy: reports['created_by'],
+        updatedBy: reports['updated_by']);
 
     saveInventoryToLocal(inventory);
   }
@@ -182,8 +182,9 @@ class InventoryController extends GetxController {
   }
 
   List<InventoryModel> getInventories() {
-    final box = Hive.box<InventoryModel>('inventories');
-    return box.values.toList();
+    final syncedInv = (Hive.box<InventoryModel>('inventories')).values.toList();
+    final pendingInv = (Hive.box<InventoryModel>('inventories-pending')).values.toList();
+    return [...syncedInv,...pendingInv];
   }
 
   List<InventoryModel> getInventoriesByDepartment(String deptId) {

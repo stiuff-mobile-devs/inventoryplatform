@@ -60,8 +60,8 @@ class StatusChart extends StatelessWidget {
     final thirtyDaysAgo = now.subtract(const Duration(days: 30));
 
     return inventories.where((inventory) {
-      return inventory.created_at != null &&
-          inventory.created_at.isAfter(thirtyDaysAgo);
+      return inventory.createdAt != null &&
+          inventory.createdAt.isAfter(thirtyDaysAgo);
     }).length;
   }
 
@@ -70,8 +70,8 @@ class StatusChart extends StatelessWidget {
     final thirtyDaysAgo = now.subtract(const Duration(days: 30));
 
     return inventories.where((inventory) {
-      return inventory.updated_at != null &&
-          inventory.updated_at!.isAfter(thirtyDaysAgo) &&
+      return inventory.updatedAt != null &&
+          inventory.updatedAt!.isAfter(thirtyDaysAgo) &&
           inventory.active == true;
     }).length;
   }

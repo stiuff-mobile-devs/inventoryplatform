@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:inventoryplatform/app/controllers/connection_controller.dart';
+import 'package:inventoryplatform/app/controllers/sync_controller.dart';
 
 class ConnectionStatusIcon extends StatelessWidget {
   const ConnectionStatusIcon({super.key});
@@ -9,6 +10,7 @@ class ConnectionStatusIcon extends StatelessWidget {
   Widget build(BuildContext context) {
     // Certifique-se de que o ConnectionController está disponível
     final ConnectionController controller = Get.find<ConnectionController>();
+    final syncController = Get.find<SyncController>();
 
     return GetX<ConnectionController>(
       builder: (controller) {
@@ -25,6 +27,7 @@ class ConnectionStatusIcon extends StatelessWidget {
             ),
           );
         } else {
+          syncController.sync();
           return const Positioned(
             right: 20,
             child: Icon(

@@ -17,19 +17,19 @@ class MaterialModelAdapter extends TypeAdapter<MaterialModel> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return MaterialModel(
+      id: fields[0] as String?,
       tag: fields[1] as String?,
-      name: fields[2] as String,
+      title: fields[2] as String,
       observations: fields[3] as String,
-      geolocation: fields[5] as String,
+      geolocation: (fields[5] as Map).cast<String, String>(),
       description: fields[6] as String,
       inventoryId: fields[7] as String?,
       createdBy: fields[9] as String,
       imagePaths: (fields[8] as List?)?.cast<String>(),
-      updatedAt: fields[10] as DateTime?,
-      updatedBy: fields[11] as String?,
     )
-      ..id = fields[0] as String
       ..createdAt = fields[4] as DateTime
+      ..updatedAt = fields[10] as DateTime
+      ..updatedBy = fields[11] as String
       ..active = fields[12] as bool;
   }
 
@@ -42,7 +42,7 @@ class MaterialModelAdapter extends TypeAdapter<MaterialModel> {
       ..writeByte(1)
       ..write(obj.tag)
       ..writeByte(2)
-      ..write(obj.name)
+      ..write(obj.title)
       ..writeByte(3)
       ..write(obj.observations)
       ..writeByte(4)

@@ -21,37 +21,37 @@ class DepartmentModel extends HiveObject {
   bool active;
 
   @HiveField(5)
-  DateTime created_at;
+  DateTime createdAt;
 
   @HiveField(6)
-  DateTime updated_at;
+  DateTime updatedAt;
 
   @HiveField(7)
-  String created_by;
+  String createdBy;
 
   @HiveField(8)
-  String updated_by;
+  String updatedBy;
 
   DepartmentModel({
     required this.title,
     required this.description,
-    required this.created_by,
-    this.imagePath,
+    required this.createdBy,
+    required this.imagePath,
   }) : id = Uuid().v4(),
         active = true,
-        created_at = DateTime.now(),
-        updated_at = DateTime.now(),
-        updated_by = created_by;
+        createdAt = DateTime.now(),
+        updatedAt = DateTime.now(),
+        updatedBy = createdBy;
 
   DepartmentModel.existing({
     required this.id,
     required this.title,
     required this.description,
     required this.active,
-    required this.created_at,
-    required this.updated_at,
-    required this.created_by,
-    required this.updated_by,
-    this.imagePath,
+    required this.createdAt,
+    required this.updatedAt,
+    required this.createdBy,
+    required this.updatedBy,
+    required this.imagePath,
   });
 }

@@ -38,9 +38,9 @@ class _MaterialFormState extends State<MaterialForm> {
         );
         setState(() {
           _currentPosition = {
-            "Latitude": "${position.latitude}",
-            "Longitude": "${position.longitude}",
-            "Altitude": "${position.altitude}",
+            "latitude": "${position.latitude}",
+            "longitude": "${position.longitude}",
+            "altitude": "${position.altitude}",
           };
           _isLoading = false;
         });
@@ -236,17 +236,17 @@ class _MaterialFormState extends State<MaterialForm> {
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             Text(
-                              "Latitude: ${_currentPosition?["Latitude"] ?? "N/A"}",
+                              "Latitude: ${_currentPosition?["latitude"] ?? "N/A"}",
                               style: const TextStyle(fontSize: 16),
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              "Longitude: ${_currentPosition?["Longitude"] ?? "N/A"}",
+                              "Longitude: ${_currentPosition?["longitude"] ?? "N/A"}",
                               style: const TextStyle(fontSize: 16),
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              "Altitude: ${_currentPosition?["Altitude"] ?? "N/A"}",
+                              "Altitude: ${_currentPosition?["altitude"] ?? "N/A"}",
                               style: const TextStyle(fontSize: 16),
                             ),
                           ],
@@ -288,7 +288,7 @@ class _MaterialFormState extends State<MaterialForm> {
                     : ElevatedButton(
                         onPressed: () async {
                           if (_formKey.currentState!.validate()) {
-                            await controller.saveMaterial(context, geolocationToStr(), widget.codDepartment);
+                            await controller.saveMaterial(context, _currentPosition, widget.codDepartment);
                             Get.offNamed(Routes.ALT_CAMERA);
                           }
                         },

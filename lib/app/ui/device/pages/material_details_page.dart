@@ -81,7 +81,7 @@ class MaterialDetailsPage extends StatelessWidget {
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 8.0),
-                      Text('Nome: ${material.name}'),
+                      Text('Nome: ${material.title}'),
                       const SizedBox(height: 8.0),
                       Text('Tag: ${material.tag}'),
                       const SizedBox(height: 8.0),

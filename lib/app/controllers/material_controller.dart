@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -10,13 +9,13 @@ import 'package:inventoryplatform/app/controllers/inventory_controller.dart';
 import 'package:inventoryplatform/app/data/models/inventory_model.dart';
 import 'package:inventoryplatform/app/data/models/material_model.dart';
 import 'package:inventoryplatform/app/services/auth_service.dart';
-import 'package:inventoryplatform/app/ui/device/forms/material_form.dart';
+import 'package:inventoryplatform/app/services/connection_service.dart';
 import 'package:inventoryplatform/app/ui/device/pages/material_details_page.dart';
 import 'package:inventoryplatform/app/ui/device/theme/custom_bd_dialogs.dart';
 
 class MaterialController extends GetxController {
-  //final _panelController = Get.find<PanelController>();
   final _inventoryController = Get.find<InventoryController>();
+  final ConnectionService connectionService = ConnectionService();
 
   final TextEditingController tagController = TextEditingController();
   final TextEditingController dateController = TextEditingController();
@@ -39,7 +38,7 @@ class MaterialController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    fetchAndSaveAllMaterials(); // Chama a função ao inicializar o controlador
+    //fetchAndSaveAllMaterials(); // Chama a função ao inicializar o controlador
   }
 
   void onClose() {
@@ -116,11 +115,15 @@ class MaterialController extends GetxController {
 
     // Cria um material vazio
     MaterialModel material = MaterialModel(
-        name: '',
+        title: '',
         tag: '',
         createdBy: "",
         description: '',
-        geolocation: '',
+        geolocation: {
+          "altitude": '',
+          "longitude": '',
+          "latitude": '',
+        },
         observations: '',
         inventoryId: '',
         imagePaths: []);
@@ -132,7 +135,7 @@ class MaterialController extends GetxController {
   }
 
   Future<void> saveMaterialToFirestore(
-      var user, String geolocationStr, String inventoryId) async {
+      var user, Map<String,String>? geolocation, String inventoryId) async {
     try {
       List<String> imagens =
           await _imageController.convertImagesToBase64(imagesList);
@@ -150,14 +153,14 @@ class MaterialController extends GetxController {
       Map<String, dynamic> data = {
         "tag": tagController.text.trim(),
         "description": descriptionController.text.trim(),
-        "name": nameController.text.trim(),
-        "geolocation": geolocationStr,
+        "title": nameController.text.trim(),
+        "geolocation": geolocation,
         "observations": observationsController.text.trim(),
-        "inventory Id": inventoryId,
+        "inventoryId": inventoryId,
         "reports": {
           "created_at": FieldValue.serverTimestamp(),
           "created_by": user.email ?? "",
-          "updated_at": "",
+          "updated_at": FieldValue.serverTimestamp(),
           "updated_by": "",
         },
         "images": {
@@ -180,23 +183,23 @@ class MaterialController extends GetxController {
     }
   }
 
-  Future<void> saveMaterialToHive(var user, String geolocationStr,
+  Future<void> saveMaterialToHive(var user, Map<String,String>? geolocation,
       String inventorieId, BuildContext context) async {
     try {
       MaterialModel retornado = await checkMaterial(tagController.text.trim());
       if (retornado.tag == "") {
         final box = Hive.box<MaterialModel>('materials');
         final material = MaterialModel(
-          name: nameController.text.trim(),
+          title: nameController.text.trim(),
           tag: tagController.text.trim(),
           createdBy: user.email,
           description: descriptionController.text.trim(),
-          geolocation: geolocationStr,
+          geolocation: geolocation,
           observations: observationsController.text.trim(),
           inventoryId: inventorieId,
           imagePaths: images.isNotEmpty ? images : null,
         );
-        await box.add(material);
+        await box.put(material.id, material);
         hiveMaterialId = material.id;
         print(material.imagePaths);
       } else {
@@ -211,51 +214,58 @@ class MaterialController extends GetxController {
 
   // Função para salvar os dados
   Future<void> saveMaterial(
-      BuildContext context, String geolocationStr, String inventoryId) async {
+      BuildContext context, Map<String,String>? geolocation, String inventoryId) async {
     var user = _authService.currentUser;
     bool firestoreSuccess = false;
     bool hiveSuccess = false;
     CustomDialogs.showLoadingDialog(
         "Carregando informações para o banco local...");
 
-try {
-      await Future.delayed(const Duration(seconds: 2)); // Garante 2 segundos de exibição
-    await saveMaterialToHive(user, geolocationStr, inventoryId, context);
-      hiveSuccess = true;
+    if (await connectionService.checkInternetConnection()) {
+      try {
+        await Future.delayed(
+            const Duration(seconds: 2)); // Garante 2 segundos de exibição
+        await saveMaterialToHive(user, geolocation, inventoryId, context);
+        hiveSuccess = true;
+        CustomDialogs.closeDialog(); // Fecha o pop-up anterior
+        CustomDialogs.showSuccessDialog("Dados salvos localmente com sucesso!");
+        await Future.delayed(const Duration(seconds: 2));
+      } catch (e) {
+        CustomDialogs.closeDialog(); // Fecha o pop-up anterior
+        CustomDialogs.showErrorDialog("Erro ao enviar para o banco local!");
+        await Future.delayed(const Duration(seconds: 2));
+      }
+      // Exibe o pop-up inicial com barra de progresso
+      CustomDialogs.showLoadingDialog(
+          "Carregando informações para o banco online...");
+      try {
+        await Future.delayed(
+            const Duration(seconds: 2)); // Garante 2 segundos de exibição
+        await saveMaterialToFirestore(user, geolocation, inventoryId);
+        firestoreSuccess = true;
+        CustomDialogs.closeDialog(); // Fecha o pop-up anterior
+        CustomDialogs.showSuccessDialog("Dados salvos online com sucesso!");
+        await Future.delayed(const Duration(seconds: 2));
+      } catch (e) {
+        CustomDialogs.closeDialog(); // Fecha o pop-up anterior
+        CustomDialogs.showErrorDialog("Erro ao enviar para o banco online!");
+        await Future.delayed(const Duration(seconds: 2));
+      }
+      // Exibe o resultado final
       CustomDialogs.closeDialog(); // Fecha o pop-up anterior
-      CustomDialogs.showSuccessDialog("Dados salvos localmente com sucesso!");
-      await Future.delayed(const Duration(seconds: 2));
-    } catch (e) {
-      CustomDialogs.closeDialog(); // Fecha o pop-up anterior
-      CustomDialogs.showErrorDialog("Erro ao enviar para o banco local!");
-      await Future.delayed(const Duration(seconds: 2));
-    }
-    // Exibe o pop-up inicial com barra de progresso
-    CustomDialogs.showLoadingDialog("Carregando informações para o banco online...");
-    try {
-      await Future.delayed(const Duration(seconds: 2)); // Garante 2 segundos de exibição
-    await saveMaterialToFirestore(user, geolocationStr, inventoryId);
-      firestoreSuccess = true;
-      CustomDialogs.closeDialog(); // Fecha o pop-up anterior
-      CustomDialogs.showSuccessDialog("Dados salvos online com sucesso!");
-      await Future.delayed(const Duration(seconds: 2));
-    } catch (e) {
-      CustomDialogs.closeDialog(); // Fecha o pop-up anterior
-      CustomDialogs.showErrorDialog("Erro ao enviar para o banco online!");
-      await Future.delayed(const Duration(seconds: 2));
-    }
-    // Exibe o resultado final
-    CustomDialogs.closeDialog(); // Fecha o pop-up anterior
-    if (firestoreSuccess && hiveSuccess) {
-      CustomDialogs.showSuccessDialog("Dados enviados com sucesso!");
-    } else if (firestoreSuccess || hiveSuccess) {
-      CustomDialogs.showInfoDialog(
-        firestoreSuccess
-            ? "Apenas os dados do banco online foram enviados!"
-            : "Apenas os dados do banco local foram enviados!",
-      );
+      if (firestoreSuccess && hiveSuccess) {
+        CustomDialogs.showSuccessDialog("Dados enviados com sucesso!");
+      } else if (firestoreSuccess || hiveSuccess) {
+        CustomDialogs.showInfoDialog(
+          firestoreSuccess
+              ? "Apenas os dados do banco online foram enviados!"
+              : "Apenas os dados do banco local foram enviados!",
+        );
+      } else {
+        CustomDialogs.showErrorDialog("Erro ao enviar os dados!");
+      }
     } else {
-      CustomDialogs.showErrorDialog("Erro ao enviar os dados!");
+      await savePendingMaterial(user, geolocation, inventoryId, context);
     }
 
     await Future.delayed(const Duration(seconds: 2));
@@ -263,9 +273,107 @@ try {
     clearData();
   }
 
-  List<MaterialModel> getMaterials() {
+  Future<void> saveExistingMaterialToLocal(String id, Map<String,dynamic> mat, List<String> imagem) async {
+    final reports = mat['reports'];
+
+    MaterialModel material = MaterialModel.existing(
+      id: id,
+      title: mat['title'],
+      description: mat['description'],
+      active: mat['active'],
+      createdAt: reports['created_at'].toDate(),
+      updatedAt: reports['updated_at'].toDate(),
+      createdBy: reports['created_by'],
+      updatedBy: reports['updated_by'],
+      imagePaths: [
+        imagem[0],
+        imagem[1],
+        imagem[2],
+      ],
+      observations: mat['observations'],
+      geolocation: {
+        "altitude": mat['geolocation']['altitude'],
+        "latitude": mat['geolocation']['latitude'],
+        "longitude": mat['geolocation']['longitude']
+      },
+      inventoryId: mat['inventoryId'],
+      tag: mat['tag']
+    );
+
     final box = Hive.box<MaterialModel>('materials');
-    return box.values.toList();
+    box.put(material.id,material);
+  }
+
+  Future<void> savePendingMaterial(var user, Map<String,String>? geolocation,
+      String inventorieId, BuildContext context) async {
+    try {
+      MaterialModel retornado = await checkMaterial(tagController.text.trim());
+      if (retornado.tag == "") {
+        final box = Hive.box<MaterialModel>('materials-pending');
+        final material = MaterialModel(
+          title: nameController.text.trim(),
+          tag: tagController.text.trim(),
+          createdBy: user.email,
+          description: descriptionController.text.trim(),
+          geolocation: geolocation,
+          observations: observationsController.text.trim(),
+          inventoryId: inventorieId,
+          imagePaths: images.isNotEmpty ? images : null,
+        );
+        await box.put(material.id, material);
+        hiveMaterialId = material.id;
+        print(material.imagePaths);
+      } else {
+        navigateToMaterialDetails(context, retornado);
+      }
+
+
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
+  Future<void> syncMaterialToFirestore(MaterialModel material) async {
+    var user = _authService.currentUser;
+    await FirebaseFirestore.instance
+        .collection("materials")
+        .doc(material.id)
+        .set({
+      "tag": material.tag,
+      "description":  material.description,
+      "title":  material.title,
+      "geolocation":  material.geolocation,
+      "observations":  material.observations,
+      "inventoryId":  material.inventoryId,
+      "reports": {
+        "created_at": FieldValue.serverTimestamp(),
+        "created_by": user?.email ?? "",
+        "updated_at": FieldValue.serverTimestamp(),
+        "updated_by": FieldValue.serverTimestamp(),
+      },
+      "images": {
+        "image1": "",
+        "image2": "",
+        "image3": "",
+      },
+      "active": true,
+    });
+    final box = Hive.box<MaterialModel>('materials');
+    final boxPending = Hive.box<MaterialModel>('materials-pending');
+    await boxPending.delete(material.id);
+    box.put(material.id,material);
+  }
+
+  List<MaterialModel> getMaterials() {
+    final synced = (Hive.box<MaterialModel>('materials')).values.toList();
+    final pending = (Hive.box<MaterialModel>('materials-pending')).values.toList();
+    return [...synced,...pending];
+  }
+
+  MaterialModel? getMaterialById(String materialId) {
+    final box = Hive.box<MaterialModel>('materials');
+    final material = box.get(materialId);
+    return material;
   }
 
   List<MaterialModel> getMaterialsByDepartment(String deptId) {
@@ -325,13 +433,13 @@ try {
             (await _imageController.convertBase64ToImages(allimages));
         final material = MaterialModel(
           id: doc.id,
-          name: data['name'] ?? '',
+          title: data['title'] ?? '',
           tag: data['tag'] ?? '',
           createdBy: data['reports']?['created_by'] ?? '',
           description: data['description'] ?? '',
           geolocation: data['geolocation'] ?? '',
           observations: data['observations'] ?? '',
-          inventoryId: data['inventory']?['inventory Id'] ?? '',
+          inventoryId: data['inventory']?['inventoryId'] ?? '',
           imagePaths: [
             imagens[0],
             imagens[1],
@@ -355,7 +463,7 @@ try {
     final materials = box.values.toList();
 
     for (var material in materials) {
-      print('Material: ${material.name}');
+      print('Material: ${material.title}');
       print('Image Paths: ${material.imagePaths}');
     }
   }

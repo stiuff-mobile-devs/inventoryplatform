@@ -12,16 +12,16 @@ class MaterialModel extends HiveObject {
   String? tag;
 
   @HiveField(2)
-  String name;
+  String title;
 
   @HiveField(3)
   String observations;
 
   @HiveField(4)
-  DateTime createdAt = DateTime.now();
+  DateTime createdAt;
 
   @HiveField(5)
-  String geolocation;
+  Map<String,String>? geolocation;
 
   @HiveField(6)
   String description;
@@ -36,26 +36,43 @@ class MaterialModel extends HiveObject {
   String createdBy;
 
   @HiveField(10)
-  DateTime? updatedAt;
+  DateTime updatedAt;
 
   @HiveField(11)
-  String? updatedBy;
+  String updatedBy;
 
   @HiveField(12)
-  bool active = true;
+  bool active;
 
   MaterialModel({
     String? id, // Torna o ID opcional
     this.tag,
-    required this.name,
+    required this.title,
     required this.observations,
-    required this.geolocation,
+    this.geolocation,
     required this.description,
     required this.inventoryId,
     required this.createdBy,
     this.imagePaths,
-    this.updatedAt,
-    this.updatedBy,
+  }) : id = id ?? Uuid().v4(), // Gera um ID automaticamente se não for fornecido
+        createdAt = DateTime.now(),
+        updatedAt = DateTime.now(),
+        updatedBy = createdBy,
+        active = true;
 
-  }) : id = id ?? Uuid().v4(); // Gera um ID automaticamente se não for fornecido
+  MaterialModel.existing({
+    required this.id,
+    required this.title,
+    required this.description,
+    required this.observations,
+    required this.inventoryId,
+    required this.active,
+    required this.imagePaths,
+    this.geolocation,
+    required this.createdAt,
+    required this.updatedAt,
+    required this.createdBy,
+    required this.updatedBy,
+    this.tag
+  });
 }
