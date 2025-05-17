@@ -1,7 +1,11 @@
+import 'dart:convert';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:path/path.dart' as p;
 import 'package:intl/intl.dart';
 import 'package:inventoryplatform/app/ui/device/theme/temporary_message_display.dart';
@@ -15,12 +19,28 @@ import 'package:inventoryplatform/app/data/models/inventory_model.dart';
 import 'package:inventoryplatform/app/data/models/material_model.dart';
 import 'package:inventoryplatform/app/routes/app_routes.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
+import 'package:googleapis/drive/v3.dart' as drive;
 
 class MaterialPage extends StatefulWidget {
   const MaterialPage({super.key});
 
   @override
   State<MaterialPage> createState() => _MaterialPageState();
+}
+
+class AuthenticatedClient extends http.BaseClient {
+  final Map<String, String> headers;
+  final http.Client _inner = http.Client();
+
+  AuthenticatedClient(this.headers);
+
+  @override
+  Future<http.StreamedResponse> send(http.BaseRequest request) {
+    request.headers.addAll(headers);
+    return _inner.send(request);
+  }
 }
 
 class _MaterialPageState extends State<MaterialPage> {
@@ -30,6 +50,7 @@ class _MaterialPageState extends State<MaterialPage> {
   List<InventoryModel> _allInventories = [];
 
   int _inventoryIndex = 0;
+  bool _isLoading = false; // Variável para controlar o estado de carregamento
 
   @override
   void initState() {
@@ -74,10 +95,11 @@ class _MaterialPageState extends State<MaterialPage> {
         children: [
           _buildHeader(department.title),
           _buildInventoryOption(),
-          _allMaterials.isNotEmpty ? _buildItemList() :
-          const TemporaryMessageDisplay(
-            message: "Não há itens para serem listados.",
-          ),
+          _allMaterials.isNotEmpty
+              ? _buildItemList()
+              : const TemporaryMessageDisplay(
+                  message: "Não há itens para serem listados.",
+                ),
         ],
       ),
     );
@@ -172,19 +194,18 @@ class _MaterialPageState extends State<MaterialPage> {
             shrinkWrap: true,
             itemCount: _allMaterials.length,
             itemBuilder: (context, index) {
-              return InkWell (
-                onTap: () {
-                  expandMaterialDetails(_allMaterials[index]);
-                },
-                child: Row(children: [
-                  const SizedBox(height: 30),
-                  Expanded(flex: 2, child: Text(_allMaterials[index].tag!)),
-                  Expanded(child: Text(_allMaterials[index].name)),
-                  Expanded(
-                      child:
-                      Text(formatDatePortuguese(_allMaterials[index].createdAt))),
-                ])
-              );
+              return InkWell(
+                  onTap: () {
+                    expandMaterialDetails(_allMaterials[index]);
+                  },
+                  child: Row(children: [
+                    const SizedBox(height: 30),
+                    Expanded(flex: 2, child: Text(_allMaterials[index].tag!)),
+                    Expanded(child: Text(_allMaterials[index].name)),
+                    Expanded(
+                        child: Text(formatDatePortuguese(
+                            _allMaterials[index].createdAt))),
+                  ]));
             },
             separatorBuilder: (context, index) {
               return const Divider(
@@ -196,12 +217,11 @@ class _MaterialPageState extends State<MaterialPage> {
             },
           ),
           const SizedBox(height: 20.0),
-          Center (
-            child: ElevatedButton(
+          Center(
+              child: ElevatedButton(
             onPressed: openDialog,
             child: const Text("Gerar PDF"),
-            )
-          )
+          ))
         ],
       ),
     );
@@ -236,44 +256,136 @@ class _MaterialPageState extends State<MaterialPage> {
     await Share.shareXFiles([XFile(filePath)]);
   }
 
+  Future<void> savePDFDrive(String action) async {
+    try {
+      // Gera o PDF
+      final pdf = generatePdf();
+      final Uint8List pdfData = await pdf.save();
+
+      // Salva o PDF temporariamente
+      final tempDir = await getTemporaryDirectory();
+      final filePath = "${tempDir.path}/relatorio.pdf";
+      final file = File(filePath);
+      await file.writeAsBytes(pdfData);
+
+      if (action == "save") {
+        // Salvar localmente
+        String? directory = await FilePicker.platform.getDirectoryPath();
+        if (directory != null) {
+          final localFilePath = p.join(directory, "relatório.pdf");
+          final localFile = File(localFilePath);
+          await localFile.writeAsBytes(pdfData);
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Relatório salvo com sucesso.')),
+          );
+        }
+      } else if (action == "share") {
+        // Compartilhar PDF
+        await Share.shareXFiles([XFile(filePath)]);
+      } else if (action == "drive") {
+        // Enviar para o Google Drive
+        final googleUser = await GoogleSignIn(
+          scopes: [
+            drive.DriveApi.driveFileScope,
+            'https://www.googleapis.com/auth/drive.file',
+          ],
+        ).signIn();
+
+        if (googleUser == null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Login no Google cancelado.')),
+          );
+          return;
+        }
+
+        final googleAuth = await googleUser.authentication;
+        final authHeaders = {
+          'Authorization': 'Bearer ${googleAuth.accessToken}',
+        };
+
+        final client = AuthenticatedClient(authHeaders);
+        final driveApi = drive.DriveApi(client);
+
+        final driveFile = drive.File();
+        driveFile.name = "relatorio.pdf";
+
+        final response = await driveApi.files.create(
+          driveFile,
+          uploadMedia: drive.Media(file.openRead(), file.lengthSync()),
+        );
+
+        if (response.id != null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+                content:
+                    Text('Arquivo enviado para o Google Drive com sucesso!')),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+                content:
+                    Text('Falha ao enviar o arquivo para o Google Drive.')),
+          );
+        }
+      }
+    } catch (e) {
+      debugPrint('Erro: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erro: $e')),
+      );
+    }
+  }
+
   pw.Document generatePdf() {
     final pdf = pw.Document();
 
     pdf.addPage(
       pw.Page(
         build: (pw.Context context) {
-          return pw.Wrap(
+          return pw.Wrap(children: [
+            pw.Column(
               children: [
-                pw.Column (
+                pw.Center(child: pw.Text("RELATÓRIO DE MATERIAIS")),
+                _inventoryIndex != 0
+                    ? pw.Center(
+                        child:
+                            pw.Text(_allInventories[_inventoryIndex - 1].title))
+                    : pw.Center(child: pw.Text("")),
+                pw.SizedBox(height: 20.0),
+                pw.Row(
                   children: [
-                    pw.Center (child: pw.Text("RELATÓRIO DE MATERIAIS")),
-                    _inventoryIndex != 0 ? pw.Center (child: pw.Text(_allInventories[_inventoryIndex-1].title)) :
-                                            pw.Center (child: pw.Text("")),
-                    pw.SizedBox(height: 20.0),
-                    pw.Row (
-                      children: [
-                        pw.Expanded(flex: 2, child: pw.Text("Código de Barras",)),
-                        pw.Expanded(child: pw.Text("Título",)),
-                        pw.Expanded(child: pw.Text("Adicionado", )),
-                      ],
-                    ),
-                    pw.Divider( thickness: 1, indent: 1, endIndent: 1),
-                    pw.ListView.builder(
-                      itemCount: _allMaterials.length,
-                      itemBuilder: (context, index) {
-                        return pw.Row (
-                            children: [
-                              pw.Expanded(flex: 2, child: pw.Text(_allMaterials[index].tag!)),
-                              pw.Expanded(child: pw.Text(_allMaterials[index].name)),
-                              pw.Expanded(child: pw.Text(formatDatePortuguese(_allMaterials[index].createdAt))),
-                            ]
-                        );
-                      },
-                    )
+                    pw.Expanded(
+                        flex: 2,
+                        child: pw.Text(
+                          "Código de Barras",
+                        )),
+                    pw.Expanded(
+                        child: pw.Text(
+                      "Título",
+                    )),
+                    pw.Expanded(
+                        child: pw.Text(
+                      "Adicionado",
+                    )),
                   ],
                 ),
-              ]
-          );
+                pw.Divider(thickness: 1, indent: 1, endIndent: 1),
+                pw.ListView.builder(
+                  itemCount: _allMaterials.length,
+                  itemBuilder: (context, index) {
+                    return pw.Row(children: [
+                      pw.Expanded(
+                          flex: 2, child: pw.Text(_allMaterials[index].tag!)),
+                      pw.Expanded(child: pw.Text(_allMaterials[index].name)),
+                      pw.Expanded(
+                          child: pw.Text(formatDatePortuguese(
+                              _allMaterials[index].createdAt))),
+                    ]);
+                  },
+                )
+              ],
+            ),
+          ]);
         },
       ),
     );
@@ -351,52 +463,77 @@ class _MaterialPageState extends State<MaterialPage> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text("O que fazer com o PDF?"),
-        actions: [
-          Center (
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    minimumSize: const Size(180, 40),
+        content: _isLoading
+            ? const Center(
+                child: CircularProgressIndicator(), // Exibe o loading
+              )
+            : null,
+        actions: _isLoading
+            ? [
+                const Center(
+                  child: CircularProgressIndicator(), // Exibe o loading
+                )
+              ] // Remove os botões enquanto está carregando
+            : [
+                Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          minimumSize: const Size(180, 40),
+                        ),
+                        onPressed: () async {
+                          setState(() {
+                            _isLoading = true; // Ativa o loading
+                          });
+                          await savePdf();
+                          setState(() {
+                            _isLoading = false; // Desativa o loading
+                          });
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                                content: Text('Relatório salvo com sucesso.')),
+                          );
+                          Navigator.pop(context);
+                        },
+                        child: const Text("Salvar"),
+                      ),
+                      const SizedBox(width: 10),
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          minimumSize: const Size(180, 40),
+                        ),
+                        onPressed: () {
+                          sharePdf();
+                        },
+                        child: const Text("Compartilhar"),
+                      ),
+                      const SizedBox(width: 10),
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          minimumSize: const Size(180, 40),
+                        ),
+                        onPressed: () async {
+                          setState(() {
+                            _isLoading = true; // Ativa o loading
+                          });
+                          await savePDFDrive("drive");
+                          setState(() {
+                            _isLoading = false; // Desativa o loading
+                          });
+                          Navigator.pop(context);
+                        },
+                        child: const Text("Salvar no Google Drive"),
+                      ),
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text("Fechar"),
+                      ),
+                    ],
                   ),
-                  onPressed: () async {
-                    await savePdf();
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Relatório salvo com sucesso.')),
-                    );
-                    Navigator.pop(context);
-                  },
-                  child: const Text("Salvar"),
-                ),
-                const SizedBox(width: 10),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    minimumSize: const Size(180, 40),
-                  ),
-                  onPressed: () {
-                    sharePdf();
-                  },
-                  child: const Text("Compartilhar"),
-                ),
-                const SizedBox(width: 10),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    minimumSize: const Size(180, 40),
-                  ),
-                  onPressed: () {
-
-                  },
-                  child: const Text("Salvar no Google Drive"),
-                ),
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text("Fechar"),
-                ),
-              ]
-            ),
-          )
-        ],
+                )
+              ],
       ),
     );
   }
