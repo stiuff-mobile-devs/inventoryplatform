@@ -40,7 +40,7 @@ class _InventoryPageState extends State<InventoryPage> {
     return RefreshIndicator(
       backgroundColor: Colors.white,
       onRefresh: _panelController.refreshPage,
-      child: Column(
+        child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildHeader(context),
@@ -53,6 +53,7 @@ class _InventoryPageState extends State<InventoryPage> {
           _buildList(),
         ],
       ),
+
     );
   }
 

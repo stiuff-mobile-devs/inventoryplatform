@@ -88,29 +88,39 @@ class DepartmentForm extends StatelessWidget {
               Center(
                 child: Column(
                   children: [
-                    Obx(
-                      () => controller.image.value == null
-                          ? Container(
-                              height: 200,
-                              width: 200,
-                              decoration: BoxDecoration(
-                                border: Border.all(color: Colors.grey),
-                                borderRadius: BorderRadius.circular(8.0),
+                    Obx(() {
+                      final imageFile = controller.image.value;
+                      if (imageFile == null) {
+                        return Container(
+                          height: 200,
+                          width: 200,
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.grey),
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                          child: const Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                "Nenhuma imagem selecionada",
+                                textAlign: TextAlign.center,
                               ),
-                              child: const Center(
-                                child: Text("Nenhuma imagem selecionada"),
-                              ),
-                            )
-                          : ClipRRect(
-                              borderRadius: BorderRadius.circular(8.0),
-                              child: Image.file(
-                                controller.image.value! as File,
-                                height: 200,
-                                width: 200,
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                    ),
+                            ],
+                          ),
+                        );
+                      }
+                      else {
+                        return ClipRRect(
+                          borderRadius: BorderRadius.circular(8.0),
+                          child: Image.file(
+                            imageFile,
+                            height: 200,
+                            width: 200,
+                            fit: BoxFit.cover,
+                          ),
+                        );
+                      }
+                    }),
                     const SizedBox(height: 10),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,

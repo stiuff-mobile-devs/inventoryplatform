@@ -220,32 +220,37 @@ class LoginPageState extends State<LoginPage> {
   Widget _buildLoginDetails(Orientation orientation, double availableWidth) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         orientation == Orientation.landscape
             ? Padding(
-                padding: const EdgeInsets.only(left: 16.0, top: 8.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Faça o seu login.',
-                      style:
-                          Theme.of(context).textTheme.headlineSmall?.copyWith(
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold,
-                              ),
-                    ),
-                    Divider(
-                      thickness: 5,
-                      color: Colors.black,
-                      endIndent: availableWidth * 0.65,
-                    ),
-                  ],
+          padding: const EdgeInsets.only(top: 8.0),
+          child: Column(
+            children: [
+              Text(
+                'Faça o seu login.',
+                style:
+                Theme.of(context).textTheme.headlineSmall?.copyWith(
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
                 ),
-              )
+              ),
+              const SizedBox(height: 5),
+              Container(
+                height: 3,
+                width: 190,
+                decoration: BoxDecoration(
+                  color: Colors.black,
+                  borderRadius: BorderRadius.circular(5),
+
+                ),
+              ),
+            ],
+          ),
+        )
             : const SizedBox.shrink(),
         Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8.0),
+          padding: const EdgeInsets.symmetric(vertical: 10.0),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -258,6 +263,7 @@ class LoginPageState extends State<LoginPage> {
       ],
     );
   }
+
 
   Widget _buildDivider(double availableWidth) {
     return Container(

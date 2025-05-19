@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_state_manager/get_state_manager.dart';
@@ -223,13 +222,16 @@ class _DepartmentConfigPageState extends State<DepartmentConfigPage> {
     editController.setInitialData(_panelController.getCurrentDepartment()!);
     final department = _panelController.getCurrentDepartment()!;
 
-    return Obx(() => Column(
+    return Obx(() =>
+    SingleChildScrollView(
+      child:
+        Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             editController.isEditing.value
                 ? _editingDepartment()
                 : _showDepartment(department),
           ],
-        ));
+        )));
   }
 }
