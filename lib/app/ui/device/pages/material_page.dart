@@ -307,7 +307,8 @@ class _MaterialPageState extends State<MaterialPage> {
         final driveApi = drive.DriveApi(client);
 
         final driveFile = drive.File();
-        driveFile.name = "relatorio.pdf";
+        final timestamp = DateFormat('yyyyMMdd_HHmmss').format(DateTime.now());
+        driveFile.name = "relatorio_$timestamp.pdf";
 
         final response = await driveApi.files.create(
           driveFile,
