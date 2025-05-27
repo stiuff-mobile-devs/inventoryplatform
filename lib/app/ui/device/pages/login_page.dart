@@ -9,6 +9,7 @@ import 'package:inventoryplatform/app/ui/device/theme/credentials_model.dart';
 import 'package:inventoryplatform/app/ui/device/theme/google_login_button.dart';
 import 'package:inventoryplatform/app/ui/device/theme/loading_dialog.dart';
 import 'package:inventoryplatform/app/ui/device/theme/login_header.dart';
+import 'package:inventoryplatform/app/controllers/version_controller.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -52,6 +53,8 @@ class LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    final VersionController versionController = Get.put(VersionController());
+
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
@@ -61,15 +64,33 @@ class LoginPageState extends State<LoginPage> {
             end: Alignment.bottomRight,
           ),
         ),
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: OrientationBuilder(
-              builder: (context, orientation) {
-                return _buildContent(orientation);
-              },
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: OrientationBuilder(
+                    builder: (context, orientation) {
+                      return _buildContent(orientation);
+                    },
+                  ),
+                ),
+              ),
             ),
-          ),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 16.0),
+              child: Text(
+                versionController.version, // Acesse o valor diretamente
+                style: const TextStyle(
+                  fontSize: 10,
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

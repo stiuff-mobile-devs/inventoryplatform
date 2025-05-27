@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:inventoryplatform/app/controllers/sidebar_controller.dart';
+import 'package:inventoryplatform/app/controllers/version_controller.dart';
 import 'package:inventoryplatform/app/routes/app_routes.dart';
 import 'package:inventoryplatform/app/services/utils_service.dart';
 import 'package:sidebarx/sidebarx.dart';
@@ -13,6 +14,8 @@ class CustomSidebar extends StatelessWidget {
   CustomSidebar({super.key});
   final controller = Get.put(SidebarController());
   final UtilsService utilsService = UtilsService();
+  final VersionController _versionController =
+      Get.put(VersionController()); // Instância do VersionController
 
   final SidebarXController sidebarController =
       SidebarXController(selectedIndex: 0, extended: true);
@@ -127,6 +130,11 @@ class CustomSidebar extends StatelessWidget {
             Get.offAllNamed(Routes.SETTINGS);
             sidebarController.selectIndex(2);
           },
+        ),
+        SidebarXItem(
+          icon: Icons.info,
+          label: 'Versão ${_versionController.version}',
+          onTap: null,
         ),
         SidebarXItem(
           icon: Icons.logout,

@@ -6,7 +6,6 @@ import 'package:inventoryplatform/app/routes/app_routes.dart';
 import 'package:inventoryplatform/app/ui/device/theme/base_scaffold.dart';
 import 'package:inventoryplatform/app/ui/device/theme/carousel_section.dart'
     as w;
-import 'package:inventoryplatform/app/ui/device/components/usuarios_dialog.dart';
 
 class HomePage extends StatelessWidget {
   final HomeController controller = Get.put(HomeController());

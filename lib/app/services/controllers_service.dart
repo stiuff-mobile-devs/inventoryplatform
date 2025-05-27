@@ -8,11 +8,13 @@ import 'package:inventoryplatform/app/controllers/login_controller.dart';
 import 'package:inventoryplatform/app/controllers/material_controller.dart';
 import 'package:inventoryplatform/app/controllers/panel_controller.dart';
 import 'package:inventoryplatform/app/controllers/sync_controller.dart';
+import 'package:inventoryplatform/app/controllers/version_controller.dart';
 import 'package:inventoryplatform/app/services/auth_service.dart';
 import 'package:inventoryplatform/app/services/error_service.dart';
 
 class ControllerInitializer {
   static Future<void> initialize() async {
+    Get.put(VersionController());
     Get.put(ImageController());
     Get.put(AuthService());
     Get.put(DepartmentController());
